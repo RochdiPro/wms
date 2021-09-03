@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-ajouter-bon-reception',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AjouterBonReceptionComponent implements OnInit {
 
-  constructor() { }
+  firstFormGroup:any= FormGroup;
+  secondFormGroup:any= FormGroup;
 
-  ngOnInit(): void {
+  constructor(private _formBuilder: FormBuilder) {}
+
+  ngOnInit() {
+    this.firstFormGroup = this._formBuilder.group({
+      firstCtrl: ['', Validators.required]
+    });
+    this.secondFormGroup = this._formBuilder.group({
+      secondCtrl: ['', Validators.required]
+    });
   }
-
 }

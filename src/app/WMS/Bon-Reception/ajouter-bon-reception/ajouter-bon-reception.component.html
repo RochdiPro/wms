@@ -1,1 +1,27 @@
-<p>ajouter-bon-reception works!</p>
+<mat-horizontal-stepper>
+    <mat-step label="Step 1" state="phone">
+      <p>Put down your phones.</p>
+      <div>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Step 2" state="chat">
+      <p>Socialize with each other.</p>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+      </div>
+    </mat-step>
+    <mat-step label="Step 3">
+      <p>You're welcome.</p>
+    </mat-step>
+  
+    <!-- Icon overrides. -->
+    <ng-template matStepperIcon="phone">
+      <mat-icon>call_end</mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="chat">
+      <mat-icon>forum</mat-icon>
+    </ng-template>
+  </mat-horizontal-stepper>
+  

@@ -12,9 +12,11 @@ import { AjouterBonReceptionComponent } from './WMS/Bon-Reception/ajouter-bon-re
 import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-reception/lister-bon-reception.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
- 
- 
-@NgModule({
+import {MatIconModule} from '@angular/material/icon';
+import {MatStepperModule} from '@angular/material/stepper';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+@NgModule({ 
   declarations: [
     AppComponent,
     MenuComponent,
@@ -26,12 +28,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MenuWmsComponent,
    
   ],
+  exports: [
+     
+     
+     
+  ],
   imports: [
     HttpClientModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    
+    MatIconModule,
+    MatStepperModule,
+    FormsModule, ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
