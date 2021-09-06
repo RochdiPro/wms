@@ -15,6 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from '@angular/material/icon';
 import {MatStepperModule} from '@angular/material/stepper';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSelectModule  } from '@angular/material/select';
 
 @NgModule({ 
   declarations: [
@@ -41,6 +42,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatIconModule,
     MatStepperModule,
     FormsModule, ReactiveFormsModule,
+    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
