@@ -70,15 +70,42 @@ export class BonReceptionServiceService {
         }, observe: 'body'
       }).pipe(catchError(this.handleError))
   }
+  // get data from bon de retour
+  Quantite_Fiche_Technique_Fiche_Bon_Retour(id: any): Observable<any> {
+    return this.httpClient.get(ERP + 'Quantite_Fiche_Technique_Fiche_Bon_Retour/'
+      , {
+        params: {
+          Id_Bon: id
+        }, observe: 'body'
+      }).pipe(catchError(this.handleError))
+  }
+  // get data from bon de transfert 
+  Quantite_Fiche_Technique_Fiche_Bon_Transfert(id: any): Observable<any> {
+    return this.httpClient.get(ERP + 'Quantite_Fiche_Technique_Fiche_Bon_Transfert/'
+      , {
+        params: {
+          Id_Bon: id
+        }, observe: 'body'
+      }).pipe(catchError(this.handleError))
+  }
+  // get data from bon de importation 
+  Quantite_Fiche_Technique_Fiche_Bon_Entree_Importation(id: any): Observable<any> {
+    return this.httpClient.get(ERP + 'Quantite_Fiche_Technique_Fiche_Bon_Entree_Importation/'
+      , {
+        params: {
+          Id_Bon: id
+        }, observe: 'body'
+      }).pipe(catchError(this.handleError))
+  }
 
- 
+ // get famaille 
   Famille_Logistique(): Observable<any> {
     return this.httpClient.get(ERP + 'Categorie_Famille_Logistique/').pipe(
       catchError(this.handleError)
 
     );
   }
-
+   // get sous famaille apartire de famaille 
   sousFamille(id: any): Observable<any> {
     return this.httpClient.get(ERP + 'Categorie_Sous_Famille_Logistique/'
       , {
@@ -88,6 +115,46 @@ export class BonReceptionServiceService {
       }).pipe(catchError(this.handleError))
   }
 
+  // create bon reception 
+  createBonReception(form: any): Observable<Object> {
+    return this.httpClient.post(ERP + "Creer_Bon_Reception", form);
+
+  }
+  // get bon entree local by id  
+  get_Information_Bon_entree_Local (id: any): Observable<any> {
+    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Local" , {
+      params: {
+        Id_Bon: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError))    
+  }
+
+   // get bon entree Importation by id  
+   get_Information_Bon_entree_Importation(id: any): Observable<any> {
+    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Importation" , {
+      params: {
+        Id_Bon: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError))    
+  }
+
+   // get bon   transfert by id  
+   get_Information_Bon_transfert(id: any): Observable<any> {
+    return this.httpClient.get(ERP + "Bon_Transfert" , {
+      params: {
+        Id : id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError))    
+  }
+
+   // get bon   retour by id   
+   get_Information_Bon_retour(id: any): Observable<any> {
+    return this.httpClient.get(ERP + "Bon_Retour" , {
+      params: {
+        Id : id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError))    
+  }
 /*S
   Detail_BonReception(Id: any): Observable<any> {
 
