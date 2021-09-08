@@ -1,0 +1,63 @@
+<h1 mat-dialog-title>Nouveau Bon Rejet</h1>
+
+<div mat-dialog-content>
+    <div class="row">
+        <div class="table-responsive">
+           <table class="mb-0 table">
+                <thead>
+               <tr>
+                    
+                    <th>ID Article</th>
+                    <th>Article</th>
+                    <th>Qte</th>
+                    <th>Controle Qualitatif</th>
+                    <th>Controle Quantitatif</th>
+                     
+
+                </tr>
+               </thead>
+               <tbody>
+                 <tr  *ngFor = "let obj  of obj_artciles; let i=index">
+                 
+                     <td>{{obj.id}} </td>
+                     <td>{{obj.nom}} </td>
+                     <td>{{obj.qte}} </td>              
+                             
+                     <td>
+                           <div class="checkbox">
+                        <label for="checkbox_input4">
+                            <input id="checkbox_input4"   [disabled]="true" type="checkbox"  [checked]="obj.controle_qt"/>
+                            <i class="custom-checkbox"></i>
+                         </label>
+                    </div>  
+                   </td>     
+                     <td>
+                        <div class="checkbox">
+                            <label for="checkbox_input4">
+                                <input id="checkbox_input4"  [disabled]="true"  type="checkbox"  [checked]="obj.controle_tech" />
+                                <i class="custom-checkbox"></i>
+                             </label>
+                        </div>   
+                        
+                        </td>
+                     <td>                      
+                    </td>
+
+
+               </tr>
+              
+               </tbody>
+           </table>
+           <textarea rows="6" cols="60" #reclamation></textarea>
+       </div>
+    
+     </div>
+
+
+</div>
+
+<div mat-dialog-actions class="float-right">
+    <button class="mb-2 mr-2 btn btn-success" (click)=" onSubmit(reclamation.value)">Valider</button>
+    <button class="mb-2 mr-2 btn btn-primary" (click)="close()">Fermer</button>
+
+</div>

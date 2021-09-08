@@ -26,7 +26,6 @@
                   <table class="mb-0 table">
                      <thead>
                         <tr>
-
                            <th>ID Bon Entrée </th>
                            <th>Local</th>
                            <th>Date</th>
@@ -42,7 +41,8 @@
                            <td>{{bon.date_BEL | date:'dd/MM/yyyy HH:MM:SS'}} </td>
                            <td>{{bon.id_Fr}} </td>
                            <td>
-                              <button type="button" class="btn btn-primary" (click)="getNombre_Support(bon.id_Bon_Entree_Local)">
+                              <button type="button" class="btn btn-primary"
+                                 (click)="getNombre_Support(bon.id_Bon_Entree_Local)">
                                  <i class="far fa-plus-square mr-2"></i>Ajouter
                               </button>
                            </td>
@@ -109,7 +109,8 @@
                            <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
                            <td>{{bon.local}} </td>
                            <td>
-                              <button type="button" class="btn btn-primary" (click)="getNombre_Support(bon.id_Bon_Retour)">
+                              <button type="button" class="btn btn-primary"
+                                 (click)="getNombre_Support(bon.id_Bon_Retour)">
                                  <i class="far fa-plus-square mr-2"></i>Ajouter
                               </button>
                            </td>
@@ -143,7 +144,8 @@
                            <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
 
                            <td>
-                              <button type="button" class="btn btn-primary" (click)="getNombre_Support(bon.id_Bon_Transfert)">
+                              <button type="button" class="btn btn-primary"
+                                 (click)="getNombre_Support(bon.id_Bon_Transfert)">
                                  <i class="far fa-plus-square mr-2"></i>Ajouter
                               </button>
                            </td>
@@ -307,6 +309,7 @@
       </form>
    </mat-step>
 
+   <!--      controle   -->
    <mat-step [stepControl]="controleFormGroup" label="Controle Marchandise">
       <form [formGroup]="controleFormGroup">
          <div class="main-card mb-3 card">
@@ -337,20 +340,19 @@
                            <td>
                               <label class="container">
                                  <input type="checkbox" [checked]="article.controle_qt" data-toggle="toggle"
-                                    data-onstyle="success" id="checkQuan" required disabled=true >
+                                    data-onstyle="success" id="checkQuan" required disabled=true>
                                  <span class="checkmark"></span>
                               </label>
                            </td>
                            <td>
                               <label class="container">
-                                 <input type="checkbox" (change)="onNativeChange(article.id)" data-toggle="toggle"
-                                    [checked]="article.controle_tech" data-onstyle="success" id="checkQual"
-                                    formControlName="checkQual" required>
+                                 <input type="checkbox" data-toggle="toggle" [checked]="article.controle_tech"
+                                    data-onstyle="success" id="checkQual" formControlName="checkQual" required
+                                    (click)="checkQualite(article.id)">
                                  <span class="checkmark"></span>
                               </label>
                            </td>
                         </tr>
-
                      </tbody>
                   </table>
                </div>
@@ -364,130 +366,126 @@
                </button>
             </div>
             <div class="col-md-2 mb-1">
-               <button class="mb-2 mr-2 btn btn-primary active" mat-raised-button color="primary"
-                  (click)="VerifControle()">
+               <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary"(click)="Verifier_etat_bon()" >
                   Suivant<i class="fas fa-chevron-right ml-2"></i></button>
 
             </div>
          </div>
       </form>
    </mat-step>
-   
-  <mat-step>
-     <ng-template matStepLabel>Cloture</ng-template>
-     <h5>Information Operation de récepetion</h5>
 
 
-     <div class="row">
-        <div class="col-md-3 mb-3">
-           <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy HH:MM:SS'}}
-        </div>
-        <div class="col-md-3 mb-3">
-           <h6> <strong>Type de Bon</strong> </h6> {{type_bon}}
-        </div>
-        <div class="col-md-3 mb-3">
-         <h6> <strong> Numéro de bon</strong> </h6> {{id}}
+   <!--   cloture     -->
+   <mat-step>
+      <ng-template matStepLabel>Cloture</ng-template>
+      <h5>Information Operation de récepetion</h5>
+      <div class="row">
+         <div class="col-md-3 mb-3">
+            <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy HH:MM:SS'}}
+         </div>
+         <div class="col-md-3 mb-3">
+            <h6> <strong>Type de Bon</strong> </h6> {{type_bon}}
+         </div>
+         <div class="col-md-3 mb-3">
+            <h6> <strong> Numéro de bon</strong> </h6> {{id}}
+         </div>
+         <div class="col-md-2 mb-3">
+            <h6> <strong>Responsable:</strong> </h6> rochdi
+         </div>
       </div>
-        <div class="col-md-2 mb-3">
-           <h6> <strong>Responsable:</strong> </h6> rochdi
-        </div>
+      <div class="row">
 
-     </div>
-     <div class="row">
-        
-        <div class="col-md-3 mb-3">
-         <h6>
-            <strong> Liste Des Support</strong>
-           <table class="mb-0 table">
-               <tr>
-                
-                  <th>Type</th>
-                  <th>Poids</th>
-                  <th>Hauteur</th>
-                  <th>Largeur</th>
-                  <th>longeur</th>
-                  
-               </tr>
-               <tr  *ngFor="let support  of arraySupport   ">
-                   
-                  <td>{{support.value.typeSupport}}</td>
-                  <td>{{support.value.poids}}</td>
-                  <td>{{support.value.hauteur}}</td>
-                  <td>{{support.value.largeur}}</td>
-                  <td>{{support.value.longeur}}</td>
-                 
-               </tr>
- 
-            </table>
-         </h6>
-        </div>
-        <div class="col-md-1 mb-1"></div>
-        <div class="col-md-8 mb-8">
-         <h6>
-            <strong> Liste Des Articles</strong>
-            <table class="table">
-               <thead>
+         <div class="col-md-3 mb-3">
+            <h6>
+               <strong> Liste Des Support</strong>
+               <table class="mb-0 table">
                   <tr>
-                     <th></th>
-                     <th>ID Article</th>
-                     <th>Nom Article</th>
-                     <th>Fiche Technique</th>
-                     <th>Quanitité</th>
-                     <th>Totale </th>
-                     <th>Controle Quantitatif</th>
-                     <th>Controle Qualitatif</th>
+
+                     <th>Type</th>
+                     <th>Poids</th>
+                     <th>Hauteur</th>
+                     <th>Largeur</th>
+                     <th>longeur</th>
+
                   </tr>
-               </thead>
-               <tbody>
-                  <tr *ngFor="let article  of  obj_articles ;let i=index">
-                     <td scope="row"></td>
-                     <td>{{article.id}} </td>
-                     <td>{{article.nom}} </td>
-                     <td>{{article.fiche_Technique}} </td>
-                     <td>{{article.qte}} </td>
-                     <td>{{article.total}} </td>
-                     <td>
-                        <label class="container">
-                           <input type="checkbox" [checked]="article.controle_qt" data-toggle="toggle"
-                              data-onstyle="success" id="checkQuan" required disabled=true >
-                           <span class="checkmark"></span>
-                        </label>
-                     </td>
-                     <td>
-                        <label class="container">
-                           <input type="checkbox" (change)="onNativeChange(article.id)" data-toggle="toggle"
-                              [checked]="article.controle_tech" data-onstyle="success" id="checkQual"
-                              formControlName="checkQual" required>
-                           <span class="checkmark"></span>
-                        </label>
-                     </td>
+                  <tr *ngFor="let support  of arraySupport   ">
+
+                     <td>{{support.value.typeSupport}}</td>
+                     <td>{{support.value.poids}}</td>
+                     <td>{{support.value.hauteur}}</td>
+                     <td>{{support.value.largeur}}</td>
+                     <td>{{support.value.longeur}}</td>
+
                   </tr>
 
-               </tbody>
-            </table>
-         </h6>
-        </div>
- 
-     </div>
+               </table>
+            </h6>
+         </div>
+         <div class="col-md-1 mb-1"></div>
+         <div class="col-md-8 mb-8">
+            <h6>
+               <strong> Liste Des Articles</strong>
+               <table class="table">
+                  <thead>
+                     <tr>
+                        <th></th>
+                        <th>ID Article</th>
+                        <th>Nom Article</th>
+                        <th>Fiche Technique</th>
+                        <th>Quanitité</th>
+                        <th>Totale </th>
+                        <th>Controle Quantitatif</th>
+                        <th>Controle Qualitatif</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr *ngFor="let article  of  obj_articles ;let i=index">
+                        <td scope="row"></td>
+                        <td>{{article.id}} </td>
+                        <td>{{article.nom}} </td>
+                        <td>{{article.fiche_Technique}} </td>
+                        <td>{{article.qte}} </td>
+                        <td>{{article.total}} </td>
+                        <td>
+                           <label class="container">
+                              <input type="checkbox" [checked]="article.controle_qt" required disabled=true>                              
+                           </label>
+                        </td>
+                        <td>
+                           <label class="container">
+                              <input type="checkbox"   [checked]="article.controle_tech" disabled=true>
+                           </label>
+                        </td>
+                     </tr>
 
-     <div>
-        <div class="row">
-           <div class="col-md-6 mb-3"> </div>
-           <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
-              <i class="fas fa-chevron-left mr-2"></i>Précédent
-           </button>
-             <button mat-raised-button (click)="stepper.reset()" class="mb-2 mr-2 btn btn-warning active  ">
-              <i class="fas fa-power-off mr-2"></i>Reset
-           </button>
-             <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="createBonReception()">
-              <i class="fas fa-check mr-2"></i>Valider
-           </button>
-            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" 
-              (click)="imprimerFicheRecpetion()">
-              <i class="fas fa-print mr-2"></i>Impression
-           </button>  
+                  </tbody>
+               </table>
+            </h6>
+         </div>
 
-        </div>
-     </div>
-  </mat-step>    
+      </div>
+
+      <div>
+         <div class="row">
+            <div class="col-md-6 mb-3"> </div>
+            <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
+               <i class="fas fa-chevron-left mr-2"></i>Précédent
+            </button>
+            <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  " *ngIf="this.VerifierEetatbon">  Conserver </button>
+            <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"*ngIf="this.VerifierEetatbon">
+               <i class="fas fa-check mr-2"></i>Valider
+            </button>
+            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" *ngIf="this.VerifierEetatbon"
+               (click)="imprimerFicheRecpetion()">
+               <i class="fas fa-print mr-2"></i>Impression
+            </button>
+            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"*ngIf="!(this.VerifierEetatbon)">
+               <i class="fas fa-trash-alt mr-2"></i>Bon_rejet
+            </button>
+
+         </div>
+      </div>
+   </mat-step>
+
+
 </mat-horizontal-stepper>

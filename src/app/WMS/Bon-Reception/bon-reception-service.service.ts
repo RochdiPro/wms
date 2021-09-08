@@ -155,6 +155,28 @@ export class BonReceptionServiceService {
       }, observe: 'body'
     }).pipe(catchError(this.handleError))    
   }
+
+  // get all bon receptions 
+  Bon_Receptions(): Observable<any> {
+    return this.httpClient.get(ERP + "Bon_Receptions");
+
+  }
+  // Supprimer un bon Reception 
+  Supprimer_Bon_Reception(id: any): Observable<Object> {
+    return this.httpClient.delete(ERP + "Supprimer_Bon_Reception", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+
+  // Ajouter bon rejet
+  creer_BonR_ejet(form: any): Observable<Object> {
+    return this.httpClient.post(ERP + "/Creer_Bon_Rejet", form);
+
+  }
+
+
 /*S
   Detail_BonReception(Id: any): Observable<any> {
 

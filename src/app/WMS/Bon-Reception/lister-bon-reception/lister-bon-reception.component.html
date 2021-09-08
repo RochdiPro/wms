@@ -1,1 +1,82 @@
-<p>lister-bon-reception works!</p>
+<form>
+    <div class="main-card mb-3 card">
+        <div class="card-body">
+            <h5 class="card-title">Liste Bon Reception </h5>
+<!--            <div class="row">
+                <div class="col-md-3 mb-3">
+
+                    <mat-form-field appearance="fill">
+                        <mat-label>Choisir Type Filter</mat-label>
+                        <mat-select [(ngModel)]="selectedOption" name="select" [(value)]="selected">
+                            <mat-option value="id">Id</mat-option>
+                            <mat-option value="etat">Etat</mat-option>
+                            <mat-option value="responsable">Responsable</mat-option>
+
+                        </mat-select>
+
+                    </mat-form-field>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <div class="search-wrapper">
+                        <div class="input-holder">
+                            <input [(ngModel)]="filters.keyword" name="keyword" (input)="ListBonRecpetionFilter()"
+                                type="text" class="search-input" placeholder="Type to search">
+                            <button class="search-icon"><span></span></button>
+                        </div>
+                        <button class="close"></button>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <a href="/Menu/reception/Gerer-support" class="btn btn-primary btn-icon-split">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span class="text"> Nouveau</span>
+                    </a>
+                </div>
+
+
+            </div>
+-->
+            <div class="table-responsive">
+                <table class="mb-0 table">
+                    <thead>
+                        <tr>                           
+                            <th> </th>
+                            <th>ID</th>
+                            <th>Responsable</th>
+                            <th>Date</th>
+                            <th>Etat</th>
+                            <th>Ancien Type</th>
+                            <th>Ancien ID</th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let bon of bonReception; let i = index">
+                            <td> <button class="fas fa-edit mb-2 mr-2 btn " (click)="Modifier_Bon(bon.id)"></button></td>
+                            <td> {{bon.id}}</td>
+                            <td> {{bon.responsable}} </td>
+                            <td> {{bon.date_Creation |date:'dd/MM/yyyy ' }}</td>
+                            <td> {{bon.etat}} </td>
+                            <td> {{bon.type_Be}} </td>
+                            <td> {{bon.id_Be}} </td>
+
+                          <td> <button class="fas fa-trash-alt mb-2 mr-2 btn " (click)="Supprimer_Bon(bon.id)"> </button>
+                            </td>
+                           
+
+
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>

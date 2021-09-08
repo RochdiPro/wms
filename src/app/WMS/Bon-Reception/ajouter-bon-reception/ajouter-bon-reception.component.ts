@@ -1,10 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { BonReceptionServiceService } from '../bon-reception-service.service';
 import Swal from 'sweetalert2'
 import { MatStepper } from '@angular/material/stepper';
+import * as moment from 'moment';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+declare var require: any
 
-
+const pdfMake = require("pdfmake/build/pdfmake");
+const pdfFonts = require("pdfmake/build/vfs_fonts");
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 @Component({
   selector: 'app-ajouter-bon-reception',
   templateUrl: './ajouter-bon-reception.component.html',
@@ -28,14 +35,17 @@ export class AjouterBonReceptionComponent implements OnInit {
   id: any;
   nbSupport: any;
   listeArticleBon: any;
-  Source:any;
-  Destiation:any;
+  Source: any;
+  Destination: any;
+  modele: any;
 
-
-  constructor(private _formBuilder: FormBuilder, public service: BonReceptionServiceService) {
+  constructor(public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
     this.service.Famille_Logistique().subscribe((data: any) => {
       this.Famille_Logistique = data;
     });
+    this.chargementModel();
+    this.modelePdfBase64();
+
   }
 
   ngOnInit() {
@@ -43,12 +53,12 @@ export class AjouterBonReceptionComponent implements OnInit {
       nbSupport: ['', Validators.required]
     });
     this.SupportFormGroup = this._formBuilder.group({
-      typeSupport: new FormControl({ value: '', disabled: true }, Validators.required),
-      poids: new FormControl({ value: '', disabled: true }, Validators.required),
-      hauteur: new FormControl({ value: '', disabled: true }, Validators.required),
-      largeur: new FormControl({ value: '', disabled: true }, Validators.required),
-      longeur: new FormControl({ value: '', disabled: true }, Validators.required),
-      qte: new FormControl({ value: '', disabled: true }, Validators.required),
+      typeSupport: new FormControl({ value: 'Pallette', disabled: true }, Validators.required),
+      poids: new FormControl({ value: '1', disabled: true }, Validators.required),
+      hauteur: new FormControl({ value: '1', disabled: true }, Validators.required),
+      largeur: new FormControl({ value: '1', disabled: true }, Validators.required),
+      longeur: new FormControl({ value: '1', disabled: true }, Validators.required),
+      qte: new FormControl({ value: '1', disabled: true }, Validators.required),
     });
     this.ArticleFormGroup = this._formBuilder.group({
       famille_Logistique: new FormControl({ value: '', disabled: true }, Validators.required),
@@ -108,34 +118,37 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
 
   // get les information generale de bon 
-  get_detail_bon(id : any )
-  { 
-    if (this.bonEntree_selected){
-    this.service.get_Information_Bon_entree_Local(id).subscribe((data: any) => {
-      this.Source=data.id_Fr
-      this.Destiation=data.local
-      console.log(this.Source + "  " +this.Destiation)
-    });}
-    else if (this.bonEntree_impo_selected){
+  get_detail_bon(id: any) {
+    if (this.bonEntree_selected) {
+      this.service.get_Information_Bon_entree_Local(id).subscribe((data: any) => {
+        this.Source = data.id_Fr
+        this.Destination = data.local
+
+      });
+    }
+    else if (this.bonEntree_impo_selected) {
       this.service.get_Information_Bon_entree_Importation(id).subscribe((data: any) => {
-       this.Source=data.id_Fr
-      this.Destiation=data.local
-      console.log(this.Source + "  " +this.Destiation)
-    });}
-    else if (this.bontransfert_selected){
+        this.Source = data.id_Fr
+        this.Destination = data.local
+
+      });
+    }
+    else if (this.bontransfert_selected) {
       this.service.get_Information_Bon_transfert(id).subscribe((data: any) => {
-       this.Source=data.local_Source
-      this.Destiation=data.local_Destination
-      console.log(this.Source + "  " +this.Destiation)
-    });}
-    else if (this.bonrtour_selected){
+        this.Source = data.local_Source
+        this.Destination = data.local_Destination
+
+      });
+    }
+    else if (this.bonrtour_selected) {
       this.service.get_Information_Bon_retour(id).subscribe((data: any) => {
-       this.Source=data.id_Clt
-      this.Destiation=data.local
-      console.log(this.Source + "  " +this.Destiation)
-    });}
+        this.Source = data.id_Clt
+        this.Destination = data.local
+
+      });
+    }
   }
- 
+
   /// get liste bon entree Local
   private listeBELocal() {
     this.service.Liste_Bon_Entree().subscribe((data: any) => {
@@ -186,7 +199,7 @@ export class AjouterBonReceptionComponent implements OnInit {
       },
     });
   }
-  
+
   /*
   ****************************************           fonctions relative a steep 2    ********************************************** 
   */
@@ -194,8 +207,6 @@ export class AjouterBonReceptionComponent implements OnInit {
   arraySupport: any = [];
   newAttribute: any;
   listArticleBonEntree: any = [];
-
-
 
   //generer tableau de support
   genererTemplateSupport(nbSupport: any) {
@@ -213,11 +224,11 @@ export class AjouterBonReceptionComponent implements OnInit {
   // Ajouter une ligne dans le tableau du support  
   ajouterligneSupport(): FormGroup {
     return this._formBuilder.group({
-      typeSupport: new FormControl({ value: '', disabled: false }, Validators.required),
-      poids: new FormControl({ value: '', disabled: false }, Validators.required),
-      hauteur: new FormControl({ value: '', disabled: false }, Validators.required),
-      largeur: new FormControl({ value: '', disabled: false }, Validators.required),
-      longeur: new FormControl({ value: '', disabled: false }, Validators.required),
+      typeSupport: new FormControl({ value: 'Pallette', disabled: false }, Validators.required),
+      poids: new FormControl({ value: '1', disabled: false }, Validators.required),
+      hauteur: new FormControl({ value: '1', disabled: false }, Validators.required),
+      largeur: new FormControl({ value: '1', disabled: false }, Validators.required),
+      longeur: new FormControl({ value: '1', disabled: false }, Validators.required),
     });
   }
 
@@ -470,33 +481,46 @@ export class AjouterBonReceptionComponent implements OnInit {
   */
 
   sysDate = new Date();
-  onNativeChange(id: any) {
-    /*  for (let i = 0; i < this.lis.length; i++) {
-        if (this.lis[i].id == id)
-  
-          this.lis[i].test2 = this.controleFormGroup.get('checkQual').value;
-  
-      }*/
-
-
+  // verifier le qualite d'article
+  checkQualite(id:any)
+  {
+    for (let i = 0; i < this.obj_articles.length; i++) {
+    if(this.obj_articles[i].id==id){
+       
+      if(this.obj_articles[i].controle_tech == false){
+        this.obj_articles[i].controle_tech=true
+      } 
+      else{this.obj_articles[i].controle_tech=false}
+      
+    }
+   }
   }
-
-  VerifControle() { }
-
-
+  // function verife les controle Quaite QTe si verifier alors on peur imrimer enregistrer sinon le conserver  
+  VerifierEetatbon:any=false;
+  Verifier_etat_bon(){
+    this.VerifierEetatbon =true;
+    for (let i = 0; i < this.obj_articles.length; i++) { 
+        
+        if(this.obj_articles[i].controle_tech == false){ this.VerifierEetatbon=false;}  
+        if(this.obj_articles[i].controle_qt == false){ this.VerifierEetatbon=false;} 
+    } 
+  }
+ 
   /*
    ****************************************           fonctions relative a steep 5  ********************************************** 
    */
-  
+
+
+  Valider: any = true;
   doc: any
-  createBonReception() {
+  creer_Bon_Reception() {
 
 
     this.doc = document.implementation.createDocument("Bon_Reception", "", null);
     var BR = this.doc.createElement("Bon_Reception");
     var Etat = this.doc.createElement("Etat"); Etat.innerHTML = "en cours"
     var source = this.doc.createElement("Source"); source.innerHTML = this.Source
-    var distination = this.doc.createElement("Destination"); distination.innerHTML = this.Destiation
+    var distination = this.doc.createElement("Destination"); distination.innerHTML = this.Destination
     var InformationsGenerales = this.doc.createElement("Informations-Generales");
     var Date = this.doc.createElement("Date"); Date.innerHTML = this.sysDate.toDateString()
     var Id_Bon = this.doc.createElement("Id_Bon"); Id_Bon.innerHTML = this.id
@@ -513,7 +537,7 @@ export class AjouterBonReceptionComponent implements OnInit {
 
     for (let i = 0; i < this.obj_articles.length; i++) {
 
-      var Produit = this.doc.createElement('Produit') 
+      var Produit = this.doc.createElement('Produit')
       var id = this.doc.createElement('Id'); id.innerHTML = this.obj_articles[i].id
       var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.obj_articles[i].nom
       var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.obj_articles[i].qte
@@ -522,126 +546,126 @@ export class AjouterBonReceptionComponent implements OnInit {
       var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
       var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
 
-      var Supports = this.doc.createElement('Supports')    
+      var Supports = this.doc.createElement('Supports')
       if (this.obj_articles[i].sup1 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "1";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup1;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup2 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "2";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup2;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup3 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "3";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup3;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup4 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "4";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup4;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup5 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "5";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup5;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup6 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "6";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup6;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup7 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "7";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup7;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup8 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "8";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup8;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup9 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "9";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup9;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup10 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "10";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup10;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup11 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "11";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup11;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup12 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "12";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup12;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup13 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "13";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup12;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup14 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "14";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup13;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup15 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "15";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup14;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup16 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "16";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup15;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup17 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "17";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup16;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup18 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "18";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup17;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup19 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "19";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup18;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
       if (this.obj_articles[i].sup20 > 0) {
         var Support = this.doc.createElement('Support');
         var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "20";
         var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup19;
-        Support.appendChild(n_s);Support.appendChild(qte_s);Supports.appendChild(Support);
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
       }
 
       Produit.appendChild(id);
@@ -657,21 +681,21 @@ export class AjouterBonReceptionComponent implements OnInit {
     var Supports_Listes = this.doc.createElement('Liste_Supports')
     for (let i = 0; i < this.arraySupport.length; i++) {
       var Support = this.doc.createElement('Support')
-      var Numero = this.doc.createElement('Numero') ; Numero.innerHTML = i+1;
-      var typeSupport = this.doc.createElement('typeSupport') ; typeSupport.innerHTML = this.arraySupport[i].value.typeSupport;
-      var poids = this.doc.createElement('poids')  ; poids.innerHTML = this.arraySupport[i].value.poids;
-      var hauteur = this.doc.createElement('hauteur') ; hauteur.innerHTML = this.arraySupport[i].value.hauteur;
-      var largeur = this.doc.createElement('largeur') ; largeur.innerHTML = this.arraySupport[i].value.largeur;
-      var longeur = this.doc.createElement('longeur')  ; longeur.innerHTML = this.arraySupport[i].value.longeur;
+      var Numero = this.doc.createElement('Numero'); Numero.innerHTML = i + 1;
+      var typeSupport = this.doc.createElement('typeSupport'); typeSupport.innerHTML = this.arraySupport[i].value.typeSupport;
+      var poids = this.doc.createElement('poids'); poids.innerHTML = this.arraySupport[i].value.poids;
+      var hauteur = this.doc.createElement('hauteur'); hauteur.innerHTML = this.arraySupport[i].value.hauteur;
+      var largeur = this.doc.createElement('largeur'); largeur.innerHTML = this.arraySupport[i].value.largeur;
+      var longeur = this.doc.createElement('longeur'); longeur.innerHTML = this.arraySupport[i].value.longeur;
       Support.appendChild(Numero);
       Support.appendChild(typeSupport);
       Support.appendChild(poids);
       Support.appendChild(hauteur);
       Support.appendChild(largeur);
-      Support.appendChild(longeur); 
-      Supports_Listes.appendChild(Support);   
+      Support.appendChild(longeur);
+      Supports_Listes.appendChild(Support);
     }
-      
+
 
     BR.appendChild(Etat);
     BR.appendChild(InformationsGenerales);
@@ -683,8 +707,8 @@ export class AjouterBonReceptionComponent implements OnInit {
 
     var formData: any = new FormData();
     let url = "assets/BonRecpetion.xml";
-     
-     
+
+
     fetch(url)
       .then(response => response.text())
       .then(data => {
@@ -694,15 +718,15 @@ export class AjouterBonReceptionComponent implements OnInit {
         console.log("id bon :", this.id)
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
-        formData.append('Etat', "En cours");
+        formData.append('Etat', "Traiter");
         formData.append('Responsable', "rochdi");
         formData.append('date', this.sysDate);
-        formData.append('Local', "hhh");
+        formData.append('Local', this.Destination);
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
-        formData.append('Nb_Support',this.nbSupport);
+        formData.append('Nb_Support', this.nbSupport);
         this.service.createBonReception(formData).subscribe(data => {
-          console.log("data: ",data);
+          console.log("data: ", data);
           //this.bonReception = data
 
           Swal.fire(
@@ -710,20 +734,766 @@ export class AjouterBonReceptionComponent implements OnInit {
             'Bon De Reception Ajouté Avec Sucées',
             'success'
           )
-         
+
         },
           error => console.log(error));
       });
-    console.log('bon reception cree',formData.values());
+    console.log('bon reception cree', formData.values());
+
+
+  }
+  //convertir blob à un fichier  
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+    var b: any = theBlob;
+    b.lastModifiedDate = new Date();
+    b.name = fileName;
+    return <File>theBlob;
+  }
+
+  Conserver() {
+    this.doc = document.implementation.createDocument("Bon_Reception", "", null);
+    var BR = this.doc.createElement("Bon_Reception");
+    var Etat = this.doc.createElement("Etat"); Etat.innerHTML = "en cours"
+    var source = this.doc.createElement("Source"); source.innerHTML = this.Source
+    var distination = this.doc.createElement("Destination"); distination.innerHTML = this.Destination
+    var InformationsGenerales = this.doc.createElement("Informations-Generales");
+    var Date = this.doc.createElement("Date"); Date.innerHTML = this.sysDate.toDateString()
+    var Id_Bon = this.doc.createElement("Id_Bon"); Id_Bon.innerHTML = this.id
+    var Type_Bon = this.doc.createElement("Type_Bon"); Type_Bon.innerHTML = this.type_bon
+    var Responsable = this.doc.createElement("Responsable"); Responsable.innerHTML = "Responsable";
+    InformationsGenerales.appendChild(source);
+    InformationsGenerales.appendChild(distination);
+    InformationsGenerales.appendChild(Date);
+    InformationsGenerales.appendChild(Id_Bon);
+    InformationsGenerales.appendChild(Type_Bon);
+    InformationsGenerales.appendChild(Responsable);
+
+    var Produits_Listes = this.doc.createElement('Produits')
+
+    for (let i = 0; i < this.obj_articles.length; i++) {
+
+      var Produit = this.doc.createElement('Produit')
+      var id = this.doc.createElement('Id'); id.innerHTML = this.obj_articles[i].id
+      var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.obj_articles[i].nom
+      var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.obj_articles[i].qte
+      var FicheTechnique = this.doc.createElement('Fiche_Technique'); FicheTechnique.innerHTML = this.obj_articles[i].fiche_Technique
+      var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
+      var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
+      var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
+
+      var Supports = this.doc.createElement('Supports')
+      if (this.obj_articles[i].sup1 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "1";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup1;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup2 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "2";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup2;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup3 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "3";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup3;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup4 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "4";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup4;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup5 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "5";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup5;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup6 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "6";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup6;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup7 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "7";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup7;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup8 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "8";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup8;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup9 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "9";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup9;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup10 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "10";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup10;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup11 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "11";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup11;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup12 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "12";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup12;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup13 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "13";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup12;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup14 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "14";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup13;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup15 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "15";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup14;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup16 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "16";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup15;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup17 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "17";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup16;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup18 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "18";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup17;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup19 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "19";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup18;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+      if (this.obj_articles[i].sup20 > 0) {
+        var Support = this.doc.createElement('Support');
+        var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = "20";
+        var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].sup19;
+        Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+      }
+
+      Produit.appendChild(id);
+      Produit.appendChild(Nom);
+      Produit.appendChild(Qte);
+      Produit.appendChild(FicheTechnique);
+      Produit.appendChild(verif_qte);
+      Produit.appendChild(verif_fiche);
+      Produit.appendChild(total);
+      Produit.appendChild(Supports);
+      Produits_Listes.appendChild(Produit)
+    }
+    var Supports_Listes = this.doc.createElement('Liste_Supports')
+    for (let i = 0; i < this.arraySupport.length; i++) {
+      var Support = this.doc.createElement('Support')
+      var Numero = this.doc.createElement('Numero'); Numero.innerHTML = i + 1;
+      var typeSupport = this.doc.createElement('typeSupport'); typeSupport.innerHTML = this.arraySupport[i].value.typeSupport;
+      var poids = this.doc.createElement('poids'); poids.innerHTML = this.arraySupport[i].value.poids;
+      var hauteur = this.doc.createElement('hauteur'); hauteur.innerHTML = this.arraySupport[i].value.hauteur;
+      var largeur = this.doc.createElement('largeur'); largeur.innerHTML = this.arraySupport[i].value.largeur;
+      var longeur = this.doc.createElement('longeur'); longeur.innerHTML = this.arraySupport[i].value.longeur;
+      Support.appendChild(Numero);
+      Support.appendChild(typeSupport);
+      Support.appendChild(poids);
+      Support.appendChild(hauteur);
+      Support.appendChild(largeur);
+      Support.appendChild(longeur);
+      Supports_Listes.appendChild(Support);
+    }
+
+
+    BR.appendChild(Etat);
+    BR.appendChild(InformationsGenerales);
+    BR.appendChild(Produits_Listes);
+    BR.appendChild(Supports_Listes);
+
+    this.doc.appendChild(BR)
+    console.log(this.doc)
+
+    var formData: any = new FormData();
+    let url = "assets/BonRecpetion.xml";
+
+
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        let xml2string = new XMLSerializer().serializeToString(this.doc.documentElement);
+        var myBlob = new Blob([xml2string], { type: 'application/xml' });
+        var myFile = this.convertBlobFichier(myBlob, "assets/BonRecpetion.xml");
+        console.log("id bon :", this.id)
+        formData.append('Id', this.id);
+        formData.append('Id_Be', this.id);
+        formData.append('Etat', "Conserver");
+        formData.append('Responsable', "rochdi");
+        formData.append('date', this.sysDate);
+        formData.append('Local', this.Destination);
+        formData.append('Type_Be', this.type_bon);
+        formData.append('Detail', myFile);
+        formData.append('Nb_Support', this.nbSupport);
+        this.service.createBonReception(formData).subscribe(data => {
+          console.log("data: ", data);
+          //this.bonReception = data
+
+          Swal.fire(
+            'Ajout Effecté',
+            'Bon De Reception Ajouté Avec Sucées',
+            'success'
+          )
+
+        },
+          error => console.log(error));
+      });
+     
+
+  }
+
+
+  modeleSrc: any;
+  //impression de la fiche recption
+  imprimerFicheRecpetion() {
+
+    var body = [];
+    var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification');
+    body.push(title);
+    var tabArt: any = [];
+    for (let i = 0; i < this.obj_articles.length; i++) {
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);
+      obj.push(this.obj_articles[i].fiche_Technique);
+      if (this.obj_articles[i].fiche_Technique == true) { obj.push("oui"); } else { obj.push("non"); }
+      obj.push(this.obj_articles[i].qte);
+      if (this.obj_articles[i].controle_qt == true) { obj.push("oui"); } else { obj.push("non"); }
+      body.push(obj);
+    }
+
+
+    var body2 = [];
+    var title = new Array('Id Support', 'Type', 'Poids', 'Hauteur', 'Largeur', 'Longeur');
+    body2.push(title);
+    var tabArt: any = [];
+    for (let i = 0; i < this.arraySupport.length; i++) {
+      var obj = new Array();
+      obj.push(i + 1);
+      obj.push(this.arraySupport[i].value.typeSupport);
+      obj.push(this.arraySupport[i].value.poids);
+      obj.push(this.arraySupport[i].value.hauteur);
+      obj.push(this.arraySupport[i].value.largeur);
+      obj.push(this.arraySupport[i].value.longeur);
+
+      body2.push(obj);
+    }
+
+    var def = {
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableExample: {
+          margin: [0, 5, 0, 15]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'black'
+        }
+      },
+      defaultStyle: {
+        // alignment: 'justify'
+      },
+      pageMargins: [40, 120, 40, 60],
+
+
+      info: {
+        title: 'Fiche Bon Réception',
+
+      },
+      background: [
+        {
+          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
+        }
+      ],
+
+      content: [
+        {
+          text: 'Bon Reception N°' + this.id + '\n\n',
+          fontSize: 15,
+
+          alignment: 'center',
+
+          color: 'black',
+          bold: true
+        },
+
+        {
+          columns: [
+
+            {
+              text:
+                'Type Bon :' + '\t' + this.type_bon
+                + '\n\n' +
+                'Id Bon  :' + '\t' + this.id
+
+              ,
+
+              fontSize: 10,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+            {
+              text:
+                ' Utilisateur :' + '\t' + "rochdi"
+                + '\n\n' + 'Date      :' + (moment(this.sysDate)).format('DD-MMM-YYYY HH:mm:ss') + '\t'
+              ,
+
+              fontSize: 10,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+
+
+          ]
+        },
+
+        {
+          text: '\n\n' + 'Liste des Articles ' + '\t\n',
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', '*', '*', '*', '*', '*', '*'],
+            body: body
+          }
+        },
+        {
+          text: '\n\n' + 'Liste des Supports ' + '\t\n',
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', '*', '*', '*', '*', '*', '*'],
+            body: body2
+          }
+        },
+      ],
+    };
+
+    pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
+
+  }
+
+  // temps d'attente pour le traitement de fonction 
+  delai(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  // conversion de modele de pdf  en base 64 
+  async modelePdfBase64() {
+    await this.delai(4000);
+    const lecteur = new FileReader();
+    lecteur.onloadend = () => {
+      this.modeleSrc = lecteur.result;
+      this.modeleSrc = btoa(this.modeleSrc);
+      this.modeleSrc = atob(this.modeleSrc);
+      this.modeleSrc = this.modeleSrc.replace(/^data:image\/[a-z]+;base64,/, "");
+    }
+    lecteur.readAsDataURL(this.modele);
+  }
+  // récupération de modele pour créer le pdf
+  async chargementModel() {
+    this.http.get('./../../../assets/images/ficheRecpetion.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+      this.modele = reponse;
+      return this.modele;
+    }, err => console.error(err))
+  }
+
+  /***
+   *    etape genertation bon rejet
+   * 
+   */
+  Bon_rejet() {
+    Swal.fire({
+      title: 'Contrôle Effectué',
+      text: "Marchandise Non Verifé",
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Rejeter Marchandise',
+      cancelButtonText: 'Ressayé'
+
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {
+          width: 'auto',
+          data: { objects:this.obj_articles, id_Bon: this.id, local:this.Destination ,type:this.type_bon}
+        });
+        dialogRef.afterClosed().subscribe(result => {         
+        });
+
+      }
+
+    })
+
+  }
+
+
+
+
+}
+
+
+//dialog detail
+@Component({
+  selector: 'ajouter-bon-rejet',
+  templateUrl: 'ajouter-bon-rejet.html',
+})
+export class Ajouter_Bon_Rejet {
+  //bon: Bon_Rejet = new Bon_Rejet
+  docRejet: any
+  idBon: any
+  sysDate = new Date();
+  liste_articleBonRejet_Array: Array<any> = [];
+  liste_articleBonReception_Array: Array<any> = [];
+  listLigneArticleRejet: any[] = []
+  obj_artciles:any;
+  lis: any = [];
+
+  modeleSrc2: any;
+  modele2: any;
+
+  local: any
+  reclamation:any;
+  type_bon:any;
+  constructor(public dialogRef: MatDialogRef<Ajouter_Bon_Rejet>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private router: Router, private http: HttpClient) {
+    this.chargementModel2();
+    this.modelePdfBase642();
+
+    this.idBon = data.idBon
+    this.local = data.local
+    this.obj_artciles=data.objects
+    this.type_bon=data.type
+   
+  }
+  
+    CreeBonRejet() {
+  
+      this.docRejet = document.implementation.createDocument("Bon_Rejet", "", null);
+  
+      var BR = this.docRejet.createElement("Bon_Rejet");
+      var Etat = this.docRejet.createElement("Etat"); Etat.innerHTML = "en cours"
+      var Local = this.docRejet.createElement("Local"); Local.innerHTML = this.local
+  
+      var InformationsGenerales = this.docRejet.createElement("Informations-Generales");
+      var Date = this.docRejet.createElement("Date"); Date.innerHTML = this.sysDate.toDateString()
+      var Id_Bon = this.docRejet.createElement("Id_Bon"); Id_Bon.innerHTML = this.idBon
+      var Responsable = this.docRejet.createElement("Responsable"); Responsable.innerHTML = "Responsable";
+      InformationsGenerales.appendChild(Local);
+      InformationsGenerales.appendChild(Date);
+      InformationsGenerales.appendChild(Id_Bon);
+      InformationsGenerales.appendChild(Responsable);
+  
+      var Produits_Listes = this.docRejet.createElement('Produits')
+  
+      for (let i = 0; i < this.obj_artciles.length; i++) {
+        
+        var Produits = this.docRejet.createElement('Produit')
+        var id = this.docRejet.createElement('Id'); id.innerHTML = this.obj_artciles[i].id
+        var Nom = this.docRejet.createElement('Nom'); Nom.innerHTML = this.obj_artciles[i].nom
+        var Qte = this.docRejet.createElement('Qte'); Qte.innerHTML = this.obj_artciles[i].qte
+        var FicheTechnique = this.docRejet.createElement('FicheTechnique'); FicheTechnique.innerHTML = this.obj_artciles[i].fiche_Technique
+        let ch ="";if(this.obj_artciles[i].controle_qt==false){ch=ch+" Quantite non Verifier car "+this.obj_artciles[i].qte +" < "+this.obj_artciles[i].total}
+        if(this.obj_artciles[i].controle_tech==false){ch=ch+" Fiche Technique non Verifier  " }
+
+        var Reclmation = this.docRejet.createElement('Reclmation'); Reclmation.innerHTML = ch;
+
+        Produits.appendChild(id);
+        Produits.appendChild(Nom);
+        Produits.appendChild(Qte);
+        Produits.appendChild(Reclmation);  
+        Produits_Listes.appendChild(Produits);
+      }
+  
+      BR.appendChild(Etat);
+      BR.appendChild(InformationsGenerales);
+      BR.appendChild(Produits_Listes);
+  
+      this.docRejet.appendChild(BR)
+      console.log(this.docRejet)
+  
+  
+      var formData: any = new FormData();
+      let url = "assets/BonRejet.xml";
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          let xml2string = new XMLSerializer().serializeToString(this.docRejet.documentElement);
+          var myBlob = new Blob([xml2string], { type: 'application/xml' });
+          var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
+          console.log(this.idBon)
+          formData.append('Id_Bon', this.idBon);
+          formData.append('Etat', "En cours");
+          formData.append('Responsable', "User1");
+          formData.append('Date', this.sysDate);
+          formData.append('Local', this.local);
+          formData.append('Type_Bon', this.type_bon);
+          formData.append('Reclamations', this.reclamation);
+          
+          formData.append('Detail', myFile);
+          this.service.creer_BonR_ejet(formData).subscribe(data => {
+            console.log("Bon rejet", data);
+            Swal.fire({
+              title: 'Bon Rejet!',
+              text: 'Bon Rejet est crée et envoyée.',
+              icon: 'success',
+              showCancelButton: true,
+              confirmButtonColor: 'green',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Imprimer',
+              cancelButtonText: 'Quitter'
+            }).then((result) => {           
+  
+               if (result.isConfirmed) {
+                 
+                this.imprimerFicheRejet()
+  
+              }
+  
+            })
+          });
+  
+      //this.router.navigate(['Menu/Edit-reception/Gerer-support'])
+    },)}
+  
+  onSubmit(rec:any) {
+    this.reclamation=rec;
+    this.CreeBonRejet();
+  }
+
+
+
+  //fermer dialogue
+  close() {
+    this.dialogRef.close();
+  }
+
+  imprimerFicheRejet() {
+    var body = [];
+    var titulos = new Array(' ID ', 'Article', 'Fiche Technique', 'Qte', 'Controle Quan', 'Controle Qual', 'Reclmation');
+    body.push(titulos);
+    var tabArt: any = [];
+     
+    for (let i = 0; i < this.obj_artciles.length; i++) {
+      var fila = new Array();
 
  
-  }
-    //convertir blob à un fichier  
-    convertBlobFichier = (theBlob: Blob, fileName: string): File => {
-      var b: any = theBlob;
-      b.lastModifiedDate = new Date();
-      b.name = fileName;
-      return <File>theBlob;
+      let ch ="";if(this.obj_artciles[i].controle_qt==false){ch=ch+" Quantite non Verifier car "+this.obj_artciles[i].qte +" < "+this.obj_artciles[i].total}
+      if(this.obj_artciles[i].controle_qt==false){ch=ch+" Fiche Technique non Verifier  " }
+
+ 
+      fila.push(this.obj_artciles[i].id);
+      fila.push(this.obj_artciles[i].nom_Article);
+      fila.push(this.obj_artciles[i].fiche_Technique);
+      fila.push(this.obj_artciles[i].qte);
+      fila.push(this.obj_artciles[i].controle_qt);
+      fila.push(this.obj_artciles[i].controle_tech);
+      fila.push(ch);
+
+      body.push(fila);
+
+
     }
-  imprimerFicheRecpetion() { }
+    // console.log(fila)
+
+
+    var def = {
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableExample: {
+          margin: [0, 5, 0, 15]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'black'
+        }
+      },
+      defaultStyle: {
+        // alignment: 'justify'
+      },
+      pageMargins: [40, 120, 40, 60],
+
+
+      info: {
+        title: 'Fiche Rejet Marchandise',
+
+      },
+      background: [
+        {
+          image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
+        }
+      ],
+
+      content: [
+        {
+          text: 'Informations Bon Rejet N°' + this.idBon + '\n\n',
+          fontSize: 15,
+          alignment: 'center',
+
+          color: 'black',
+          bold: true
+        },
+
+        {
+          columns: [
+
+            {
+              text:
+                'Responsable :' + '\t' + 'User'
+                + '\n\n' +
+                'Id Bon Entrée :' + '\t' + this.idBon
+
+              ,
+
+              fontSize: 16,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+            {
+              text:
+                'Date :' + '\t' + (moment(this.sysDate)).format('DD-MMM-YYYY HH:mm:ss')
+                + '\n\n' + 'Type Bon :' + '\t'
+              ,
+
+              fontSize: 10,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+
+
+          ]
+        },
+
+        {
+
+          text: '\n\n' + 'Liste des Article :' + '\t\n',
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+        {
+          table: {
+            headerRows: 7,
+            widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            body: body
+          }
+        },
+        {
+
+          text: '\n\n' + 'Reclamation :' + '\t\n\n\n'+this.reclamation,
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+      ],
+    };
+
+    pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
+  }
+
+
+  async modelePdfBase642() {
+    await this.delai(4000);
+    const lecteur = new FileReader();
+    lecteur.onloadend = () => {
+      this.modeleSrc2 = lecteur.result;
+      this.modeleSrc2 = btoa(this.modeleSrc2);
+      this.modeleSrc2 = atob(this.modeleSrc2);
+      this.modeleSrc2 = this.modeleSrc2.replace(/^data:image\/[a-z]+;base64,/, "");
+    }
+    lecteur.readAsDataURL(this.modele2);
+  }
+
+  delai(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  // récupération de modele pour créer le pdf
+  async chargementModel2() {
+    this.http.get('./../../../assets/images/ficheRejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+      this.modele2 = reponse;
+      return this.modele2;
+    }, err => console.error(err),
+      () => console.log(this.modele2))
+  }
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+    var b: any = theBlob;
+    b.lastModifiedDate = new Date();
+    b.name = fileName;
+    return <File>theBlob;
+  }
+
+
 }
