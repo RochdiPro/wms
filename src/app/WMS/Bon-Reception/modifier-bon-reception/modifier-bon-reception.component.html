@@ -1,1 +1,275 @@
-<p>modifier-bon-reception works!</p>
+<mat-horizontal-stepper [linear]="isLinear" #stepper>
+     
+ 
+    
+ 
+    <!--   Article  &  support   -->
+ 
+    <mat-step [stepControl]="ArticleFormGroup">
+       <form [formGroup]="ArticleFormGroup">
+          <ng-template matStepLabel>Identifier Article</ng-template>
+          <div class="table-responsive">
+             <table class="mb-0 table">
+                <thead>
+                   <tr>
+                      <th>ID Article</th>
+                      <th>Nom Article</th>
+                      <th>Famille</th>
+                      <th>Sous Famille</th>
+                      <th>Quanitité théorique</th>
+                      <th>Support</th>
+                      <th>Totale</th>
+                   </tr>
+                </thead>
+                <tbody>
+                   <tr *ngFor="let article  of  obj_articles ;let i = index;">
+                      <td>{{article.id}}</td>
+                      <td>{{article.nom }}</td>
+                      <td>
+                         <mat-form-field appearance="fill">
+                            <mat-label>Famille Logistique</mat-label>
+                            <mat-select [disabled]="disableSelect.value" name="famille"
+                               (selectionChange)="Famille($event,article.id)">
+                               <mat-option value="article.famaille" style="color: brown;" [disabled]>{{article.famaille}}
+                               </mat-option>
+                               <mat-option *ngFor="let f of Famille_Logistique" [value]="f.nom">{{f.nom}}</mat-option>
+                            </mat-select>
+                         </mat-form-field>
+                      </td>
+                      <td>
+                         <mat-form-field appearance="fill">
+                            <mat-label>Sous Famille Logistique</mat-label>
+                            <mat-select [disabled]="disableSelect.value" name="sousFamille"
+                               (focus)="getSousFamille(article.id)" (selectionChange)="SousFamille($event,article.id)">
+ 
+                               <mat-option *ngFor="let f of Sous_Famille_Logistique" [value]="f">{{f}}</mat-option>
+                               <mat-option value="article.sous_famaille" style="color: brown;">{{article.sous_famaille}}
+                               </mat-option>
+                            </mat-select>
+                         </mat-form-field>
+                      </td>
+                      <td>{{article.qte}} </td>
+                    <td>
+                         <form [formGroup]="SupportFormGroup">
+                            <table class="mb-0 table">
+                               <tr *ngFor="let support  of arraySupport ;let j=index;">
+                                  <td> Support {{j+1}}</td>
+                                  <td>
+                                     <input class="form-control" type="number" style="width: 80px;" value="article.Support[j].qte"    (keyup)="getTotale($event,j,article.id)" />
+                                  </td>
+                               </tr>
+                            </table>
+                         </form>
+ 
+                      </td>
+                      <td>
+                         <span>{{article.total}} </span>
+                      </td>  
+ 
+                   </tr>
+                </tbody>
+             </table>
+          </div>
+ 
+          <div class="row">
+             <div class="col-md-7 mb-3"></div>
+             <div class="col-md-2 mb-1">
+                <button class="mb-3 mr-3 btn btn-primary active" mat-button matStepperPrevious>
+                   <i class="fas fa-chevron-left mr-2"></i>Précédent
+                </button>
+             </div>
+             <div class="col-md-2 mb-1">
+                <button mat-raised-button color="primary" matStepperNext class="mb-2 mr-2 btn btn-primary active">
+                   Suivant<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+ 
+             </div>
+ 
+ 
+          </div>
+       </form>
+    </mat-step>
+ 
+    <!--      controle    -->
+    <mat-step [stepControl]="controleFormGroup" label="Controle Marchandise">
+       <form [formGroup]="controleFormGroup">
+          <div class="main-card mb-3 card">
+             <div class="card-body">
+                <h5 class="card-title">Liste Article Bon Entrée </h5>
+                <div class="table-responsive">
+                   <table class="table">
+                      <thead>
+                         <tr>
+                            <th></th>
+                            <th>ID Article</th>
+                            <th>Nom Article</th>
+                            <th>Fiche Technique</th>
+                            <th>Quanitité</th>
+                            <th>Totale </th>
+                            <th>Controle Quantitatif</th>
+                            <th>Controle Qualitatif</th>
+                         </tr>
+                      </thead>
+                      <tbody>
+                       <!--  <tr *ngFor="let article2  of  obj_articles ;let i=index">
+                            <td scope="row"></td>
+                            <td>{{article2.id}} </td>
+                            <td>{{article2.nom}} </td>
+                            <td>{{article2.fiche_Technique}} </td>
+                            <td>{{article2.qte}} </td>
+                            <td>{{article2.total}} </td>
+                            <td>
+                               <label class="container">
+                                  <input type="checkbox" [checked]="article2.controle_qt" data-toggle="toggle"
+                                     data-onstyle="success" id="checkQuan" required disabled=true>
+                                   
+                               </label>
+                            </td>
+                            <td>
+                               <label class="container">
+                                  <input type="checkbox" data-toggle="toggle" [checked]="article2.controle_tech"
+                                     data-onstyle="success" id="checkQual" formControlName="checkQual" required
+                                     (click)="checkQualite(article2.id)">
+                                  
+                               </label>
+                            </td>
+                         </tr> 
+                        -->
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+          </div>
+          <div class="row">
+             <div class="col-md-7 mb-3"></div>
+             <div class="col-md-2 mb-1">
+                <button class="mb-2 mr-2 btn btn-primary active" mat-button matStepperPrevious>
+                   <i class="fas fa-chevron-left mr-2"></i>Précédent
+                </button>
+             </div>
+             <div class="col-md-2 mb-1">
+                <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary"(click)="Verifier_etat_bon()" >
+                   Suivant<i class="fas fa-chevron-right ml-2"></i></button>
+ 
+             </div>
+          </div>
+       </form>
+    </mat-step>
+   -->
+ 
+    <!--   cloture     -->
+    <mat-step>
+       <ng-template matStepLabel>Cloture</ng-template>
+       <h5>Information Operation de récepetion</h5>
+       <div class="row">
+          <div class="col-md-3 mb-3">
+             <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy HH:MM:SS'}}
+          </div>
+          <div class="col-md-2 mb-2">
+             <h6> <strong>Type de Bon</strong> </h6> {{type_bon}}
+          </div>
+          <div class="col-md-2 mb-2">
+             <h6> <strong> Numéro de bon</strong> </h6> {{id}}
+          </div>
+          <div class="col-md-2 mb-2">
+             <h6> <strong>Local:</strong> </h6> {{Destination}}
+          </div>
+          <div class="col-md-2 mb-2">
+             <h6> <strong>Responsable:</strong> </h6> rochdi
+          </div>
+       </div>
+       <div class="row">
+ 
+          
+        
+          <div class="col-md-8 mb-8">
+             <h6>
+                <strong> Liste Des Articles</strong>
+                <table class="table">
+                   <thead>
+                      <tr>
+                         <th></th>
+                         <th>ID Article</th>
+                         <th>Nom Article</th>
+                         <th>Fiche Technique</th>
+                         <th>Quanitité</th>
+                         <th>Totale </th>
+                         <th>Controle Quantitatif</th>
+                         <th>Controle Qualitatif</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      <tr *ngFor="let article  of  obj_articles ;let i=index">
+                         <td scope="row"></td>
+                         <td>{{article.id}} </td>
+                         <td>{{article.nom}} </td>
+                         <td>{{article.fiche_Technique}} </td>
+                         <td>{{article.qte}} </td>
+                         <td>{{article.total}} </td>
+                         <td>
+                            <label class="container">
+                               <input type="checkbox" [checked]="article.controle_qt" required disabled=true>                              
+                            </label>
+                         </td>
+                         <td>
+                            <label class="container">
+                               <input type="checkbox"   [checked]="article.controle_tech" disabled=true>
+                            </label>
+                         </td>
+                      </tr>
+ 
+                   </tbody>
+                </table>
+             </h6>
+          </div>
+          <div class="col-md-1 mb-1"></div>
+          <div class="col-md-3 mb-3">
+             <h6>
+                <strong> Liste Des Support</strong>
+                <table class="mb-0 table">
+                   <tr>
+ 
+                      <th>Type</th>
+                      <th>Poids</th>
+                      <th>Hauteur</th>
+                      <th>Largeur</th>
+                      <th>longeur</th>
+ 
+                   </tr>
+                   <tr *ngFor="let support  of arraySupport   ">
+ 
+                      <td>{{support.value.typeSupport}}</td>
+                      <td>{{support.value.poids}}</td>
+                      <td>{{support.value.hauteur}}</td>
+                      <td>{{support.value.largeur}}</td>
+                      <td>{{support.value.longeur}}</td>
+ 
+                   </tr>
+ 
+                </table>
+             </h6>
+          </div>
+ 
+       </div>
+ 
+       <div>
+          <div class="row">
+             <div class="col-md-6 mb-3"> </div>
+             <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
+                <i class="fas fa-chevron-left mr-2"></i>Précédent
+             </button>
+             <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  ">  Conserver </button>
+             <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"*ngIf="this.VerifierEetatbon">
+                <i class="fas fa-check mr-2"></i>Valider
+             </button>
+             
+             <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"*ngIf="!(this.VerifierEetatbon)">
+                <i class="fas fa-trash-alt mr-2"></i>Bon_rejet
+             </button>
+ 
+          </div>
+       </div>
+    </mat-step>
+ 
+ 
+ </mat-horizontal-stepper>

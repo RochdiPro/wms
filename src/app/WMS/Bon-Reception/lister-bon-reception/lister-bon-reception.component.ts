@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { BonReceptionServiceService } from '../bon-reception-service.service';
 
@@ -13,7 +14,7 @@ export class ListerBonReceptionComponent implements OnInit {
   bonReception: any;
 
 
-  constructor(private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
+  constructor(public router :Router ,private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
 
   }
   Bon_Receptions() {
@@ -60,7 +61,7 @@ export class ListerBonReceptionComponent implements OnInit {
     })
   }
   Modifier_Bon(id: any) {
-
+    this.router.navigate(['/Menu/WMS-Reception/Modifier/',id]);
   }
   Select_Bon() { }
 

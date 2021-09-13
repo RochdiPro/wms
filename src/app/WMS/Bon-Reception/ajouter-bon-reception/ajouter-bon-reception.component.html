@@ -27,6 +27,7 @@
                      <thead>
                         <tr>
                            <th>ID Bon Entrée </th>
+                           <th>Etat</th>
                            <th>Local</th>
                            <th>Date</th>
                            <th>ID Fournisseur</th>
@@ -35,8 +36,8 @@
                      </thead>
                      <tbody>
                         <tr *ngFor="let bon  of bonEntrees_Local; let i=index ">
-
                            <td>{{bon.id_Bon_Entree_Local}} </td>
+                           <td>{{bon.etat}}</td>
                            <td>{{bon.local}} </td>
                            <td>{{bon.date_BEL | date:'dd/MM/yyyy HH:MM:SS'}} </td>
                            <td>{{bon.id_Fr}} </td>
@@ -61,6 +62,7 @@
                      <thead>
                         <tr>
                            <th>ID Bon Entrée </th>
+                           <th>Etat</th>
                            <th>Local</th>
                            <th>Date</th>
                            <th>ID Fournisseur</th>
@@ -72,6 +74,7 @@
                         <tr *ngFor="let bon  of bonEntrees_impo; let i=index ">
 
                            <td>{{bon.id_Bon}} </td>
+                           <td>{{bon.etat}}</td>
                            <td>{{bon.local}} </td>
                            <td>{{bon.date_Creation | date:'dd/MM/yyyy HH:MM:SS'}} </td>
                            <td>{{bon.id_Fr}} </td>
@@ -96,6 +99,7 @@
 
                            <th>ID Bon Retour </th>
                            <th>ID Client</th>
+                           <th>Etat</th>
                            <th>Date</th>
                            <th>Local</th>
                            <th> </th>
@@ -106,6 +110,7 @@
 
                            <td>{{bon.id_Bon_Retour}} </td>
                            <td>{{bon.id_Clt}} </td>
+                           <td>{{bon.etat}}</td>
                            <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
                            <td>{{bon.local}} </td>
                            <td>
@@ -129,9 +134,12 @@
                         <tr>
 
                            <th>ID Bon Transfert </th>
+                           <th> Etat</th>
                            <th>Local Source</th>
                            <th>Locale Destination</th>
+                          
                            <th>Date</th>
+                           
                            <th> </th>
                         </tr>
                      </thead>
@@ -139,8 +147,10 @@
                         <tr *ngFor="let bon  of bontransfert; let i=index ">
 
                            <td>{{bon.id_Bon_Transfert}} </td>
+                           <td>{{bon.etat}}</td>
                            <td>{{bon.local_Source}} </td>
                            <td>{{bon.local_Destination}} </td>
+                      
                            <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
 
                            <td>
@@ -273,7 +283,7 @@
                                  <td> Support {{j+1}}</td>
                                  <td formGroupName>
                                     <input class="form-control" type="number" style="width: 80px;" formControlName="qte"
-                                       (keyup)="getTotale($event,j+1,article.id)" />
+                                       (keyup)="getTotale($event,j,article.id)" />
                                  </td>
                               </tr>
                            </table>
@@ -383,45 +393,23 @@
          <div class="col-md-3 mb-3">
             <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy HH:MM:SS'}}
          </div>
-         <div class="col-md-3 mb-3">
+         <div class="col-md-2 mb-2">
             <h6> <strong>Type de Bon</strong> </h6> {{type_bon}}
          </div>
-         <div class="col-md-3 mb-3">
+         <div class="col-md-2 mb-2">
             <h6> <strong> Numéro de bon</strong> </h6> {{id}}
          </div>
-         <div class="col-md-2 mb-3">
+         <div class="col-md-2 mb-2">
+            <h6> <strong>Local:</strong> </h6> {{Destination}}
+         </div>
+         <div class="col-md-2 mb-2">
             <h6> <strong>Responsable:</strong> </h6> rochdi
          </div>
       </div>
       <div class="row">
 
-         <div class="col-md-3 mb-3">
-            <h6>
-               <strong> Liste Des Support</strong>
-               <table class="mb-0 table">
-                  <tr>
-
-                     <th>Type</th>
-                     <th>Poids</th>
-                     <th>Hauteur</th>
-                     <th>Largeur</th>
-                     <th>longeur</th>
-
-                  </tr>
-                  <tr *ngFor="let support  of arraySupport   ">
-
-                     <td>{{support.value.typeSupport}}</td>
-                     <td>{{support.value.poids}}</td>
-                     <td>{{support.value.hauteur}}</td>
-                     <td>{{support.value.largeur}}</td>
-                     <td>{{support.value.longeur}}</td>
-
-                  </tr>
-
-               </table>
-            </h6>
-         </div>
-         <div class="col-md-1 mb-1"></div>
+         
+       
          <div class="col-md-8 mb-8">
             <h6>
                <strong> Liste Des Articles</strong>
@@ -462,6 +450,33 @@
                </table>
             </h6>
          </div>
+         <div class="col-md-1 mb-1"></div>
+         <div class="col-md-3 mb-3">
+            <h6>
+               <strong> Liste Des Support</strong>
+               <table class="mb-0 table">
+                  <tr>
+
+                     <th>Type</th>
+                     <th>Poids</th>
+                     <th>Hauteur</th>
+                     <th>Largeur</th>
+                     <th>longeur</th>
+
+                  </tr>
+                  <tr *ngFor="let support  of arraySupport   ">
+
+                     <td>{{support.value.typeSupport}}</td>
+                     <td>{{support.value.poids}}</td>
+                     <td>{{support.value.hauteur}}</td>
+                     <td>{{support.value.largeur}}</td>
+                     <td>{{support.value.longeur}}</td>
+
+                  </tr>
+
+               </table>
+            </h6>
+         </div>
 
       </div>
 
@@ -471,14 +486,11 @@
             <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
                <i class="fas fa-chevron-left mr-2"></i>Précédent
             </button>
-            <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  " *ngIf="this.VerifierEetatbon">  Conserver </button>
+            <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  ">  Conserver </button>
             <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"*ngIf="this.VerifierEetatbon">
                <i class="fas fa-check mr-2"></i>Valider
             </button>
-            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" *ngIf="this.VerifierEetatbon"
-               (click)="imprimerFicheRecpetion()">
-               <i class="fas fa-print mr-2"></i>Impression
-            </button>
+            
             <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"*ngIf="!(this.VerifierEetatbon)">
                <i class="fas fa-trash-alt mr-2"></i>Bon_rejet
             </button>

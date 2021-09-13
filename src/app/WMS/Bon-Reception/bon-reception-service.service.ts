@@ -176,18 +176,25 @@ export class BonReceptionServiceService {
 
   }
 
+  // get bon   reception  by id  
+  get_Bon_Reception_By_Id(id: any): Observable<Object> {
+    return this.httpClient.get(ERP + "Bon_Reception", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+// get information from  bon reception avec id 
+  Detail_Bon_Reception(Id: any): Observable<any> {
 
-/*S
-  Detail_BonReception(Id: any): Observable<any> {
-
-    return this.httpClient.get(infonet + "Detail_Bon_Reception"
+    return this.httpClient.get(ERP + "Detail_Bon_Reception"
       , {
         params: {
           Id: Id
         }, responseType: 'blob'
       }).pipe(catchError(this.handleError))
   }
-
+/*S
 
   createBonReception(form: any): Observable<Object> {
     return this.httpClient.post(infonet + "Creer_Bon_Reception", form);
