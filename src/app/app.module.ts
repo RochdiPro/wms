@@ -18,6 +18,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule  } from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
 import {ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
+import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.component';
 
 @NgModule({ 
   declarations: [
@@ -31,7 +32,9 @@ import {ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-r
     MenuWmsComponent,
     Ajouter_Bon_Rejet,
 
-    ModifierBonReceptionComponent
+    ModifierBonReceptionComponent,
+
+    BonRejetComponent
    
   ],
   exports: [

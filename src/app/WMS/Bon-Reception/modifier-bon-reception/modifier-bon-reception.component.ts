@@ -54,6 +54,8 @@ export class ModifierBonReceptionComponent implements OnInit {
       this.bonReception = data;
       this.type_bon = this.bonReception.type_Be;
       this.Destination = this.bonReception.local
+      this.nbSupport=this.bonReception.nb_Support       
+
 
     }, error => console.log(error));
     this.getDetail();
@@ -142,7 +144,7 @@ export class ModifierBonReceptionComponent implements OnInit {
 
 
 
-        //  console.log(this.obj_articles)
+          console.log(this.obj_articles[0].supports[0].id)
 
 
       }
@@ -152,25 +154,12 @@ export class ModifierBonReceptionComponent implements OnInit {
 
 
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 
   /*
-  ****************************************           fonctions relative a steep 2    ********************************************** 
+  ****************************************           fonctions relative a steep 1   ********************************************** 
   */
   //supports: any = [];
   arraySupport: any = [];
@@ -210,11 +199,7 @@ export class ModifierBonReceptionComponent implements OnInit {
 
   Supports: any = [];
   support: any = {};
-     Identifier_Articles( ) {
-      
-     
   
-    } 
 
   Sous_Famille_Logistique: any = [];
   Famille_Logistique: any = [];
@@ -308,7 +293,7 @@ export class ModifierBonReceptionComponent implements OnInit {
   doc: any
   bon_reception: any
   // creer le bon reception si etat verifier 
-  creer_Bon_Reception() {
+  Modifier_Bon_Reception() {
     this.doc = document.implementation.createDocument("Bon_Reception", "", null);
     var BR = this.doc.createElement("Bon_Reception");
     var Etat = this.doc.createElement("Etat"); Etat.innerHTML = "Validé"
@@ -405,11 +390,11 @@ export class ModifierBonReceptionComponent implements OnInit {
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);
 
-        this.service.createBonReception(formData).subscribe((data) => {
+        this.service.Modifier_BonReception( formData).subscribe((data) => {
           this.bon_reception = data
           Swal.fire(
-            'Ajout Effecté',
-            'Bon De Reception Ajouté Avec Sucées',
+            'Modification',
+            'Bon De Reception Modifier Avec Sucées',
             'success'
           ).then((result) => {
             if (result.isConfirmed) {

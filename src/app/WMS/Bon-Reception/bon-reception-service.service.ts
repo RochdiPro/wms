@@ -194,6 +194,13 @@ export class BonReceptionServiceService {
         }, responseType: 'blob'
       }).pipe(catchError(this.handleError))
   }
+
+
+
+  Modifier_BonReception( formData:any): Observable<Object> {
+    return this.httpClient.post(ERP+ "/Modifier_Bon_Reception", formData);
+  }  
+   
 /*S
 
   createBonReception(form: any): Observable<Object> {
