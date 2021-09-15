@@ -196,10 +196,25 @@ export class BonReceptionServiceService {
   }
 
 
-
+  /// modifier un bon de reception  
   Modifier_BonReception( formData:any): Observable<Object> {
     return this.httpClient.post(ERP+ "/Modifier_Bon_Reception", formData);
   }  
+  
+
+  // get bons de rejet 
+  Bon_rejet():  Observable<any> {
+      return this.httpClient.get(ERP + "Bon_Rejets");  
+  }
+     
+  // Supprimer un bon Rejet
+  Supprimer_Bon_rejet(id: any): Observable<Object> {
+    return this.httpClient.delete(ERP + "Supprimer_Bon_Rejet", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
    
 /*S
 

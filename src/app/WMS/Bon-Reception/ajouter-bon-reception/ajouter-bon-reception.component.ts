@@ -546,7 +546,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         console.log("id bon :", this.id)
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
-        formData.append('Etat', "Traiter");
+        formData.append('Etat', "Validé");
         formData.append('Responsable', "rochdi");
         formData.append('date', this.sysDate);
         formData.append('Local', this.Destination);
@@ -692,7 +692,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         console.log("id bon :", this.id)
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
-        formData.append('Etat', "Conserver");
+        formData.append('Etat', "En Attente");
         formData.append('Responsable', "rochdi");
         formData.append('date', this.sysDate);
         formData.append('Local', this.Destination);
@@ -923,12 +923,7 @@ export class AjouterBonReceptionComponent implements OnInit {
       }
 
     })
-
   }
-
-
-
-
 }
 
 
@@ -962,8 +957,7 @@ export class Ajouter_Bon_Rejet {
     this.local = data.local
     this.obj_articles = data.objects
     this.type_bon = data.type
-     
-
+   
   }
 
   CreeBonRejet() {
@@ -1023,9 +1017,10 @@ export class Ajouter_Bon_Rejet {
         let xml2string = new XMLSerializer().serializeToString(this.doc .documentElement);
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
-        console.log(this.idBon)
+        
+        console.log( this.type_bon +"  "+ this.idBon +"        hhhh")  
         formData.append('Id_Bon', this.idBon);
-        formData.append('Etat', "En cours");
+        formData.append('Etat', "Rejeter");
         formData.append('Responsable', "User1");
         formData.append('Date', this.sysDate);
         formData.append('Local', this.local);
@@ -1056,7 +1051,7 @@ export class Ajouter_Bon_Rejet {
           })
         });
 
-        //this.router.navigate(['Menu/Edit-reception/Gerer-support'])
+        this.router.navigate(['/Menu/WMS-Reception/Rejet'])
       })
   }
 

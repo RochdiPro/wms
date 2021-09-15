@@ -53,14 +53,16 @@
                          <form [formGroup]="SupportFormGroup">
                             <table class="mb-0 table">
                                <tr *ngFor="let support  of arraySupport ;let j=index;">
-                                  <td> Support {{j+1}}  </td>
+                                  <td> Support {{j+1}}     </td>                                 
                                   <td>
-                                     <input class="form-control" type="number" style="width: 80px;" value="{{article.supports[j].qte}}"    (keyup)="getTotale($event,j,article.id)" />
+                                     <input class="form-control" type="number" style="width: 80px;"  value="{{article.supports[j].qte}}"(blur)="getTotale($event,j,article.id)" />
                                   </td>
                                </tr>
                             </table>
                          </form>
- 
+
+
+                          
                       </td>
                       <td>
                          <span>{{article.total}} </span>

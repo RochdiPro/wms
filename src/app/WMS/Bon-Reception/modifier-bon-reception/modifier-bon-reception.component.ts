@@ -10,6 +10,7 @@ import * as xml2js from 'xml2js';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ajouter_Bon_Rejet } from '../ajouter-bon-reception/ajouter-bon-reception.component';
+import { Console } from 'console';
 declare var require: any
 
 const pdfMake = require("pdfmake/build/pdfmake");
@@ -88,6 +89,7 @@ export class ModifierBonReceptionComponent implements OnInit {
   obj_articles: any = [];
   supports: any = [];
   new_obj: any = {}
+  sup:any ={}
   // Get Detail bon reception 
   getDetail() {
     this.service.Detail_Bon_Reception(this.id).subscribe((detail: any) => {
@@ -113,16 +115,11 @@ export class ModifierBonReceptionComponent implements OnInit {
           this.arraySupport[k].largeur = this.xmldata.Liste_Supports[0].Support[k].largeur;
           this.arraySupport[k].longeur = this.xmldata.Liste_Supports[0].Support[k].longeur;
         }
-
-        for (let k = 0; k < this.xmldata.Produits[0].Produit[0].Supports.length; k++) {
-          this.support = {}
-          this.support.id = k;
-          this.support.qte = 0;
-          this.supports.push(this.support);
-        }
-        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {
-          this.new_obj = {}
-
+        
+        
+        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {    
+ 
+          this.new_obj={}
           this.new_obj.id = this.xmldata.Produits[0].Produit[i].Id;
           this.new_obj.nom = this.xmldata.Produits[0].Produit[i].Nom;
           this.new_obj.fiche_Technique = this.xmldata.Produits[0].Produit[i].Fiche_Technique;
@@ -131,20 +128,22 @@ export class ModifierBonReceptionComponent implements OnInit {
           this.new_obj.famaille = this.xmldata.Produits[0].Produit[i].famaille;
           this.new_obj.sous_famaille = this.xmldata.Produits[0].Produit[i].sous_famaille;
           this.new_obj.total = this.xmldata.Produits[0].Produit[i].Total;
-          this.new_obj.supports = this.supports;
-          for (let k = 0; k < this.xmldata.Produits[0].Produit[0].Supports.length; k++) {
-            this.new_obj.supports[k].qte = this.xmldata.Produits[0].Produit[0].Supports[0].Support[k].Qte;
-          }
-
+          this.support = []    
+          for (let h = 0; h <= this.xmldata.Produits[0].Produit[i].Supports.length; h++) {
+            this.sup = {}
+            this.sup.id = h;
+            this.sup.qte =  this.xmldata.Produits[0].Produit[0].Supports[0].Support[h].Qte;
+            this.support.push(this.sup)
+            
+          } 
+          this.new_obj.supports=this.support; 
           this.new_obj.controle_qt = this.xmldata.Produits[0].Produit[i].Qte_Verifier;
           this.new_obj.controle_tech = this.xmldata.Produits[0].Produit[i].Fiche_Technique_Verifier;
           this.obj_articles.push(this.new_obj)
 
+
         }
-
-
-
-          console.log(this.obj_articles[0].supports[0].id)
+          console.log(this.obj_articles  )
 
 
       }

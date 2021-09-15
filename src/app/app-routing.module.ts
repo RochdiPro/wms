@@ -9,7 +9,9 @@ import { EditBonReceptionComponent } from './WMS/Bon-Reception/edit-bon-receptio
 import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-reception/lister-bon-reception.component';
 import { ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
-
+import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
+import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
+   
  
 const routes: Routes =
   [
@@ -33,6 +35,15 @@ const routes: Routes =
             { path: 'Ajouter', component: AjouterBonReceptionComponent},   
             { path: 'Rejet', component: BonRejetComponent},   
             { path: 'Modifier/:id', component: ModifierBonReceptionComponent},   
+          ]
+        } ,
+        {
+           path: 'WMS-Stockage', component: EditStockageComponent, children: [
+             { path: '', redirectTo: 'WMS-Stockage', pathMatch: 'full' },          
+            { path: 'Entree', component: EntreeBonReceptionComponent},
+           // { path: 'Ajouter', component: AjouterBonReceptionComponent},   
+           // { path: 'Rejet', component: BonRejetComponent},   
+          //  { path: 'Modifier/:id', component: ModifierBonReceptionComponent},   
           ]
         } 
 

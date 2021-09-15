@@ -279,11 +279,11 @@
                      <td>
                         <form [formGroup]="SupportFormGroup">
                            <table class="mb-0 table">
-                              <tr formArrayName="ClassDetails" *ngFor="let support  of arraySupport ;let j=index;">
+                              <tr   *ngFor="let support  of arraySupport ;let j=index;">
                                  <td> Support {{j+1}}</td>
-                                 <td formGroupName>
-                                    <input class="form-control" type="number" style="width: 80px;" formControlName="qte"
-                                       (keyup)="getTotale($event,j,article.id)" />
+                                  <!--formControlName="qte"-->
+                                 <td >
+                                    <input class="form-control" type="number" style="width: 80px;" (blur) ="getTotale($event,j,article.id)" />
                                  </td>
                               </tr>
                            </table>
@@ -292,7 +292,6 @@
                      </td>
                      <td>
                         <span>{{article.total}} </span>
-
                      </td>
 
                   </tr>
@@ -311,10 +310,7 @@
                <button mat-raised-button color="primary" matStepperNext class="mb-2 mr-2 btn btn-primary active">
                   Suivant<i class="fas fa-chevron-right ml-2"></i>
                </button>
-
             </div>
-
-
          </div>
       </form>
    </mat-step>

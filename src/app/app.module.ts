@@ -19,7 +19,9 @@ import { MatSelectModule  } from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
 import {ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
 import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.component';
-
+import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
+import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
+  
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -31,11 +33,11 @@ import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.compo
     ListerBonReceptionComponent,
     MenuWmsComponent,
     Ajouter_Bon_Rejet,
-
     ModifierBonReceptionComponent,
-
-    BonRejetComponent
-   
+    BonRejetComponent,
+  
+   EditStockageComponent,
+   EntreeBonReceptionComponent
   ],
   exports: [
      
