@@ -792,9 +792,9 @@ export class AjouterBonReceptionComponent implements OnInit {
       content: [
         {
           text: 'Bon Reception N° ' + id + '\n\n',
-          fontSize: 15,
+          fontSize: 10,
 
-          alignment: 'center',
+          alignment: 'left',
 
           color: 'black',
           bold: true
@@ -1147,9 +1147,9 @@ export class Ajouter_Bon_Rejet {
 
       content: [
         {
-          text: 'Informations Bon Rejet N°' + id + '\n\n',
-          fontSize: 15,
-          alignment: 'center',
+          text: 'Bon Rejet N°' + id + '\n\n',
+          fontSize: 10,
+          alignment: 'left',
 
           color: 'black',
           bold: true
