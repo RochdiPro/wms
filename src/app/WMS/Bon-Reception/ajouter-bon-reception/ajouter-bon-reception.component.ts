@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { BonReceptionServiceService } from '../bon-reception-service.service';
 import Swal from 'sweetalert2'
@@ -24,6 +24,8 @@ export class AjouterBonReceptionComponent implements OnInit {
   SupportFormGroup: any = FormGroup;
   ArticleFormGroup: any = FormGroup;
   controleFormGroup: any = FormGroup;
+  @ViewChild("qte") qte: any;
+
 
   isLinear = false;
   selected = 'id';
@@ -40,7 +42,8 @@ export class AjouterBonReceptionComponent implements OnInit {
   Destination: any;
   modele: any;
 
-  constructor(public router :Router ,public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
+
+  constructor(public router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
     this.service.Famille_Logistique().subscribe((data: any) => {
       this.Famille_Logistique = data;
     });
@@ -74,7 +77,7 @@ export class AjouterBonReceptionComponent implements OnInit {
   /*
   ****************************************           fonctions relative a steep 1 ********************************************** 
   */
- 
+
   //  function pour choisir type de marchandise a fin de realisier l'affichage du tableau avec le parametre de bon  
   bonEntree_selected: any;
   bonEntree_impo_selected: any;
@@ -205,14 +208,19 @@ export class AjouterBonReceptionComponent implements OnInit {
   supports: any = [];
   arraySupport: any = [];
   newAttribute: any;
-  listArticleBonEntree: any = []; 
+  listArticleBonEntree: any = [];
+  l_article: any = {};
+  table_Support: any = [];
+
   //generer tableau de support
   genererTemplateSupport(nbSupport: any) {
     this.arraySupport = [];
     for (let i = 0; i < nbSupport; i++) {
       this.arraySupport.push(this.ajouterligneSupport());
 
+
     }
+    //console.log(this.table_Support)
 
     this.SupportFormGroup = this._formBuilder.group({
       ClassDetails: this._formBuilder.array(this.arraySupport)
@@ -230,7 +238,7 @@ export class AjouterBonReceptionComponent implements OnInit {
       longeur: new FormControl({ value: '1', disabled: false }, Validators.required),
     });
   }
- 
+
 
   /*
   ****************************************           fonctions relative a steep 3  ********************************************** 
@@ -246,14 +254,16 @@ export class AjouterBonReceptionComponent implements OnInit {
       this.service.Quantite_Fiche_Technique_Fiche_Bon_Entree_Local(id).subscribe((data: any) => {
         this.listeArticleBon = data;
 
-        for (let k = 0; k < this.arraySupport.length; k++) {
-          this.support = {}
-          this.support.id = k;
-          this.support.qte = 0;
-          this.supports.push(this.support);
-        }
+        
 
         for (let i = 0; i < this.listeArticleBon.length; i++) {
+          this.supports=[]
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
           this.new_obj = {};
           this.new_obj.id = this.listeArticleBon[i].id;
           this.new_obj.nom = this.listeArticleBon[i].nom_Article;
@@ -268,6 +278,7 @@ export class AjouterBonReceptionComponent implements OnInit {
           this.new_obj.controle_tech = false;
           this.obj_articles.push(this.new_obj)
         }
+        console.log(this.obj_articles)
 
       });
     }
@@ -359,6 +370,35 @@ export class AjouterBonReceptionComponent implements OnInit {
       });
     }
 
+
+  }
+
+
+  id_art:any;
+  id_sup:any;
+  get_Qte_Support(id_article: any, id: any) {
+    this.id_art=id_article;
+    this.id_sup=id;
+    for (let j = 0; j < this.obj_articles.length; j++) {
+      if (id_article == this.obj_articles[j].id) {
+        for (let k = 0; k < this.obj_articles[j].supports.length; k++) {
+          if (id == this.obj_articles[j].supports[k].id) {
+            this.qte.nativeElement.value = this.obj_articles[j].supports[k].qte;
+          }
+        }
+      }
+    }
+
+  }
+  Modifier_Support( id:any) {    
+    const dialogRef = this.dialog.open(Support, {
+      width: 'auto',
+      data: { objects: this.obj_articles , id :id}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.calculeTotale(id);
+    });
+
   }
 
   Sous_Famille_Logistique: any = [];
@@ -371,7 +411,7 @@ export class AjouterBonReceptionComponent implements OnInit {
       if (this.obj_articles[i].id == id) {
         this.obj_articles[i].famaille = ch
       }
-    } 
+    }
   }
   // get sous famaille 
   getSousFamille(id: any) {
@@ -395,18 +435,16 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
 
   //calcule Totale Support
-  getTotale(ev: any, i: any, id: any) {
+ calculeTotale( id: any) {
 
     for (let j = 0; j < this.obj_articles.length; j++) {
       if (id == this.obj_articles[j].id) {
         let sm = 0;
-       
-        for (let k = 0; k < this.obj_articles[j].supports.length; k++) {        
-          if (this.obj_articles[j].supports[k].id == i) {
-             this.obj_articles[j].supports[k].qte = ev.target.value
-          }          
-          sm = Number(sm)+ Number(this.obj_articles[j].supports[k].qte)         
-        }        
+
+        for (let k = 0; k < this.obj_articles[j].supports.length; k++) {
+          
+          sm = Number(sm) + Number(this.obj_articles[j].supports[k].qte)
+        }
         this.obj_articles[j].total = sm;
         if (this.obj_articles[j].total == this.obj_articles[j].qte) { this.obj_articles[j].controle_qt = true } else { this.obj_articles[j].controle_qt = false }
       }
@@ -451,9 +489,9 @@ export class AjouterBonReceptionComponent implements OnInit {
 
   Valider: any = true;
   doc: any
-  bon_reception :any
+  bon_reception: any
   // creer le bon reception si etat verifier 
-  creer_Bon_Reception() { 
+  creer_Bon_Reception() {
     this.doc = document.implementation.createDocument("Bon_Reception", "", null);
     var BR = this.doc.createElement("Bon_Reception");
     var Etat = this.doc.createElement("Etat"); Etat.innerHTML = "Validé"
@@ -495,7 +533,7 @@ export class AjouterBonReceptionComponent implements OnInit {
           Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
         }
       }
-       
+
 
       Produit.appendChild(id);
       Produit.appendChild(Nom);
@@ -553,9 +591,9 @@ export class AjouterBonReceptionComponent implements OnInit {
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);
-    
-        this.service.createBonReception(formData).subscribe((data) => {  
-          this.bon_reception=data
+
+        this.service.createBonReception(formData).subscribe((data) => {
+          this.bon_reception = data
           Swal.fire(
             'Ajout Effecté',
             'Bon De Reception Ajouté Avec Sucées',
@@ -570,22 +608,24 @@ export class AjouterBonReceptionComponent implements OnInit {
                 cancelButtonText: 'Non',
               }).then((result) => {
                 if (result.isConfirmed) {
-                
-                  this.generatePDF(this.bon_reception.id , this.bon_reception.date_Creation);
+
+                  this.generatePDF(this.bon_reception.id, this.bon_reception.date_Creation);
                   this.router.navigate(['Menu/WMS-Reception/Lister']);
                 } else if (result.isDismissed) {
                   console.log('erreur  ');
                 }
               });
-            }});
-          }, (err)=> {
-               
-        
-         
-      });});
+            }
+          });
+        }, (err) => {
 
-      
-     
+
+
+        });
+      });
+
+
+
 
   }
   //convertir blob à un fichier  
@@ -719,7 +759,7 @@ export class AjouterBonReceptionComponent implements OnInit {
 
   modeleSrc: any;
   //impression de la fiche recption
-  generatePDF( id :any , date_Creation:any) {
+  generatePDF(id: any, date_Creation: any) {
 
     var body = [];
     var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification');
@@ -845,10 +885,11 @@ export class AjouterBonReceptionComponent implements OnInit {
         },
         {
           table: {
-           
+
             alignment: 'right',
-                    body:  body
-        }} ,
+            body: body
+          }
+        },
         {
           text: '\n\n' + 'Liste des Supports ' + '\t\n',
           fontSize: 12,
@@ -911,9 +952,9 @@ export class AjouterBonReceptionComponent implements OnInit {
 
     }).then((result) => {
       if (result.isConfirmed) {
-      
+
         const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {
-          
+
           width: 'auto',
           data: { objects: this.obj_articles, id_Bon: this.id, local: this.Destination, type: this.type_bon }
         });
@@ -942,7 +983,7 @@ export class Ajouter_Bon_Rejet {
   listLigneArticleRejet: any[] = []
   obj_articles: any;
   lis: any = [];
-   bon_rejet :any ;
+  bon_rejet: any;
   modeleSrc2: any;
   modele2: any;
 
@@ -957,7 +998,7 @@ export class Ajouter_Bon_Rejet {
     this.local = data.local
     this.obj_articles = data.objects
     this.type_bon = data.type
-   
+
   }
 
   CreeBonRejet() {
@@ -978,47 +1019,47 @@ export class Ajouter_Bon_Rejet {
     InformationsGenerales.appendChild(Responsable);
     var Produits_Listes = this.doc.createElement('Produits')
 
- for (let i = 0; i < this.obj_articles.length; i++) {
+    for (let i = 0; i < this.obj_articles.length; i++) {
 
-  var Produit = this.doc.createElement('Produit')
-  var id = this.doc.createElement('Id'); id.innerHTML = this.obj_articles[i].id
-  var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.obj_articles[i].nom
-  var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.obj_articles[i].qte
-  var FicheTechnique = this.doc.createElement('Fiche_Technique'); FicheTechnique.innerHTML = this.obj_articles[i].fiche_Technique
-  var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
-  var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
-  var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
+      var Produit = this.doc.createElement('Produit')
+      var id = this.doc.createElement('Id'); id.innerHTML = this.obj_articles[i].id
+      var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.obj_articles[i].nom
+      var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.obj_articles[i].qte
+      var FicheTechnique = this.doc.createElement('Fiche_Technique'); FicheTechnique.innerHTML = this.obj_articles[i].fiche_Technique
+      var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
+      var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
+      var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
 
-   
 
-  Produit.appendChild(id);
-  Produit.appendChild(Nom);
-  Produit.appendChild(Qte);
-  Produit.appendChild(FicheTechnique);
-  Produit.appendChild(verif_qte);
-  Produit.appendChild(verif_fiche);
-  Produit.appendChild(total);
-  
-  Produits_Listes.appendChild(Produit)
- }
+
+      Produit.appendChild(id);
+      Produit.appendChild(Nom);
+      Produit.appendChild(Qte);
+      Produit.appendChild(FicheTechnique);
+      Produit.appendChild(verif_qte);
+      Produit.appendChild(verif_fiche);
+      Produit.appendChild(total);
+
+      Produits_Listes.appendChild(Produit)
+    }
     BR.appendChild(Etat);
     BR.appendChild(InformationsGenerales);
     BR.appendChild(Produits_Listes);
 
     this.doc.appendChild(BR)
-    console.log(this.doc )
+    console.log(this.doc)
 
-  
+
     var formData: any = new FormData();
     let url = "assets/BonRejet.xml";
     fetch(url)
       .then(response => response.text())
       .then(data => {
-        let xml2string = new XMLSerializer().serializeToString(this.doc .documentElement);
+        let xml2string = new XMLSerializer().serializeToString(this.doc.documentElement);
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
-        
-        console.log( this.type_bon +"  "+ this.idBon +"        hhhh")  
+
+        console.log(this.type_bon + "  " + this.idBon + "        hhhh")
         formData.append('Id_Bon', this.idBon);
         formData.append('Etat', "Rejeter");
         formData.append('Responsable', "User1");
@@ -1030,7 +1071,7 @@ export class Ajouter_Bon_Rejet {
         formData.append('Detail', myFile);
         this.service.creer_BonR_ejet(formData).subscribe(data => {
           console.log("Bon rejet", data);
-          this.bon_rejet=data
+          this.bon_rejet = data
           Swal.fire({
             title: 'Bon Rejet!',
             text: 'Bon Rejet est crée et envoyée.',
@@ -1044,7 +1085,7 @@ export class Ajouter_Bon_Rejet {
 
             if (result.isConfirmed) {
 
-              this.imprimerFicheRejet(this.bon_rejet.id , this.bon_rejet.date_Creation)
+              this.imprimerFicheRejet(this.bon_rejet.id, this.bon_rejet.date_Creation)
 
             }
 
@@ -1067,7 +1108,7 @@ export class Ajouter_Bon_Rejet {
     this.dialogRef.close();
   }
 
-  imprimerFicheRejet(id :any , date :any ) {
+  imprimerFicheRejet(id: any, date: any) {
     var body = [];
     var titulos = new Array(' ID ', 'Article', 'Fiche Technique', 'Qte', 'contrôle quantitatif', 'contrôle technique', 'Reclmation');
     body.push(titulos);
@@ -1075,21 +1116,21 @@ export class Ajouter_Bon_Rejet {
 
     for (let i = 0; i < this.obj_articles.length; i++) {
       var fila = new Array();
-      
-        console.log( this.obj_articles[i].controle_qt  +"   " +this.obj_articles[i].controle_tech );
-           
-     
-        
+
+      console.log(this.obj_articles[i].controle_qt + "   " + this.obj_articles[i].controle_tech);
+
+
+
 
       let ch = "";
-      if (this.obj_articles[i].controle_qt  ) { 
-        
+      if (this.obj_articles[i].controle_qt) {
+
       }
-      else{ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " +this.obj_articles[i].qte }
-      if (this.obj_articles[i].controle_tech  ) {
-       
+      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
+      if (this.obj_articles[i].controle_tech) {
+
       }
-      else{
+      else {
         ch = ch + " Fiche Technique non Verifier "
       }
 
@@ -1105,7 +1146,7 @@ export class Ajouter_Bon_Rejet {
       body.push(fila);
 
     }
-     console.log(body)
+    console.log(body)
 
 
     var def = {
@@ -1175,7 +1216,7 @@ export class Ajouter_Bon_Rejet {
             {
               text:
                 'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY HH:mm:ss')
-                + '\n\n' + 'Type Bon :' + this.type_bon+ '\t'
+                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
               ,
 
               fontSize: 10,
@@ -1199,10 +1240,10 @@ export class Ajouter_Bon_Rejet {
         },
         {
           table: {
-           
+
             alignment: 'right',
-                    body:  body
-        }
+            body: body
+          }
         },
         {
 
@@ -1249,5 +1290,74 @@ export class Ajouter_Bon_Rejet {
     return <File>theBlob;
   }
 
+
+}
+
+
+
+
+
+
+//dialog detail
+@Component({
+  selector: 'Support',
+  templateUrl: 'Supports.html',
+})
+export class Support {
+ 
+  
+  obj_articles: any;
+  Supports: any;
+  id_article_ajour:any;
+  
+  constructor(public dialogRef: MatDialogRef<Ajouter_Bon_Rejet>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private router: Router, private http: HttpClient) {
+    
+     
+   this.obj_articles = data.objects
+
+   this.id_article_ajour=data.id;
+    for (let k = 0; k < this.obj_articles.length; k++) {
+     
+      if(this.obj_articles[k].id==data.id){
+         this.Supports=this.obj_articles[k].supports
+      }
+    }
+     
+     
+  }
+  set_qte(event:any ,s:any,id_article :any)
+  {
+   console.log(event.target.value +"   "+ s+"  "+id_article)
+   for (let i = 0; i< this.obj_articles.length; i++) {
+    
+      if(this.obj_articles[i].id==this.id_article_ajour){
+        console.log(this.obj_articles[i].id)
+        for (let k = 0; k < this.obj_articles[i].supports.length; k++) {      
+          if(this.obj_articles[i].supports[k].id==s){
+            console.log("rrrr")
+           this.obj_articles[i].supports[k].qte=event.target.value
+          }
+      }
+    }
+   
+  }
+
+  }
+ 
+
+  onSubmit(rec: any) {
+     
+  }
+
+
+
+  //fermer dialogue
+  close() {
+    this.dialogRef.close();
+  }
+ 
+
+  
+ 
 
 }

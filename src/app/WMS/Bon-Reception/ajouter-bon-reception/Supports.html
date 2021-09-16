@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>Liste des Supports </h1>
+
+<div mat-dialog-content>
+    <div class="row">
+        <div class="table-responsive">
+           <table class="mb-0 table">
+                <thead>
+               <tr>
+                    
+                    <th>ID Support</th>                    
+                    <th>Qte</th>
+                </tr>
+               </thead>
+               <tbody>
+                <tr  *ngFor = "let obj  of Supports; let i=index">
+                 
+                    <th>{{obj.id}}</th>                    
+                    <th><input type="text" value="{{obj.qte}}" (keyup)="set_qte($event,obj.id,id_article_ajour)"></th>
+             
+                    
+
+               </tr> 
+              
+               </tbody>
+           </table>
+           
+       </div>
+    
+     </div>
+
+
+</div>
+
+<div mat-dialog-actions class="float-right">
+    
+    <button class="mb-2 mr-2 btn btn-primary" (click)="close()" >Fermer</button>
+
+</div>

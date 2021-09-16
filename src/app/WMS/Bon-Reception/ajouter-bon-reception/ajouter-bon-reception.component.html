@@ -137,9 +137,9 @@
                            <th> Etat</th>
                            <th>Local Source</th>
                            <th>Locale Destination</th>
-                          
+
                            <th>Date</th>
-                           
+
                            <th> </th>
                         </tr>
                      </thead>
@@ -150,7 +150,7 @@
                            <td>{{bon.etat}}</td>
                            <td>{{bon.local_Source}} </td>
                            <td>{{bon.local_Destination}} </td>
-                      
+
                            <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
 
                            <td>
@@ -277,19 +277,23 @@
                      </td>
                      <td>{{article.qte}} </td>
                      <td>
+                              <button class="fas fa-edit mb-2 mr-2 btn " (click)="Modifier_Support( article.id )"> </button>
+                     </td>
+                     <!--                    <td>
                         <form [formGroup]="SupportFormGroup">
                            <table class="mb-0 table">
-                              <tr   *ngFor="let support  of arraySupport ;let j=index;">
+                              <tr *ngFor="let support  of arraySupport ;let j=index;">
                                  <td> Support {{j+1}}</td>
-                                  <!--formControlName="qte"-->
-                                 <td >
-                                    <input class="form-control" type="number" style="width: 80px;" (blur) ="getTotale($event,j,article.id)" />
+                                
+                                 <td>
+                                    <input class="form-control" type="number" style="width: 80px;"
+                                       (blur)="getTotale($event,j,article.id)" />
                                  </td>
                               </tr>
                            </table>
                         </form>
 
-                     </td>
+                     </td>-->
                      <td>
                         <span>{{article.total}} </span>
                      </td>
@@ -372,7 +376,8 @@
                </button>
             </div>
             <div class="col-md-2 mb-1">
-               <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary"(click)="Verifier_etat_bon()" >
+               <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary"
+                  (click)="Verifier_etat_bon()">
                   Suivant<i class="fas fa-chevron-right ml-2"></i></button>
 
             </div>
@@ -404,8 +409,8 @@
       </div>
       <div class="row">
 
-         
-       
+
+
          <div class="col-md-8 mb-8">
             <h6>
                <strong> Liste Des Articles</strong>
@@ -432,12 +437,12 @@
                         <td>{{article.total}} </td>
                         <td>
                            <label class="container">
-                              <input type="checkbox" [checked]="article.controle_qt" required disabled=true>                              
+                              <input type="checkbox" [checked]="article.controle_qt" required disabled=true>
                            </label>
                         </td>
                         <td>
                            <label class="container">
-                              <input type="checkbox"   [checked]="article.controle_tech" disabled=true>
+                              <input type="checkbox" [checked]="article.controle_tech" disabled=true>
                            </label>
                         </td>
                      </tr>
@@ -482,12 +487,15 @@
             <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
                <i class="fas fa-chevron-left mr-2"></i>Précédent
             </button>
-            <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  ">  Conserver </button>
-            <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"*ngIf="this.VerifierEetatbon">
+            <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  "> Conserver
+            </button>
+            <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"
+               *ngIf="this.VerifierEetatbon">
                <i class="fas fa-check mr-2"></i>Valider
             </button>
-            
-            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"*ngIf="!(this.VerifierEetatbon)">
+
+            <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"
+               *ngIf="!(this.VerifierEetatbon)">
                <i class="fas fa-trash-alt mr-2"></i>Bon_rejet
             </button>
 

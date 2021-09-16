@@ -8,7 +8,7 @@ import { ChildComponent } from './child/child.component';
 import { SubChildComponent } from './sub-child/sub-child.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EditBonReceptionComponent } from './WMS/Bon-Reception/edit-bon-reception/edit-bon-reception.component';
-import { Ajouter_Bon_Rejet,AjouterBonReceptionComponent } from './WMS/Bon-Reception/ajouter-bon-reception/ajouter-bon-reception.component';
+import { Ajouter_Bon_Rejet,Support,AjouterBonReceptionComponent } from './WMS/Bon-Reception/ajouter-bon-reception/ajouter-bon-reception.component';
 import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-reception/lister-bon-reception.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,7 +35,7 @@ import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-re
     Ajouter_Bon_Rejet,
     ModifierBonReceptionComponent,
     BonRejetComponent,
-  
+    Support,
    EditStockageComponent,
    EntreeBonReceptionComponent
   ],
