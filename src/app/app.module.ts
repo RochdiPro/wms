@@ -17,11 +17,19 @@ import {MatStepperModule} from '@angular/material/stepper';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule  } from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
-import {ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
+import {ModifierBonReceptionComponent,Modifier_Support } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
 import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.component';
 import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
 import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
-  
+import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
+import { BonSortieComponent } from './WMS/inventaire/bon-sortie/bon-sortie.component';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table'  
+import { MatFormFieldModule } from '@angular/material/form-field';
+
+import {MatInputModule} from '@angular/material/input';
+
+ 
 @NgModule({ 
   declarations: [
     AppComponent,
@@ -36,8 +44,11 @@ import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-re
     ModifierBonReceptionComponent,
     BonRejetComponent,
     Support,
+    Modifier_Support,
    EditStockageComponent,
-   EntreeBonReceptionComponent
+   EntreeBonReceptionComponent,
+   EditInventaireComponent,
+   BonSortieComponent
   ],
   exports: [
      
@@ -54,6 +65,10 @@ import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-re
     FormsModule, ReactiveFormsModule,
     MatSelectModule,
     MatDialogModule,
+    MatPaginatorModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatInputModule 
   ],
   providers: [],
   bootstrap: [AppComponent]

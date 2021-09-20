@@ -8,6 +8,8 @@ import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.compo
 import { EditBonReceptionComponent } from './WMS/Bon-Reception/edit-bon-reception/edit-bon-reception.component';
 import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-reception/lister-bon-reception.component';
 import { ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
+import { BonSortieComponent } from './WMS/inventaire/bon-sortie/bon-sortie.component';
+import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
 import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
 import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
@@ -41,12 +43,19 @@ const routes: Routes =
            path: 'WMS-Stockage', component: EditStockageComponent, children: [
              { path: '', redirectTo: 'WMS-Stockage', pathMatch: 'full' },          
             { path: 'Entree', component: EntreeBonReceptionComponent},
-           // { path: 'Ajouter', component: AjouterBonReceptionComponent},   
-           // { path: 'Rejet', component: BonRejetComponent},   
-          //  { path: 'Modifier/:id', component: ModifierBonReceptionComponent},   
+            
           ]
-        } 
+        } ,
+        {
+          path: 'WMS-Inventaire', component: EditInventaireComponent, children: [
+            { path: '', redirectTo: 'WMS-Inventaire', pathMatch: 'full' },          
+           { path: 'Bon_Sortie', component: BonSortieComponent},
+        
+         ]
+       } 
 
+
+        //WMS-Inventaire/Bon_Sortie
         //   wms routing 
 
 

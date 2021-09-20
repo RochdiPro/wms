@@ -39,7 +39,7 @@
                            <td>{{bon.id_Bon_Entree_Local}} </td>
                            <td>{{bon.etat}}</td>
                            <td>{{bon.local}} </td>
-                           <td>{{bon.date_BEL | date:'dd/MM/yyyy HH:MM:SS'}} </td>
+                           <td>{{bon.date_BEL | date:'dd/MM/yyyy'}} </td>
                            <td>{{bon.id_Fr}} </td>
                            <td>
                               <button type="button" class="btn btn-primary"
@@ -76,7 +76,7 @@
                            <td>{{bon.id_Bon}} </td>
                            <td>{{bon.etat}}</td>
                            <td>{{bon.local}} </td>
-                           <td>{{bon.date_Creation | date:'dd/MM/yyyy HH:MM:SS'}} </td>
+                           <td>{{bon.date_Creation | date:'dd/MM/yyyy'}} </td>
                            <td>{{bon.id_Fr}} </td>
                            <td>
                               <button type="button" class="btn btn-primary" (click)="getNombre_Support(bon.id_Bon)">
@@ -111,7 +111,7 @@
                            <td>{{bon.id_Bon_Retour}} </td>
                            <td>{{bon.id_Clt}} </td>
                            <td>{{bon.etat}}</td>
-                           <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
+                           <td>{{bon.date | date:'dd/MM/yyyy'}} </td>
                            <td>{{bon.local}} </td>
                            <td>
                               <button type="button" class="btn btn-primary"
@@ -151,7 +151,7 @@
                            <td>{{bon.local_Source}} </td>
                            <td>{{bon.local_Destination}} </td>
 
-                           <td>{{bon.date | date:'dd/MM/yyyy HH:MM:SS'}} </td>
+                           <td>{{bon.date | date:'dd/MM/yyyy'}} </td>
 
                            <td>
                               <button type="button" class="btn btn-primary"
@@ -279,21 +279,6 @@
                      <td>
                               <button class="fas fa-edit mb-2 mr-2 btn " (click)="Modifier_Support( article.id )"> </button>
                      </td>
-                     <!--                    <td>
-                        <form [formGroup]="SupportFormGroup">
-                           <table class="mb-0 table">
-                              <tr *ngFor="let support  of arraySupport ;let j=index;">
-                                 <td> Support {{j+1}}</td>
-                                
-                                 <td>
-                                    <input class="form-control" type="number" style="width: 80px;"
-                                       (blur)="getTotale($event,j,article.id)" />
-                                 </td>
-                              </tr>
-                           </table>
-                        </form>
-
-                     </td>-->
                      <td>
                         <span>{{article.total}} </span>
                      </td>

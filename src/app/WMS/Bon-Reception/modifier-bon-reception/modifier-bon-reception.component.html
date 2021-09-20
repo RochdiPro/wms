@@ -47,21 +47,9 @@
                          </mat-form-field>
                       </td>
                       <td>{{article.qte}} </td>
-                    <td>
-                         <form [formGroup]="SupportFormGroup">
-                            <table class="mb-0 table">
-                               <tr *ngFor="let support  of arraySupport ;let j=index;">
-                                  <td> Support {{j+1}}     </td>                                 
-                                  <td>
-                                     <input class="form-control" type="number" style="width: 80px;"  value="{{article.supports[j].qte}}"(blur)="getTotale($event,j,article.id)" />
-                                  </td>
-                               </tr>
-                            </table>
-                         </form>
-
-
-                          
-                      </td>
+                      <td>
+                        <button class="fas fa-edit mb-2 mr-2 btn " (click)="Modifier_Support( article.id )"> </button>
+                     </td>
                       <td>
                          <span>{{article.total}} </span>
                       </td>  
@@ -258,10 +246,12 @@
              <button mat-raised-button matStepperPrevious class="mb-2 mr-2 btn btn-primary active ">
                 <i class="fas fa-chevron-left mr-2"></i>Précédent
              </button>
-              <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="Modifier_Bon_Reception()" >
-                <i class="fas fa-check mr-2"></i>Valider
+             <button mat-raised-button (click)="Conserver()" class="mb-2 mr-2 btn btn-warning active  "> Conserver
+            </button>
+              <button  *ngIf="this.VerifierEetatbon" mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="Modifier_Bon_Reception()" >
+                <i class="fas fa-check mr-2" ></i>Modifier
              </button>             
-             <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"*ngIf="!(this.VerifierEetatbon)">
+             <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()" *ngIf="!(this.VerifierEetatbon)">
                 <i class="fas fa-trash-alt mr-2"></i>Bon_rejet
              </button>
  

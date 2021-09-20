@@ -11,6 +11,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { ActivatedRoute, Router } from '@angular/router';
 import { Ajouter_Bon_Rejet } from '../ajouter-bon-reception/ajouter-bon-reception.component';
 import { Console } from 'console';
+import { BrowserModule } from '@angular/platform-browser'
+
 declare var require: any
 
 const pdfMake = require("pdfmake/build/pdfmake");
@@ -55,7 +57,7 @@ export class ModifierBonReceptionComponent implements OnInit {
       this.bonReception = data;
       this.type_bon = this.bonReception.type_Be;
       this.Destination = this.bonReception.local
-      this.nbSupport=this.bonReception.nb_Support       
+      this.nbSupport = this.bonReception.nb_Support
 
 
     }, error => console.log(error));
@@ -89,7 +91,7 @@ export class ModifierBonReceptionComponent implements OnInit {
   obj_articles: any = [];
   supports: any = [];
   new_obj: any = {}
-  sup:any ={}
+  sup: any = {}
   // Get Detail bon reception 
   getDetail() {
     this.service.Detail_Bon_Reception(this.id).subscribe((detail: any) => {
@@ -115,11 +117,11 @@ export class ModifierBonReceptionComponent implements OnInit {
           this.arraySupport[k].largeur = this.xmldata.Liste_Supports[0].Support[k].largeur;
           this.arraySupport[k].longeur = this.xmldata.Liste_Supports[0].Support[k].longeur;
         }
-        
-        
-        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {    
- 
-          this.new_obj={}
+
+
+        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {
+
+          this.new_obj = {}
           this.new_obj.id = this.xmldata.Produits[0].Produit[i].Id;
           this.new_obj.nom = this.xmldata.Produits[0].Produit[i].Nom;
           this.new_obj.fiche_Technique = this.xmldata.Produits[0].Produit[i].Fiche_Technique;
@@ -128,32 +130,45 @@ export class ModifierBonReceptionComponent implements OnInit {
           this.new_obj.famaille = this.xmldata.Produits[0].Produit[i].famaille;
           this.new_obj.sous_famaille = this.xmldata.Produits[0].Produit[i].sous_famaille;
           this.new_obj.total = this.xmldata.Produits[0].Produit[i].Total;
-          this.support = []    
-          for (let h = 0; h <= this.xmldata.Produits[0].Produit[i].Supports.length; h++) {
-            this.sup = {}
-            this.sup.id = h;
-            this.sup.qte =  this.xmldata.Produits[0].Produit[0].Supports[0].Support[h].Qte;
-            this.support.push(this.sup)
-            
-          } 
-          this.new_obj.supports=this.support; 
-          this.new_obj.controle_qt = this.xmldata.Produits[0].Produit[i].Qte_Verifier;
-          this.new_obj.controle_tech = this.xmldata.Produits[0].Produit[i].Fiche_Technique_Verifier;
+
+          this.supports = []
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
+
+          if (this.xmldata.Produits[0].Produit[i].Supports[0].Support) {
+            for (let h = 0; h < this.xmldata.Produits[0].Produit[i].Supports[0].Support.length; h++) {
+              for (let z = 0; z < this.arraySupport.length; z++) {
+                if (this.supports[z].id == this.xmldata.Produits[0].Produit[i].Supports[0].Support[h].Numero_Support) {
+                  this.supports[z].qte = this.xmldata.Produits[0].Produit[i].Supports[0].Support[h].Qte
+                }
+              }
+
+            }
+          }
+          this.new_obj.supports = this.supports;
+          
+          
+          this.new_obj.controle_qt = true;
+          this.new_obj.controle_tech =true ;
+        
+          if(this.xmldata.Produits[0].Produit[i].Qte_Verifier== 'false'){
+          this.new_obj.controle_qt = false;
+          }          
+          if(this.xmldata.Produits[0].Produit[i].Fiche_Technique_Verifier == 'false')
+          {
+            this.new_obj.controle_tech =false;
+          }
           this.obj_articles.push(this.new_obj)
-
-
         }
-          console.log(this.obj_articles  )
-
-
       }
       reader.readAsDataURL(detail);
     })
-
-
-
   }
- 
+
 
 
 
@@ -198,7 +213,7 @@ export class ModifierBonReceptionComponent implements OnInit {
 
   Supports: any = [];
   support: any = {};
-  
+
 
   Sous_Famille_Logistique: any = [];
   Famille_Logistique: any = [];
@@ -232,18 +247,27 @@ export class ModifierBonReceptionComponent implements OnInit {
       }
     }
   }
+  //
+  Modifier_Support(id: any) {
+    const dialogRef = this.dialog.open(Modifier_Support, {
+      width: 'auto',
+      data: { objects: this.obj_articles, id: id }
 
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      this.calculeTotale(id);
+    });
+
+  }
   //calcule Totale Support
-  getTotale(ev: any, i: any, id: any) {
+  calculeTotale(id: any) {
 
     for (let j = 0; j < this.obj_articles.length; j++) {
       if (id == this.obj_articles[j].id) {
         let sm = 0;
 
         for (let k = 0; k < this.obj_articles[j].supports.length; k++) {
-          if (this.obj_articles[j].supports[k].id == i) {
-            this.obj_articles[j].supports[k].qte = ev.target.value
-          }
+
           sm = Number(sm) + Number(this.obj_articles[j].supports[k].qte)
         }
         this.obj_articles[j].total = sm;
@@ -253,6 +277,7 @@ export class ModifierBonReceptionComponent implements OnInit {
     console.log(this.obj_articles)
 
   }
+
 
   /*
   ****************************************           fonctions relative a steep 4  ********************************************** 
@@ -275,12 +300,14 @@ export class ModifierBonReceptionComponent implements OnInit {
   // function verife les controle Quaite QTe si verifier alors on peur imrimer enregistrer sinon le conserver  
   VerifierEetatbon: any = false;
   Verifier_etat_bon() {
+ 
     this.VerifierEetatbon = true;
     for (let i = 0; i < this.obj_articles.length; i++) {
 
       if (this.obj_articles[i].controle_tech == false) { this.VerifierEetatbon = false; }
       if (this.obj_articles[i].controle_qt == false) { this.VerifierEetatbon = false; }
     }
+    console.log(this.VerifierEetatbon)
   }
 
   /*
@@ -291,6 +318,16 @@ export class ModifierBonReceptionComponent implements OnInit {
   Valider: any = true;
   doc: any
   bon_reception: any
+
+  //convertir blob à un fichier  
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+    var b: any = theBlob;
+    b.lastModifiedDate = new Date();
+    b.name = fileName;
+    return <File>theBlob;
+  }
+
+
   // creer le bon reception si etat verifier 
   Modifier_Bon_Reception() {
     this.doc = document.implementation.createDocument("Bon_Reception", "", null);
@@ -322,13 +359,16 @@ export class ModifierBonReceptionComponent implements OnInit {
       var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
       var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
       var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
+      var famaille = this.doc.createElement('famaille'); famaille.innerHTML = this.obj_articles[i].famaille
+      var s_famaille = this.doc.createElement('sous_famaille'); s_famaille.innerHTML = this.obj_articles[i].s_famaille
 
       var Supports = this.doc.createElement('Supports')
+
       for (let j = 0; j < this.obj_articles[i].supports.length; j++) {
         if (this.obj_articles[i].supports[j].qte > 0) {
           var Support = this.doc.createElement('Support');
           var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = j;
-          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].qte;
+          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].supports[j].qte
           Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
         }
       }
@@ -342,6 +382,8 @@ export class ModifierBonReceptionComponent implements OnInit {
       Produit.appendChild(verif_fiche);
       Produit.appendChild(total);
       Produit.appendChild(Supports);
+      Produit.appendChild(famaille);
+      Produit.appendChild(s_famaille);
       Produits_Listes.appendChild(Produit)
     }
     var Supports_Listes = this.doc.createElement('Liste_Supports')
@@ -381,7 +423,7 @@ export class ModifierBonReceptionComponent implements OnInit {
         console.log("id bon :", this.id)
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
-        formData.append('Etat', "Traiter");
+        formData.append('Etat', "Validé");
         formData.append('Responsable', "rochdi");
         formData.append('date', this.sysDate);
         formData.append('Local', this.Destination);
@@ -389,10 +431,10 @@ export class ModifierBonReceptionComponent implements OnInit {
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);
 
-        this.service.Modifier_BonReception( formData).subscribe((data) => {
+        this.service.Modifier_BonReception(formData).subscribe((data) => {
           this.bon_reception = data
           Swal.fire(
-            'Modification',
+            'Modification Effecté',
             'Bon De Reception Modifier Avec Sucées',
             'success'
           ).then((result) => {
@@ -407,12 +449,13 @@ export class ModifierBonReceptionComponent implements OnInit {
                 if (result.isConfirmed) {
 
                   this.generatePDF(this.bon_reception.id, this.bon_reception.date_Creation);
-                  this.router.navigate(['Menu/WMS-Reception/Lister']);
+              //    this.router.navigate(['Menu/WMS-Reception/Lister']);
                 } else if (result.isDismissed) {
                   console.log('erreur  ');
                 }
               });
             }
+            this.router.navigate(['Menu/WMS-Reception/Lister']);
           });
         }, (err) => {
 
@@ -425,13 +468,7 @@ export class ModifierBonReceptionComponent implements OnInit {
 
 
   }
-  //convertir blob à un fichier  
-  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
-    var b: any = theBlob;
-    b.lastModifiedDate = new Date();
-    b.name = fileName;
-    return <File>theBlob;
-  }
+
 
   // conserver le bon si le etat non verifier 
   Conserver() {
@@ -464,16 +501,20 @@ export class ModifierBonReceptionComponent implements OnInit {
       var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
       var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
       var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
+      var famaille = this.doc.createElement('famaille'); famaille.innerHTML = this.obj_articles[i].famaille
+      var s_famaille = this.doc.createElement('sous_famaille'); s_famaille.innerHTML = this.obj_articles[i].s_famaille
 
       var Supports = this.doc.createElement('Supports')
+
       for (let j = 0; j < this.obj_articles[i].supports.length; j++) {
         if (this.obj_articles[i].supports[j].qte > 0) {
           var Support = this.doc.createElement('Support');
           var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = j;
-          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].qte;
+          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].supports[j].qte
           Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
         }
       }
+
 
       Produit.appendChild(id);
       Produit.appendChild(Nom);
@@ -483,6 +524,8 @@ export class ModifierBonReceptionComponent implements OnInit {
       Produit.appendChild(verif_fiche);
       Produit.appendChild(total);
       Produit.appendChild(Supports);
+      Produit.appendChild(famaille);
+      Produit.appendChild(s_famaille);
       Produits_Listes.appendChild(Produit)
     }
     var Supports_Listes = this.doc.createElement('Liste_Supports')
@@ -502,13 +545,10 @@ export class ModifierBonReceptionComponent implements OnInit {
       Support.appendChild(longeur);
       Supports_Listes.appendChild(Support);
     }
-
-
     BR.appendChild(Etat);
     BR.appendChild(InformationsGenerales);
     BR.appendChild(Produits_Listes);
     BR.appendChild(Supports_Listes);
-
     this.doc.appendChild(BR)
     console.log(this.doc)
 
@@ -525,23 +565,23 @@ export class ModifierBonReceptionComponent implements OnInit {
         console.log("id bon :", this.id)
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
-        formData.append('Etat', "Conserver");
+        formData.append('Etat', "En Attente");
         formData.append('Responsable', "rochdi");
         formData.append('date', this.sysDate);
         formData.append('Local', this.Destination);
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);
-        this.service.createBonReception(formData).subscribe(data => {
+        this.service.Modifier_BonReception(formData).subscribe(data => {
           console.log("data: ", data);
           //this.bonReception = data
 
           Swal.fire(
-            'Ajout Effecté',
-            'Bon De Reception Ajouté Avec Sucées',
+            'Conserver',
+            'Bon De Reception Modifier Avec Sucées',
             'success'
           )
-
+          this.router.navigate(['Menu/WMS-Reception/Lister']);
         },
           error => console.log(error));
       });
@@ -765,3 +805,72 @@ export class ModifierBonReceptionComponent implements OnInit {
 
 }
 
+
+
+
+
+//dialog detail
+@Component({
+  selector: 'Support',
+  templateUrl: 'Supports.html',
+})
+export class Modifier_Support {
+
+
+  obj_articles: any;
+  Supports: any = [];
+  id_article_ajour: any;
+  h: any = {};
+  constructor(public dialogRef: MatDialogRef<Ajouter_Bon_Rejet>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private router: Router, private http: HttpClient) {
+
+
+    this.obj_articles = data.objects
+
+    this.id_article_ajour = data.id;
+
+
+    for (let k = 0; k < this.obj_articles.length; k++) {
+      if (this.obj_articles[k].id == data.id) {
+        this.Supports = this.obj_articles[k].supports
+
+      }
+    }
+ 
+
+
+  }
+  set_qte(event: any, s: any, id_article: any) {
+    console.log(event.target.value + "   " + s + "  " + id_article)
+    for (let i = 0; i < this.obj_articles.length; i++) {
+
+      if (this.obj_articles[i].id == this.id_article_ajour) {
+        console.log(this.obj_articles[i].id)
+        for (let k = 0; k < this.obj_articles[i].supports.length; k++) {
+          if (this.obj_articles[i].supports[k].id == s) {
+
+            this.obj_articles[i].supports[k].qte = event.target.value
+          }
+        }
+      }
+
+    }
+
+  }
+
+
+  onSubmit(rec: any) {
+
+  }
+
+
+
+  //fermer dialogue
+  close() {
+    this.dialogRef.close();
+  }
+
+
+
+
+
+}

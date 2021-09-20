@@ -214,14 +214,11 @@ export class AjouterBonReceptionComponent implements OnInit {
 
   //generer tableau de support
   genererTemplateSupport(nbSupport: any) {
-    this.arraySupport = [];
+    
     for (let i = 0; i < nbSupport; i++) {
       this.arraySupport.push(this.ajouterligneSupport());
-
-
     }
-    //console.log(this.table_Support)
-
+  
     this.SupportFormGroup = this._formBuilder.group({
       ClassDetails: this._formBuilder.array(this.arraySupport)
     });
@@ -252,10 +249,7 @@ export class AjouterBonReceptionComponent implements OnInit {
     this.id = id;
     if (this.bonEntree_selected) {
       this.service.Quantite_Fiche_Technique_Fiche_Bon_Entree_Local(id).subscribe((data: any) => {
-        this.listeArticleBon = data;
-
-        
-
+        this.listeArticleBon = data;    
         for (let i = 0; i < this.listeArticleBon.length; i++) {
           this.supports=[]
           for (let k = 0; k < this.arraySupport.length; k++) {
@@ -278,8 +272,7 @@ export class AjouterBonReceptionComponent implements OnInit {
           this.new_obj.controle_tech = false;
           this.obj_articles.push(this.new_obj)
         }
-        console.log(this.obj_articles)
-
+         
       });
     }
     else if (this.bonEntree_impo_selected) {
@@ -374,22 +367,7 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
 
 
-  id_art:any;
-  id_sup:any;
-  get_Qte_Support(id_article: any, id: any) {
-    this.id_art=id_article;
-    this.id_sup=id;
-    for (let j = 0; j < this.obj_articles.length; j++) {
-      if (id_article == this.obj_articles[j].id) {
-        for (let k = 0; k < this.obj_articles[j].supports.length; k++) {
-          if (id == this.obj_articles[j].supports[k].id) {
-            this.qte.nativeElement.value = this.obj_articles[j].supports[k].qte;
-          }
-        }
-      }
-    }
-
-  }
+  
   Modifier_Support( id:any) {    
     const dialogRef = this.dialog.open(Support, {
       width: 'auto',
@@ -476,7 +454,6 @@ export class AjouterBonReceptionComponent implements OnInit {
   Verifier_etat_bon() {
     this.VerifierEetatbon = true;
     for (let i = 0; i < this.obj_articles.length; i++) {
-
       if (this.obj_articles[i].controle_tech == false) { this.VerifierEetatbon = false; }
       if (this.obj_articles[i].controle_qt == false) { this.VerifierEetatbon = false; }
     }
@@ -525,11 +502,12 @@ export class AjouterBonReceptionComponent implements OnInit {
       var s_famaille = this.doc.createElement('sous_famaille'); s_famaille.innerHTML = this.obj_articles[i].s_famaille
 
       var Supports = this.doc.createElement('Supports')
+     
       for (let j = 0; j < this.obj_articles[i].supports.length; j++) {
         if (this.obj_articles[i].supports[j].qte > 0) {
           var Support = this.doc.createElement('Support');
           var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = j;
-          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].qte;
+          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].supports[j].qte
           Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
         }
       }
@@ -628,13 +606,7 @@ export class AjouterBonReceptionComponent implements OnInit {
 
 
   }
-  //convertir blob à un fichier  
-  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
-    var b: any = theBlob;
-    b.lastModifiedDate = new Date();
-    b.name = fileName;
-    return <File>theBlob;
-  }
+
 
   // conserver le bon si le etat non verifier 
   Conserver() {
@@ -671,14 +643,16 @@ export class AjouterBonReceptionComponent implements OnInit {
       var s_famaille = this.doc.createElement('sous_famaille'); s_famaille.innerHTML = this.obj_articles[i].s_famaille
 
       var Supports = this.doc.createElement('Supports')
+     
       for (let j = 0; j < this.obj_articles[i].supports.length; j++) {
         if (this.obj_articles[i].supports[j].qte > 0) {
           var Support = this.doc.createElement('Support');
           var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = j;
-          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].qte;
+          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].supports[j].qte
           Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
         }
       }
+
 
       Produit.appendChild(id);
       Produit.appendChild(Nom);
@@ -709,13 +683,10 @@ export class AjouterBonReceptionComponent implements OnInit {
       Support.appendChild(longeur);
       Supports_Listes.appendChild(Support);
     }
-
-
     BR.appendChild(Etat);
     BR.appendChild(InformationsGenerales);
     BR.appendChild(Produits_Listes);
     BR.appendChild(Supports_Listes);
-
     this.doc.appendChild(BR)
     console.log(this.doc)
 
@@ -738,17 +709,17 @@ export class AjouterBonReceptionComponent implements OnInit {
         formData.append('Local', this.Destination);
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
-        formData.append('Nb_Support', this.nbSupport);
+        formData.append('Nb_Support', this.nbSupport);     
         this.service.createBonReception(formData).subscribe(data => {
           console.log("data: ", data);
           //this.bonReception = data
 
           Swal.fire(
-            'Ajout Effecté',
-            'Bon De Reception Ajouté Avec Sucées',
+            'Conserver',
+            'Bon De Reception Conserver avec  Sucées',
             'success'
           )
-
+          this.router.navigate(['Menu/WMS-Reception/Lister']);
         },
           error => console.log(error));
       });
@@ -756,6 +727,14 @@ export class AjouterBonReceptionComponent implements OnInit {
 
   }
 
+  
+  //convertir blob à un fichier  
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+    var b: any = theBlob;
+    b.lastModifiedDate = new Date();
+    b.name = fileName;
+    return <File>theBlob;
+  }
 
   modeleSrc: any;
   //impression de la fiche recption
@@ -1110,7 +1089,8 @@ export class Ajouter_Bon_Rejet {
 
   imprimerFicheRejet(id: any, date: any) {
     var body = [];
-    var titulos = new Array(' ID ', 'Article', 'Fiche Technique', 'Qte', 'contrôle quantitatif', 'contrôle technique', 'Reclmation');
+    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
+ 
     body.push(titulos);
     var tabArt: any = [];
 
@@ -1138,9 +1118,9 @@ export class Ajouter_Bon_Rejet {
       fila.push(this.obj_articles[i].id);
       fila.push(this.obj_articles[i].nom);
       fila.push(this.obj_articles[i].fiche_Technique);
-      fila.push(this.obj_articles[i].qte);
-      fila.push(this.obj_articles[i].controle_qt);
-      fila.push(this.obj_articles[i].controle_tech);
+      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
+      fila.push(this.obj_articles[i].qte);  
+      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
       fila.push(ch);
 
       body.push(fila);
@@ -1327,14 +1307,14 @@ export class Support {
   }
   set_qte(event:any ,s:any,id_article :any)
   {
-   console.log(event.target.value +"   "+ s+"  "+id_article)
+   
    for (let i = 0; i< this.obj_articles.length; i++) {
     
       if(this.obj_articles[i].id==this.id_article_ajour){
         console.log(this.obj_articles[i].id)
         for (let k = 0; k < this.obj_articles[i].supports.length; k++) {      
           if(this.obj_articles[i].supports[k].id==s){
-            console.log("rrrr")
+            
            this.obj_articles[i].supports[k].qte=event.target.value
           }
       }

@@ -1,173 +1,126 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { BonReceptionServiceService } from '../bon-reception-service.service';
-
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Validators, FormArray } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 @Component({
   selector: 'app-lister-bon-reception',
   templateUrl: './lister-bon-reception.component.html',
   styleUrls: ['./lister-bon-reception.component.scss']
 })
+
 export class ListerBonReceptionComponent implements OnInit {
+
+  @ViewChild(MatPaginator) paginator: any = MatPaginator;
+  @ViewChild(MatSort) sort: any = MatSort;
+
+  form = new FormGroup({ id: new FormControl("")  ,responsable: new FormControl("") , etat: new FormControl(""), type_Be: new FormControl("") ,id_Be: new FormControl("")});
+ 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+  displayedColumns: string[] = [ 'modifier','id' ,"responsable" ,"etat","type_Be","id_Be",'supprimer','Voir_pdf','exporter_pdf'  ]; //les colonne du tableau 
+  dataSource = new MatTableDataSource<table>();
+ 
+   
+
   bonReception: any;
 
 
-  constructor(public router :Router ,private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
+  constructor(public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
 
   }
   Bon_Receptions() {
     this.service.Bon_Receptions().subscribe((data: any) => {
       this.bonReception = data;
+      this.dataSource.data = data as table[];
     })
   }
+pdf(id :any )
+{
 
+}
+telecharger(id:any)
+{
+
+}
+
+supprimer(id:any)
+{
+  const swalWithBootstrapButtons = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn btn-success',
+      cancelButton: 'btn btn-danger'
+    },
+    buttonsStyling: false
+  })
+
+  swalWithBootstrapButtons.fire({
+    title: 'Tu est sure?',
+    text: " Suppression de Bon  Réception N° " + id,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: ' Supprimer ',
+    cancelButtonText: ' Annuler ',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.service.Supprimer_Bon_Reception(id).subscribe(data => {
+
+        this.Bon_Receptions();
+
+      })
+      swalWithBootstrapButtons.fire(
+        'Suppression',
+        'Bon Reception N° ' + id + ' Supprimé Avec Sucées.',
+        'success'
+      )
+    }
+  })
+}
   ngOnInit(): void {
     this.Bon_Receptions();
     //this.getAllBonReceptions();
 
   }
-  Supprimer_Bon(id: any) {
-    const swalWithBootstrapButtons = Swal.mixin({
-      customClass: {
-        confirmButton: 'btn btn-success',
-        cancelButton: 'btn btn-danger'
-      },
-      buttonsStyling: false
-    })
-
-    swalWithBootstrapButtons.fire({
-      title: 'Tu est sure?',
-      text: " Suppression de Bon  Réception N° " + id,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: ' Supprimer ',
-      cancelButtonText: ' Annuler ',
-      reverseButtons: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.service.Supprimer_Bon_Reception(id).subscribe(data => {
-
-          this.Bon_Receptions();
-
-        })
-        swalWithBootstrapButtons.fire(
-          'Suppression',
-          'Bon Reception N° ' + id + ' Supprimé Avec Sucées.',
-          'success'
-        )
-      }
-    })
-  }
+  
   Modifier_Bon(id: any) {
-    this.router.navigate(['/Menu/WMS-Reception/Modifier/',id]);
+    this.router.navigate(['/Menu/WMS-Reception/Modifier/', id]);
   }
   Select_Bon() { }
 
-  /*  ListBonRecpetion(){
-      this.service.ListBonReception().subscribe(data => {
-       this.ListBonReception = data;
-       console.log(data);
-     });
-   } */
-  /* getAllBonReceptions() {
-     this.service.getAllBonReceptions().subscribe((data: any) => {
-       this.bonReception = data;
-     })
-   }
- 
-   SelectBR(id: any) {
-     console.log(id)
-   }
-   modifierBon(id: any) {
-     console.log("id: ",id);
-     this.router.navigate(['Menu/reception/modifier-bon-recpetion',id]);
-   }
-   supprimerBon(id: number) {
-     const swalWithBootstrapButtons = Swal.mixin({
-       customClass: {
-         confirmButton: 'btn btn-success',
-         cancelButton: 'btn btn-danger'
-       },
-       buttonsStyling: false
-     })
- 
-     swalWithBootstrapButtons.fire({
-       title: 'Tu est sure?',
-       text: "You won't be able to revert this!",
-       icon: 'warning',
-       showCancelButton: true,
-       confirmButtonText: 'Oui, Supprimer!',
-       cancelButtonText: 'Non, Annuler!',
-       reverseButtons: true
-     }).then((result) => {
-       if (result.isConfirmed) {
-         this.service.deleteBonReceptions(id).subscribe(data => {
-           console.log(data);
-           this.getAllBonReceptions();
- 
-         })
-         swalWithBootstrapButtons.fire(
-           'Suppresion Effecté!',
-           'Bon De Reception Supprimé Avec Sucées.',
-           'success'
-         )
-       }
-     })
-   }
-   selectedOption: any;
- 
-   ListBonRecpetionFilter() {
-     console.log(this.selectedOption)
- 
-     if (this.selectedOption == "id")
-       this.service.ListBonReception().subscribe(
-         data => this.ListBonReception = this.filterByID(data)
-       )
-     else if (this.selectedOption == "responsable")
- 
-       this.service.ListBonReception().subscribe(
-         data => this.ListBonReception = this.filterByRespoansable(data)
-       )
-     else if (this.selectedOption == "etat")
- 
-       this.service.ListBonReception().subscribe(
-         data => this.ListBonReception = this.filterByEtat(data)
-       )
- 
-   }
- 
-   filterByID(ListBonReception: Bon_Reception[]) {
-     return ListBonReception.filter((b) => {
-       return b.id.toString().toLowerCase().includes(this.filters.keyword.toLowerCase());
-     })
-   }
-   filterByEtat(ListBonReception: Bon_Reception[]) {
-     return ListBonReception.filter((b) => {
-       return b.etat.toString().toLowerCase().includes(this.filters.keyword.toLowerCase());
-     })
-   }
-   filterByRespoansable(ListBonReception: Bon_Reception[]) {
-     return ListBonReception.filter((b) => {
-       return b.responsable.toString().toLowerCase().includes(this.filters.keyword.toLowerCase());
-     })
-   }
-   filters = {
-     keyword: ''
-   }
-   SelectBon(id: any) {
-     console.log(id)
-     const dialogRef = this.dialog.open(DetailBonRecption, {
-       width: '650px',
-       data: { id: id }
-     });
-     dialogRef.afterClosed().subscribe(result => {
- 
- 
-     });
- 
- 
-   }*/
+
+
+  filtrerid() { 
+   /* this.service.fltreListeproduit("nom_produit", this.form.get('nom_Produit').value, "nom_emballage", this.form.get('nom_Emballage').value, "type_emballage", this.form.get('type_Emballage').value).subscribe((data) => {
+      this.dataSource.data = data as tableColisage[];
+    });*/
+  }
+
+  filtreresponsable() { }
+
+  filtrerdate() { }
+
+  filtreretat() { }
+
+  filtrertype() { }
+
+  filtrerancienid() { }
+
 
 }
+
+export interface table {
+  id: number;  
+  responsable:string
+  etat:string;
+  type_Be:string;
+  id_Be:String ;
+}
+ 
