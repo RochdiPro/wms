@@ -1,1 +1,25 @@
-<p>bon-sortie works!</p>
+<mat-horizontal-stepper [linear]="isLinear"> 
+    <mat-step [stepControl]="firstFormGroup">
+       <form [formGroup]="firstFormGroup">  
+        <ng-template matStepLabel>Liste des articles </ng-template>  
+        <button mat-button mat-raised-button color="primary" matStepperNext>Solve</button>        
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="secondFormGroup">
+      <form [formGroup]="secondFormGroup">
+        <ng-template matStepLabel>spécifications Articles </ng-template>
+        <mat-form-field>
+            <input matInput placeholder="Any input" formControlName="secondCtrl" required>
+        </mat-form-field>
+        <button mat-button mat-raised-button color="primary" matStepperNext>Next</button>          
+        <button mat-button mat-raised-button color="" matStepperPrevious>Back</button>        
+      </form>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel icon>Cloture</ng-template>
+      You are now done.      
+      <button mat-button mat-raised-button color="primary" >Done</button>      
+    </mat-step>
+</mat-horizontal-stepper>

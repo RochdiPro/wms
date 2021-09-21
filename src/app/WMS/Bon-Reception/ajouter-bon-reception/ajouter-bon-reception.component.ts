@@ -451,10 +451,12 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
   // function verife les controle Quaite QTe si verifier alors on peur imrimer enregistrer sinon le conserver  
   VerifierEetatbon: any = false;
+  VerifierEetat:any =false;
   Verifier_etat_bon() {
     this.VerifierEetatbon = true;
+    this.VerifierEetat = true;
     for (let i = 0; i < this.obj_articles.length; i++) {
-      if (this.obj_articles[i].controle_tech == false) { this.VerifierEetatbon = false; }
+      if (this.obj_articles[i].controle_tech == false) { this.VerifierEetatbon = false; this.VerifierEetat = false; }
       if (this.obj_articles[i].controle_qt == false) { this.VerifierEetatbon = false; }
     }
   }
@@ -841,6 +843,7 @@ export class AjouterBonReceptionComponent implements OnInit {
             {
               text:
                 ' Utilisateur :' + '\t' + "rochdi"
+                + '\n\n' + 'Etat      :' + "Non Conforme " 
                 + '\n\n' + 'Date      :' + date_Creation + '\t'
               ,
 
@@ -889,6 +892,168 @@ export class AjouterBonReceptionComponent implements OnInit {
     pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
 
   }
+
+   //impression de la fiche recption non Conforme
+   generatePDFnonConforme(id: any, date_Creation: any) {
+
+    var body = [];
+    var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification','reclamation');
+    body.push(title);
+    var tabArt: any = [];
+    for (let i = 0; i < this.obj_articles.length; i++) {
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);
+      obj.push(this.obj_articles[i].fiche_Technique);
+      let ch = "5555";
+      if (this.obj_articles[i].fiche_Technique = 'true') { obj.push("oui"); } else { obj.push("non");}
+      obj.push(this.obj_articles[i].qte);
+      console.log(this.obj_articles[i].controle_qt = 'true')
+      console.log(this.obj_articles[i].controle_qt == 'true')
+      if (this.obj_articles[i].controle_qt = 'true') { obj.push("oui"); } else { obj.push("non"); ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte ; }
+      obj.push(ch);
+      body.push(obj);
+      
+    }
+    
+     
+
+    var body2 = [];
+    var title = new Array('Id Support', 'Type', 'Poids', 'Hauteur', 'Largeur', 'Longeur');
+    body2.push(title);
+    var tabArt: any = [];
+    for (let i = 0; i < this.arraySupport.length; i++) {
+      var obj = new Array();
+      obj.push(i + 1);
+      obj.push(this.arraySupport[i].value.typeSupport);
+      obj.push(this.arraySupport[i].value.poids);
+      obj.push(this.arraySupport[i].value.hauteur);
+      obj.push(this.arraySupport[i].value.largeur);
+      obj.push(this.arraySupport[i].value.longeur);
+
+      body2.push(obj);
+    }
+
+    var def = {
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableExample: {
+          margin: [0, 5, 0, 15]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'black'
+        }
+      },
+      defaultStyle: {
+        // alignment: 'justify'
+      },
+      pageMargins: [40, 120, 40, 60],
+
+
+      info: {
+        title: 'Fiche Bon Réception',
+
+      },
+      background: [
+        {
+          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
+        }
+      ],
+
+      content: [
+        {
+          text: 'Bon Reception N° ' + id + '\n\n',
+          fontSize: 10,
+
+          alignment: 'left',
+
+          color: 'black',
+          bold: true
+        },
+
+        {
+          columns: [
+
+            {
+              text:
+                'Type Bon :' + '\t' + this.type_bon
+                + '\n\n' +
+                'Id Bon  :' + '\t' + this.id
+                + '\n\n' +
+                'Local  :' + '\t' + this.Destination
+
+              ,
+
+              fontSize: 10,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+            {
+              text:
+                ' Utilisateur :' + '\t' + "rochdi"
+                + '\n\n' + 'Etat      :' + "Non Conforme " 
+                + '\n\n' + 'Date      :' + date_Creation + '\t'
+              ,
+
+              fontSize: 10,
+
+              alignment: 'left',
+
+              color: 'black'
+            },
+
+
+          ]
+        },
+
+        {
+          text: '\n\n' + 'Liste des Articles ' + '\t\n',
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+        {
+          table: {
+
+            alignment: 'right',
+            body: body
+          }
+        },
+        {
+          text: '\n\n' + 'Liste des Supports ' + '\t\n',
+          fontSize: 12,
+          alignment: 'Center',
+          color: 'black',
+          bold: true
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', '*', '*', '*', '*', '*', '*', '*'],
+            body: body2
+          }
+        },
+      ],
+    };
+
+    pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
+
+  }
+  
 
   // temps d'attente pour le traitement de fonction 
   delai(ms: number) {
@@ -944,6 +1109,143 @@ export class AjouterBonReceptionComponent implements OnInit {
 
     })
   }
+
+  creer_Bon_Reception_non_conforme(){
+    this.doc = document.implementation.createDocument("Bon_Reception", "", null);
+    var BR = this.doc.createElement("Bon_Reception");
+    var Etat = this.doc.createElement("Etat"); Etat.innerHTML = "Validé non Conforme"
+    var source = this.doc.createElement("Source"); source.innerHTML = this.Source
+    var distination = this.doc.createElement("Destination"); distination.innerHTML = this.Destination
+    var InformationsGenerales = this.doc.createElement("Informations-Generales");
+    var Date = this.doc.createElement("Date"); Date.innerHTML = this.sysDate.toDateString()
+    var Id_Bon = this.doc.createElement("Id_Bon"); Id_Bon.innerHTML = this.id
+    var Type_Bon = this.doc.createElement("Type_Bon"); Type_Bon.innerHTML = this.type_bon
+    var Responsable = this.doc.createElement("Responsable"); Responsable.innerHTML = "Responsable";
+    InformationsGenerales.appendChild(source);
+    InformationsGenerales.appendChild(distination);
+    InformationsGenerales.appendChild(Date);
+    InformationsGenerales.appendChild(Id_Bon);
+    InformationsGenerales.appendChild(Type_Bon);
+    InformationsGenerales.appendChild(Responsable);
+
+    var Produits_Listes = this.doc.createElement('Produits')
+
+    for (let i = 0; i < this.obj_articles.length; i++) {
+
+      var Produit = this.doc.createElement('Produit')
+      var id = this.doc.createElement('Id'); id.innerHTML = this.obj_articles[i].id
+      var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.obj_articles[i].nom
+      var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.obj_articles[i].qte
+      var FicheTechnique = this.doc.createElement('Fiche_Technique'); FicheTechnique.innerHTML = this.obj_articles[i].fiche_Technique
+      var verif_qte = this.doc.createElement('Qte_Verifier'); verif_qte.innerHTML = this.obj_articles[i].controle_qt
+      var verif_fiche = this.doc.createElement('Fiche_Technique_Verifier'); verif_fiche.innerHTML = this.obj_articles[i].controle_tech
+      var total = this.doc.createElement('Total'); total.innerHTML = this.obj_articles[i].total
+      var famaille = this.doc.createElement('famaille'); famaille.innerHTML = this.obj_articles[i].famaille
+      var s_famaille = this.doc.createElement('sous_famaille'); s_famaille.innerHTML = this.obj_articles[i].s_famaille
+
+      var Supports = this.doc.createElement('Supports')
+     
+      for (let j = 0; j < this.obj_articles[i].supports.length; j++) {
+        if (this.obj_articles[i].supports[j].qte > 0) {
+          var Support = this.doc.createElement('Support');
+          var n_s = this.doc.createElement('Numero_Support'); n_s.innerHTML = j;
+          var qte_s = this.doc.createElement('Qte'); qte_s.innerHTML = this.obj_articles[i].supports[j].qte
+          Support.appendChild(n_s); Support.appendChild(qte_s); Supports.appendChild(Support);
+        }
+      }
+
+
+      Produit.appendChild(id);
+      Produit.appendChild(Nom);
+      Produit.appendChild(Qte);
+      Produit.appendChild(FicheTechnique);
+      Produit.appendChild(verif_qte);
+      Produit.appendChild(verif_fiche);
+      Produit.appendChild(total);
+      Produit.appendChild(Supports);
+      Produit.appendChild(famaille);
+      Produit.appendChild(s_famaille);
+      Produits_Listes.appendChild(Produit)
+    }
+    var Supports_Listes = this.doc.createElement('Liste_Supports')
+    for (let i = 0; i < this.arraySupport.length; i++) {
+      var Support = this.doc.createElement('Support')
+      var Numero = this.doc.createElement('Numero'); Numero.innerHTML = i + 1;
+      var typeSupport = this.doc.createElement('typeSupport'); typeSupport.innerHTML = this.arraySupport[i].value.typeSupport;
+      var poids = this.doc.createElement('poids'); poids.innerHTML = this.arraySupport[i].value.poids;
+      var hauteur = this.doc.createElement('hauteur'); hauteur.innerHTML = this.arraySupport[i].value.hauteur;
+      var largeur = this.doc.createElement('largeur'); largeur.innerHTML = this.arraySupport[i].value.largeur;
+      var longeur = this.doc.createElement('longeur'); longeur.innerHTML = this.arraySupport[i].value.longeur;
+      Support.appendChild(Numero);
+      Support.appendChild(typeSupport);
+      Support.appendChild(poids);
+      Support.appendChild(hauteur);
+      Support.appendChild(largeur);
+      Support.appendChild(longeur);
+      Supports_Listes.appendChild(Support);
+    }
+    BR.appendChild(Etat);
+    BR.appendChild(InformationsGenerales);
+    BR.appendChild(Produits_Listes);
+    BR.appendChild(Supports_Listes);
+    this.doc.appendChild(BR)
+    console.log(this.doc)
+
+    var formData: any = new FormData();
+    let url = "assets/BonRecpetion.xml";
+
+
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        let xml2string = new XMLSerializer().serializeToString(this.doc.documentElement);
+        var myBlob = new Blob([xml2string], { type: 'application/xml' });
+        var myFile = this.convertBlobFichier(myBlob, "assets/BonRecpetion.xml");
+        console.log("id bon :", this.id)
+        formData.append('Id', this.id);
+        formData.append('Id_Be', this.id);
+        formData.append('Etat', "Validé non conforme");
+        formData.append('Responsable', "rochdi");
+        formData.append('date', this.sysDate);
+        formData.append('Local', this.Destination);
+        formData.append('Type_Be', this.type_bon);
+        formData.append('Detail', myFile);
+        formData.append('Nb_Support', this.nbSupport);
+
+        this.service.createBonReception(formData).subscribe((data) => {
+          this.bon_reception = data
+          Swal.fire(
+            'Ajout Effecté',
+            'Bon De Réception non Conforme Ajouté Avec Sucées',
+            'success'
+          ).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire({
+                title: 'Voulez vous imprimer ce Bon de Réception',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Non',
+              }).then((result) => {
+                if (result.isConfirmed) {
+
+                  this.generatePDFnonConforme(this.bon_reception.id, this.bon_reception.date_Creation);
+                  this.router.navigate(['Menu/WMS-Reception/Lister']);
+                } else if (result.isDismissed) {
+                  console.log('erreur  ');
+                }
+              });
+            }
+          });
+        }, (err) => {
+
+
+
+        });
+      });
+
+  }
+
 }
 
 

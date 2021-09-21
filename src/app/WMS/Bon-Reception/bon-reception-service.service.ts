@@ -215,7 +215,55 @@ export class BonReceptionServiceService {
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
   }
-   
+  // filtre bon reception
+  filtre (champ1 : any, valeur1 : any, champ2 : any, valeur2 : any, champ3 : any, valeur3 : any , champ4 : any, valeur4 : any)
+  {
+    return this.httpClient.get(ERP + 'Filtre_Bon_Reception', {
+      params: {
+        Champ1: champ1,
+        Valeur1: valeur1,
+        Champ2: champ2,
+        Valeur2: valeur2,
+        Champ3: champ3,
+        Valeur3: valeur3,
+        Champ4: champ4,
+        Valeur4: valeur4
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+  // filtre bon rejet 
+  filtre_bon_rejet(champ1 : any, valeur1 : any, champ2 : any, valeur2 : any, champ3 : any, valeur3 : any  )
+  {
+    return this.httpClient.get(ERP + 'Filtre_Bon_Rejet', {
+      params: {
+        Champ1: champ1,
+        Valeur1: valeur1,
+        Champ2: champ2,
+        Valeur2: valeur2,
+        Champ3: champ3,
+        Valeur3: valeur3,
+        
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+
+  get_Bon_Rejet_By_Id(id: any): Observable<Object> {
+    return this.httpClient.get(ERP + "Bon_Rejet", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+// get information from  bon rejet avec id 
+  Detail_Bon_Rejet(Id: any): Observable<any> {
+
+    return this.httpClient.get(ERP + "Detail_Bon_Rejet"
+      , {
+        params: {
+          Id: Id
+        }, responseType: 'blob'
+      }).pipe(catchError(this.handleError))
+  }
 /*S
 
   createBonReception(form: any): Observable<Object> {
