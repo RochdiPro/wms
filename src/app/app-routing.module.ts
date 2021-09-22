@@ -10,6 +10,7 @@ import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-rece
 import { ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
 import { BonSortieComponent } from './WMS/inventaire/bon-sortie/bon-sortie.component';
 import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
+import { ListerBonSortieComponent } from './WMS/inventaire/lister-bon-sortie/lister-bon-sortie.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
 import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
 import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
@@ -50,6 +51,7 @@ const routes: Routes =
           path: 'WMS-Inventaire', component: EditInventaireComponent, children: [
             { path: '', redirectTo: 'WMS-Inventaire', pathMatch: 'full' },          
            { path: 'Bon_Sortie', component: BonSortieComponent},
+           { path: 'Lister_Bon_Sortie', component: ListerBonSortieComponent},
         
          ]
        } 

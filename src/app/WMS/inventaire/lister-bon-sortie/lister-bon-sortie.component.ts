@@ -7,7 +7,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
-import { BonReceptionServiceService } from '../bon-reception-service.service';
+import { InventaireService } from '../inventaire.service';
+
 declare var require: any
 
 const pdfMake = require("pdfmake/build/pdfmake");
@@ -15,27 +16,28 @@ const pdfFonts = require("pdfmake/build/vfs_fonts");
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 @Component({
-  selector: 'app-bon-rejet',
-  templateUrl: './bon-rejet.component.html',
-  styleUrls: ['./bon-rejet.component.scss']
+  selector: 'app-lister-bon-sortie',
+  templateUrl: './lister-bon-sortie.component.html',
+  styleUrls: ['./lister-bon-sortie.component.scss']
 })
-export class BonRejetComponent implements OnInit {
+export class ListerBonSortieComponent implements OnInit {
+
   bonRejet: any;
 
   @ViewChild(MatPaginator) paginator: any = MatPaginator;
   @ViewChild(MatSort) sort: any = MatSort;
 
-  form = new FormGroup({ id: new FormControl(""), responsable: new FormControl(""), type_Bon: new FormControl(""), id_Be: new FormControl("") });
+  form = new FormGroup({ id: new FormControl(""), responsable: new FormControl(""), local: new FormControl("") });
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  displayedColumns: string[] = ['id', "responsable", "type_Be", "id_Be", 'reclamation', 'supprimer', 'Voir_pdf', 'exporter_pdf']; //les colonne du tableau 
+  displayedColumns: string[] = ['id', "responsable", "local", 'reclamation', 'supprimer', 'Voir_pdf', 'exporter_pdf']; //les colonne du tableau 
   dataSource = new MatTableDataSource<table>();
 
 
-  constructor(public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
+  constructor(public router: Router, private _formBuilder: FormBuilder, private service: InventaireService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
   }
@@ -45,7 +47,7 @@ export class BonRejetComponent implements OnInit {
     this.id = id
     this.getDetail()
 
-    this.service.get_Bon_Rejet_By_Id(id).subscribe(data => {
+    this.service.get_Bon_Sortie_By_Id(id).subscribe(data => {
       this.bonRejet = data;
       this.type_bon = this.bonRejet.type_Bon;
       this.Destination = this.bonRejet.local
@@ -73,7 +75,7 @@ export class BonRejetComponent implements OnInit {
     this.id = id2
     this.getDetail()
     console.log(this.obj_articles)
-    this.service.get_Bon_Rejet_By_Id(id2).subscribe(data => {
+    this.service.get_Bon_Sortie_By_Id(id2).subscribe(data => {
       this.bonRejet = data;
       this.type_bon = this.bonRejet.type_Bon;
       this.Destination = this.bonRejet.local
@@ -441,7 +443,7 @@ export class BonRejetComponent implements OnInit {
   // Get Detail bon reception 
   xmlbonrejet: any;
   getDetail() {
-    this.service.Detail_Bon_Rejet(this.id).subscribe((detail: any) => {
+    this.service.Detail_Bon_Sortie(this.id).subscribe((detail: any) => {
       const reader = new FileReader();
 
       reader.onloadend = () => {
@@ -480,24 +482,23 @@ export class BonRejetComponent implements OnInit {
 
   }
 
-
-
   filtre() {
-    this.service.filtre_bon_rejet("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "type_bon", this.form.get('type_Bon')?.value).subscribe((data) => {
+    this.service.filtre("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "local", this.form.get('local')?.value).subscribe((data) => {
       this.dataSource.data = data as table[];
     });
   }
 
-  Bon_rejet() {
-    this.service.Bon_rejet().subscribe((data: any) => {
+
+  ngOnInit(): void {
+   this.Bon_sortie();
+
+  }
+
+  Bon_sortie() {
+    this.service.Bon_Sortie().subscribe((data: any) => {
       this.bonRejet = data;
       this.dataSource.data = data as table[];
     })
-  }
-
-  ngOnInit(): void {
-    this.Bon_rejet();
-
   }
   supprimer(id: any) {
     const swalWithBootstrapButtons = Swal.mixin({
@@ -510,7 +511,7 @@ export class BonRejetComponent implements OnInit {
 
     swalWithBootstrapButtons.fire({
       title: 'Tu est sure?',
-      text: " Suppression de Bon  Rejet N° " + id,
+      text: " Suppression de Bon Sortie N° " + id,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: ' Supprimer ',
@@ -518,9 +519,9 @@ export class BonRejetComponent implements OnInit {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        this.service.Supprimer_Bon_rejet(id).subscribe(data => {
+        this.service.Supprimer_BBon_Sortie(id).subscribe(data => {
 
-          this.Bon_rejet();
+          this.Bon_sortie();
 
         })
         swalWithBootstrapButtons.fire(
@@ -538,7 +539,6 @@ export class BonRejetComponent implements OnInit {
 export interface table {
   id: number;
   responsable: string
-  etat: string;
-  type_Be: string;
-  id_Be: String;
+  local: string;
+
 }

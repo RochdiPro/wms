@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>Modifier _Article : {{obj.nom}} </h1>
+
+<div mat-dialog-content>
+    <div class="row">
+        <div class="table-responsive">
+            <table class="mb-0 table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NOm</th>
+                        <th>Qte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr >
+                        <th>{{obj.id}}</th>
+                        <th>{{obj.nom}}</th>
+                        <th><input type="number" value="{{obj.qte}}"  (change)="modifier($event )"  (keyup)="modifier($event )">  </th>
+                                  
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div mat-dialog-actions class="float-right">
+  
+     <button class="btn btn-primary" (click)="close()">Fermer</button>
+</div>
