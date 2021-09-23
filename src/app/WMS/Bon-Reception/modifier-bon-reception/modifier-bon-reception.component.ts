@@ -105,9 +105,8 @@ export class ModifierBonReceptionComponent implements OnInit {
           data1 = result.Bon_Reception;
 
         })
-
-
-        this.xmldata = data1
+        this.xmldata= data1
+        console.log( this.xmldata)
         for (let k = 0; k < this.xmldata.Liste_Supports[0].Support.length; k++) {
           this.arraySupport.push(this.ajouterligneSupport());
           this.arraySupport[k].Numero = this.xmldata.Liste_Supports[0].Support[k].Numero;

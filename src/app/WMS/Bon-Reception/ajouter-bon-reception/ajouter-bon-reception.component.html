@@ -476,12 +476,8 @@
             </button>
             <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception()"
                *ngIf="this.VerifierEetatbon">
-               <i class="fas fa-check mr-2"></i>Valider et Conforme
-            </button>
-            <button mat-raised-button class="mb-2 mr-2 btn btn-success active" (click)="creer_Bon_Reception_non_conforme()"
-            *ngIf="this.VerifierEetat && !(this.VerifierEetatbon)">
-            <i class="fas fa-check mr-2"></i>Valider non conforme
-            </button>
+               <i class="fas fa-check mr-2"></i>Valider
+            </button>       
 
             <button mat-raised-button mat-raised-button class="mb-2 mr-2 btn btn-info active" (click)="Bon_rejet()"
                *ngIf="!(this.VerifierEetatbon)">

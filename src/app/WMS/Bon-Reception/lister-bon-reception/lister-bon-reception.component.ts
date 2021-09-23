@@ -25,7 +25,7 @@ export class ListerBonReceptionComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: any = MatPaginator;
   @ViewChild(MatSort) sort: any = MatSort;
 
-  form = new FormGroup({ id: new FormControl(""), responsable: new FormControl(""), etat: new FormControl(""), type_Be: new FormControl(""), id_Be: new FormControl("") });
+  form = new FormGroup({ id: new FormControl(""), responsable: new FormControl(""), etat: new FormControl(""), type_be: new FormControl("") });
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
@@ -120,10 +120,9 @@ export class ListerBonReceptionComponent implements OnInit {
 
 
   filtre() {
-    let x = this.form.get('id')?.value;
-    console.log(x)
-
-    this.service.filtre("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "etat", this.form.get('etat')?.value, "type_be", this.form.get('type_Be')?.value).subscribe((data) => {
+     
+     console.log( this.form.get('type_be')?.value)
+    this.service.filtre("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "etat", this.form.get('etat')?.value, "type_be", this.form.get('type_be')?.value).subscribe((data) => {
       this.dataSource.data = data as table[];
     });
   }
