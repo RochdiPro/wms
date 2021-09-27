@@ -201,7 +201,6 @@ export class BonReceptionServiceService {
     return this.httpClient.post(ERP+ "/Modifier_Bon_Reception", formData);
   }  
   
-
   // get bons de rejet 
   Bon_rejet():  Observable<any> {
       return this.httpClient.get(ERP + "Bon_Rejets");  
