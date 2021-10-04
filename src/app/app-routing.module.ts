@@ -14,6 +14,7 @@ import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/liste
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
  import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
+import { BonTransfertComponent } from './WMS/Stockage/bon-transfert/bon-transfert.component';
    
  
 const routes: Routes =
@@ -46,6 +47,7 @@ const routes: Routes =
             { path: 'Entree', component: EntreeBonReceptionComponent},
             { path: 'Bon_Sortie', component: BonSortieComponent},
             { path: 'Lister_Bon_Sortie', component: ListerBonSortieComponent},
+            { path: 'Bon_Transfert', component: BonTransfertComponent},
             
           ]
         } ,

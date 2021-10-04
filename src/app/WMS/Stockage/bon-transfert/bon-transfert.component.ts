@@ -1,3 +1,4 @@
+ 
 import { DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Component, ElementRef, Inject, OnInit, ViewChild } from "@angular/core";
@@ -22,11 +23,11 @@ const pdfFonts = require("pdfmake/build/vfs_fonts");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
-  selector: 'app-bon-sortie',
-  templateUrl: './bon-sortie.component.html',
-  styleUrls: ['./bon-sortie.component.scss']
+  selector: 'app-bon-transfert',
+  templateUrl: './bon-transfert.component.html',
+  styleUrls: ['./bon-transfert.component.scss']
 })
-export class BonSortieComponent implements OnInit {
+export class BonTransfertComponent implements OnInit {
   isLinear = false;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
@@ -79,6 +80,8 @@ export class BonSortieComponent implements OnInit {
   ngOnInit() {
 
     this.selectform = this._formBuilder.group({
+      source: ['', Validators.required],
+      destination: ['', Validators.required],
       code: ['', Validators.required],
       id: ['', Validators.required],
       id2: ['', Validators.required]
@@ -160,7 +163,7 @@ export class BonSortieComponent implements OnInit {
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == id) {
 
-        const dialogRef = this.dialog.open(ligne, {
+        const dialogRef = this.dialog.open(ligne_transfert, {
 
           width: 'auto',
           data: { object: this.table[i] }
@@ -208,7 +211,7 @@ export class BonSortieComponent implements OnInit {
 
       })
     } else if (produit.type == "4g") {
-      const dialogRef = this.dialog.open(Detail4g, {
+      const dialogRef = this.dialog.open(Detail4g_transfert, {
 
         width: 'auto',
         data: { object: produit }
@@ -217,7 +220,7 @@ export class BonSortieComponent implements OnInit {
       });
     } else if (produit.type == "serie") {
 
-      const dialogRef = this.dialog.open(detail_serie, {
+      const dialogRef = this.dialog.open(detail_serie_transfert, {
 
         width: 'auto',
         data: { object: produit }
@@ -536,15 +539,14 @@ export class BonSortieComponent implements OnInit {
 
 
 
-
 //modifier table dialogue
 @Component({
   selector: 'ligne_table',
   templateUrl: 'ligne_table.html',
 })
-export class ligne {
+export class ligne_transfert {
   obj: any;
-  constructor(public dialogRef: MatDialogRef<ligne>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
+  constructor(public dialogRef: MatDialogRef<ligne_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
     this.obj = data.object
   }
   modifier(ev: any) {
@@ -563,11 +565,11 @@ export class ligne {
   selector: 'detail4g',
   templateUrl: 'detail4g.html',
 })
-export class Detail4g {
+export class Detail4g_transfert {
   obj: any;
   inst: any = {}
   numero_Serie:any;
-  constructor(public dialogRef: MatDialogRef<Detail4g>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
+  constructor(public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
@@ -619,13 +621,13 @@ select_nserie()
   selector: 'detail_serie',
   templateUrl: 'detail_serie.html',
 })
-export class detail_serie {
+export class detail_serie_transfert {
   obj: any;
   inst: any = {}
   
   numero_Serie:any;
   @ViewChild('input') input:any=ElementRef; 
-  constructor(public dialogRef: MatDialogRef<detail_serie>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
+  constructor(public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}

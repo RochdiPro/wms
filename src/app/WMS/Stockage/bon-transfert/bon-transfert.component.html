@@ -1,0 +1,214 @@
+<mat-horizontal-stepper [linear]="isLinear">
+    <mat-step [stepControl]="selectform">
+        <form>
+          <ng-template matStepLabel>Source / Destination  </ng-template>
+          <div class="row">
+            <br>
+            <div class="col-md-4">
+              <mat-form-field>
+                <mat-label>Source</mat-label>
+                <mat-select [(ngModel)]="selectform.source" [ngModelOptions]="{standalone: true}">
+                    <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
+                  </mat-select>
+               
+              </mat-form-field>
+              <button mat-raised-button class="search" ><i class="fas fa-warehouse"></i> </button>
+            </div>
+            <div class="col-md-4">
+                
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-label>Destination</mat-label>                 
+                    <mat-select [(ngModel)]="selectform.destination" [ngModelOptions]="{standalone: true}">
+                      <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button mat-raised-button class="search" ><i class="fas fa-warehouse"></i> </button>
+              </div>
+            </div>
+          
+        </form>
+      </mat-step>
+
+    <mat-step [stepControl]="selectform">
+      <form>
+        <ng-template matStepLabel>Liste des articles </ng-template>
+  
+        <div class="row">
+          <br>
+          <div class="col-md-4">
+            <mat-form-field>
+              <mat-label>Ajouter un code à bare</mat-label>
+              <input matInput placeholder="Saisir le code à bare de l'article" [(ngModel)]="selectform.code"
+                [ngModelOptions]="{standalone: true}" />
+            </mat-form-field>
+            <button mat-raised-button class="search" (click)="Ajouter_Article_avec_code()"><i
+                class="fas fa-barcode"></i></button>
+          </div>
+          <div class="col-md-4">
+            <mat-form-field>
+              <mat-label>Code Article</mat-label>
+              <input matInput placeholder="Saisir l' ID de l'article" [(ngModel)]="selectform.id"
+                [ngModelOptions]="{standalone: true}" />
+            </mat-form-field>
+            <button mat-raised-button class="search" (click)="Ajouter_Article_avec_id()"><i
+                class="fas fa-search"></i></button>
+          </div>
+          <div class="col-md-4">
+            <mat-form-field>
+              <mat-label>Liste des Article</mat-label>
+              <mat-select [(ngModel)]="selectform.id2" [ngModelOptions]="{standalone: true}">
+                <mat-option *ngFor="let art of liste_articles" value="{{art.id_Produit}}">{{art.nom_Produit}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-raised-button class="search" (click)="Ajouter_Article_avec_choix()"><i
+                class="fas fa-plus-square"></i></button>
+          </div>
+        </div>
+        <div class="row mat-elevation-z8">
+  
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Id produit</th>
+                <th>Nom produit</th>
+                <th>Qte</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let article  of  table ;let i = index;">
+                <td>
+                  <i class="pe-7s-pen pe-7s-trash" (click)="Modifier_ligne_table(article.id)"
+                    title="Modifier article"></i>
+                </td>
+                <td>
+                  <input type="text" value="{{article.id}}" disabled />
+                </td>
+                <td>
+                  <input type="text" value="{{article.nom}}" disabled />
+                </td>
+                <td>
+                  <input type="text" value="{{article.qte}}" disabled />
+                </td>
+  
+                <td>
+  
+                  <i class="pe-7s-trash" (click)="Supprimer_ligne_table(i)" title="Supprimer article"></i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <br>
+        <div class="col-md-2 mb-1">
+          <button mat-raised-button color="primary" matStepperNext class="mb-2 mr-2 btn btn-primary active">
+            Suivant<i class="fas fa-chevron-right ml-2"></i>
+          </button>
+        </div>
+      </form>
+    </mat-step>
+  
+    <mat-step [stepControl]="secondFormGroup">
+      <form [formGroup]="secondFormGroup">
+        <ng-template matStepLabel>spécifications Articles </ng-template>
+        <!-- Lignes d'article  -->
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Id produit</th>
+              <th>Nom produit</th>
+              <th>Qte</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let article  of  table ;let i = index;">
+  
+              <td>
+                <input type="text" value="{{article.id}}" disabled />
+              </td>
+              <td>
+                <input type="text" value="{{article.nom}}" disabled />
+              </td>
+              <td>
+                <input type="text" value="{{article.qte}}" disabled />
+              </td>
+              <td> <i  class="pe-7s-look btn-b" title="plus" (click)="plus(article)"></i> </td>
+  
+            </tr>
+          </tbody>
+        </table>
+        <div class="row">
+  
+          <button class="mb-2 mr-2 btn btn-primary active" mat-button matStepperPrevious>
+            <i class="fas fa-chevron-left mr-2"></i>Précédent
+          </button>
+  
+          <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary">
+            Suivant<i class="fas fa-chevron-right ml-2"></i></button>
+  
+  
+        </div>
+      </form>
+    </mat-step>
+  
+    <mat-step>
+      <ng-template matStepLabel icon>Cloture</ng-template>
+      <div class="row">
+        <div class="col-md-8 mb-8">
+          <h6>
+            <strong> Liste Des Articles</strong>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>ID Article</th>
+                  <th>Nom Article</th>
+                  <th>Quanitité</th>
+  
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let article  of  table ;let i=index">
+                  <td scope="row"></td>
+                  <td>{{article.id}} </td>
+                  <td>{{article.nom}} </td>
+                  <td>{{article.qte}} </td>
+  
+                </tr>
+  
+              </tbody>
+            </table>
+          </h6>
+        </div>
+        <div class="col-md-4 mb-4">
+  
+          <div class="col-md-4">
+            <mat-form-field>
+              <mat-label>Local</mat-label>
+              <mat-select [(ngModel)]="cloture.local" [ngModelOptions]="{standalone: true}">
+                <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
+              </mat-select>
+            </mat-form-field>           
+          </div>
+          <h4>Réclamation</h4>
+          <textarea   [(ngModel)]="cloture.reclamation" [ngModelOptions]="{standalone: true}"
+          matInput rows="5" cols="100" placeholder="Réclamation"></textarea>
+  
+        </div>
+      </div>
+      <div class="row">
+             
+        <button class="mb-2 mr-2 btn btn-primary active" mat-button matStepperPrevious>
+           <i class="fas fa-chevron-left mr-2"></i>Précédent
+        </button>
+     
+        <button class="mb-2 mr-2 btn btn-success"  (click)="valide()" >  Valider </button>
+  
+     
+  </div>    
+    </mat-step>
+  </mat-horizontal-stepper>

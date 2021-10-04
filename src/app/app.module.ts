@@ -29,7 +29,8 @@ import {MatInputModule} from '@angular/material/input';
 import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/lister-bon-sortie.component';
 import { DatePipe } from '@angular/common';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
-
+import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_transfert} from './WMS/Stockage/bon-transfert/bon-transfert.component';
+ 
  
 @NgModule({ 
   declarations: [
@@ -49,7 +50,10 @@ import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockag
    EditStockageComponent,
    EntreeBonReceptionComponent,
    EditInventaireComponent,
-   BonSortieComponent,ligne,Detail4g,detail_serie, ListerBonSortieComponent
+   BonSortieComponent,ligne,Detail4g,detail_serie,
+   ListerBonSortieComponent,
+   BonTransfertComponent,
+   ligne_transfert,Detail4g_transfert,detail_serie_transfert
   ],
   exports: [
      

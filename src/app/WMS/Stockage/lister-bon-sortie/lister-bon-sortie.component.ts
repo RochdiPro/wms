@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -38,7 +39,7 @@ export class ListerBonSortieComponent implements OnInit {
   dataSource = new MatTableDataSource<table>();
 
 
-  constructor(public router: Router, private _formBuilder: FormBuilder, private service: StockageService, private http: HttpClient) {
+  constructor(private datePipe: DatePipe,public router: Router, private _formBuilder: FormBuilder, private service: StockageService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
   }
@@ -55,8 +56,11 @@ export class ListerBonSortieComponent implements OnInit {
       this.reclamation = this.bonRejet.reclamation
       this.date_Creation = this.bonRejet.date_Creation
     }, error => console.log(error));
-    this.telechargerPDF(this.id, this.date_Creation)
-  }
+    setTimeout(() => {
+      this.telechargerPDF(this.id, this.date_Creation)
+    }, 500);
+   
+  } 
 
   modeleSrc2: any;
   Source: any;
@@ -74,8 +78,7 @@ export class ListerBonSortieComponent implements OnInit {
 
   pdf(id2: any) {
     this.id = id2
-    this.getDetail()
-    console.log(this.obj_articles)
+    this.getDetail()     
     this.service.get_Bon_Sortie_By_Id(id2).subscribe(data => {
       this.bonRejet = data;
       this.type_bon = this.bonRejet.type_Bon;
@@ -83,8 +86,11 @@ export class ListerBonSortieComponent implements OnInit {
       this.reclamation = this.bonRejet.reclamation
       this.date_Creation = this.bonRejet.date_Creation
     }, error => console.log(error));
-    this.generatePDF(this.id, this.date_Creation)
-
+    setTimeout(() => {
+      
+      this.generatePDF(this.id, this.date_Creation) 
+    }, 1000);
+    
   }
 
   async modelePdfBase642() {
@@ -117,79 +123,132 @@ export class ListerBonSortieComponent implements OnInit {
     return <File>theBlob;
   }
 
+  ch:any
   //impression de la fiche recption
   generatePDF(id: any, date: any) {
+     
+ 
     var body = [];
-    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
-
-    body.push(titulos);
-    var tabArt: any = [];
 
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();
-
-
-
-
-
-      let ch = "";
-      if (this.obj_articles[i].controle_qt) {
+      var fila = new Array();  
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
+      obj.push(this.obj_articles[i].qte); 
+      this.ch=""
+      if (this.obj_articles[i].type=='serie') 
+      {
+        
+        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
+        {
+          this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
+          this.ch=this.ch+" ----------------------  \n"  
+        }
+       
 
       }
-      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
-      if (this.obj_articles[i].controle_tech) {
-
-      }
-      else {
-        ch = ch + " Fiche Technique non Verifier "
-      }
-
-
-      fila.push(this.obj_articles[i].id);
-      fila.push(this.obj_articles[i].nom);
-      fila.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(ch);
-
-      body.push(fila);
-
+      else if (this.obj_articles[i].type=='4g') 
+      {
+       
+        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
+        {
+           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n"     
+           this.ch=this.ch+"E1 : "+this.obj_articles[i].detail[j].e1 +"\n"     
+           this.ch=this.ch+"E2 : "+this.obj_articles[i].detail[j].e2 +"\n"  
+           this.ch=this.ch+" ----------------------  \n"  
+            
+        }
+        
+        
+      }   
+      obj.push(this.ch)
+      body.push(obj);
     }
     console.log(body)
 
-
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Rejet Marchandise',
-
+        title: 'Fiche Bon Sortie',
+       },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
       },
+      header:[ 
+        {
+          text: '' + id + '\n\n',
+          fontSize: 15, 
+          color: 'black',
+          bold: true,
+          relativePosition: {x:440, y:197}	       
+        },
+      {
+        text: '  '  +this.Destination   ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+     
+      
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      {
+        text: ' ' + this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 80, y:665}	       
+      }, 
+      {
+        text: 'rochdi' ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:85, y:131}	       
+      },
+      {
+        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:154}	       
+      },
+     ] ,
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -197,75 +256,22 @@ export class ListerBonSortieComponent implements OnInit {
       ],
 
       content: [
+       
         {
-          text: 'Bon Rejet N°' + id + '\n\n',
-          fontSize: 10,
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Responsable :' + '\t' + 'User'
-                + '\n\n' +
-                'Id Bon  :' + '\t' + id
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY')
-                + '\n\n' + 'Local :' + this.Destination
-                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-
-          text: '\n\n' + 'Liste des Article :' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-
-          text: '\n\n' + 'Reclamation :' + '\t\n\n\n' + this.reclamation,
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 20,180 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
       ],
+      
     };
+
 
     pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
   }
@@ -273,76 +279,126 @@ export class ListerBonSortieComponent implements OnInit {
   //impression de la fiche recption
   telechargerPDF(id: any, date: any) {
     var body = [];
-    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
-
-    body.push(titulos);
-    var tabArt: any = [];
 
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();
-
-
-
-
-
-      let ch = "";
-      if (this.obj_articles[i].controle_qt) {
+      var fila = new Array();  
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
+      obj.push(this.obj_articles[i].qte); 
+      this.ch=""
+      if (this.obj_articles[i].type=='serie') 
+      {
+        
+        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
+        {
+          this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
+          this.ch=this.ch+" ----------------------  \n"  
+        }
+       
 
       }
-      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
-      if (this.obj_articles[i].controle_tech) {
-
-      }
-      else {
-        ch = ch + " Fiche Technique non Verifier "
-      }
-
-
-      fila.push(this.obj_articles[i].id);
-      fila.push(this.obj_articles[i].nom);
-      fila.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(ch);
-
-      body.push(fila);
-
+      else if (this.obj_articles[i].type=='4g') 
+      {
+       
+        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
+        {
+           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n"     
+           this.ch=this.ch+"E1 : "+this.obj_articles[i].detail[j].e1 +"\n"     
+           this.ch=this.ch+"E2 : "+this.obj_articles[i].detail[j].e2 +"\n"  
+           this.ch=this.ch+" ----------------------  \n"  
+            
+        }
+        
+        
+      }   
+      obj.push(this.ch)
+      body.push(obj);
     }
     console.log(body)
 
-
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Rejet Marchandise',
-
+        title: 'Fiche Bon Sortie',
+       },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
       },
+      header:[ 
+        {
+          text: '' + id + '\n\n',
+          fontSize: 15, 
+          color: 'black',
+          bold: true,
+          relativePosition: {x:440, y:197}	       
+        },
+      {
+        text: '  '  +this.Destination   ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+     
+      
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      {
+        text: ' ' + this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 80, y:665}	       
+      }, 
+      {
+        text: 'rochdi' ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:85, y:131}	       
+      },
+      {
+        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:154}	       
+      },
+     ] ,
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -350,74 +406,20 @@ export class ListerBonSortieComponent implements OnInit {
       ],
 
       content: [
+       
         {
-          text: 'Bon Rejet N°' + id + '\n\n',
-          fontSize: 10,
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Responsable :' + '\t' + 'User'
-                + '\n\n' +
-                'Id Bon  :' + '\t' + id
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY')
-                + '\n\n' + 'Local :' + this.Destination
-                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-
-          text: '\n\n' + 'Liste des Article :' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-
-          text: '\n\n' + 'Reclamation :' + '\t\n\n\n' + this.reclamation,
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 20,180 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
       ],
+      
     };
     pdfMake.createPdf(def).download("BonRejet" + this.id);
 
@@ -442,41 +444,74 @@ export class ListerBonSortieComponent implements OnInit {
   arraySupport: any = [];
   support: any = {}
   // Get Detail bon reception 
-  xmlbonrejet: any;
+  xml: any;
+  detail:any=[];
+  ns:any={};
   getDetail() {
+    this.obj_articles=[]
     this.service.Detail_Bon_Sortie(this.id).subscribe((detail: any) => {
       const reader = new FileReader();
-
       reader.onloadend = () => {
-        this.xmlbonrejet = reader.result;
+        this.xml = reader.result;
         var parseString = require('xml2js').parseString;
         let data1;
-        parseString(atob(this.xmlbonrejet.substr(28)), function (err: any, result: any) {
-          data1 = result.Bon_Rejet;
-
+        parseString(atob(this.xml.substr(28)), function (err: any, result: any) {
+          data1 = result.Bon_Sortie;
         })
-
         this.xmldata = data1
-
-
-        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {
+         
+        for (let i = 0; i < this.xmldata.Produits[0].Produits_Simples[0].Produit.length; i++) {
 
           this.new_obj = {}
-          this.new_obj.id = this.xmldata.Produits[0].Produit[i].Id;
-          this.new_obj.nom = this.xmldata.Produits[0].Produit[i].Nom;
-          this.new_obj.fiche_Technique = this.xmldata.Produits[0].Produit[i].Fiche_Technique;
+          this.new_obj.type="simple"
+          this.new_obj.id =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Id;
+          this.new_obj.nom =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Nom;  
+          this.new_obj.qte =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Qte;
+          this.obj_articles.push(this.new_obj)
+         
+        }
+        for (let i = 0; i < this.xmldata.Produits[0].Produits_4gs[0].Produit.length; i++) {
 
-          this.new_obj.qte = this.xmldata.Produits[0].Produit[i].Qte;
-          this.new_obj.famaille = this.xmldata.Produits[0].Produit[i].famaille;
-          this.new_obj.sous_famaille = this.xmldata.Produits[0].Produit[i].sous_famaille;
-          this.new_obj.total = this.xmldata.Produits[0].Produit[i].Total;
+          this.new_obj = {}
+          this.new_obj.type="4g"
+          this.new_obj.id =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Id;
+          this.new_obj.nom =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Nom;  
+          this.new_obj.qte =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Qte;
+          this.detail = []
+           for(let j = 0 ; j < this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g.length ; j++)
+          {
+            this.ns ={}
+            this.ns.ns=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].N_Serie
+            this.ns.e1=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E1
+            this.ns.e2=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E2
+            this.detail.push(this.ns)
+          }
+          this.new_obj.detail =this.detail  
+          this.obj_articles.push(this.new_obj)
+         
+        }
+        for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit.length; i++) {
 
+          this.new_obj = {}
+          this.new_obj.type="serie"
+          this.new_obj.id =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Id;
+          this.new_obj.nom =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Nom;  
+          this.new_obj.qte =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Qte;
+          this.detail = []
+          for(let j = 0 ; j < this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series.length ; j++)
+          {
+            this.ns ={}
+            this.ns.ns=this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series[j].N_Serie
+ 
+            this.detail.push(this.ns)
+          }
+          this.new_obj.detail =this.detail  
 
           this.obj_articles.push(this.new_obj)
-
+         
         }
+       
       }
-
       reader.readAsDataURL(detail);
     })
 
