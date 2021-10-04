@@ -19,15 +19,16 @@ import { MatSelectModule  } from '@angular/material/select';
 import {MatDialogModule} from '@angular/material/dialog';
 import {ModifierBonReceptionComponent,Modifier_Support } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
 import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.component';
-import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
 import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
 import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
-import { BonSortieComponent ,ligne ,Detail4g,detail_serie} from './WMS/inventaire/bon-sortie/bon-sortie.component';
+import { BonSortieComponent ,ligne ,Detail4g,detail_serie} from './WMS/Stockage/bon-sortie/bon-sortie.component';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table'  
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import { ListerBonSortieComponent } from './WMS/inventaire/lister-bon-sortie/lister-bon-sortie.component';
+import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/lister-bon-sortie.component';
+import { DatePipe } from '@angular/common';
+import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
 
  
 @NgModule({ 
@@ -70,7 +71,11 @@ import { ListerBonSortieComponent } from './WMS/inventaire/lister-bon-sortie/lis
     MatFormFieldModule,
     MatInputModule 
   ],
-  providers: [],
+   
+  providers: [
+    DatePipe,
+    
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -7,7 +7,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
-import { InventaireService } from '../inventaire.service';
+ 
+import { StockageService } from '../stockage.service';
 
 declare var require: any
 
@@ -37,7 +38,7 @@ export class ListerBonSortieComponent implements OnInit {
   dataSource = new MatTableDataSource<table>();
 
 
-  constructor(public router: Router, private _formBuilder: FormBuilder, private service: InventaireService, private http: HttpClient) {
+  constructor(public router: Router, private _formBuilder: FormBuilder, private service: StockageService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
   }

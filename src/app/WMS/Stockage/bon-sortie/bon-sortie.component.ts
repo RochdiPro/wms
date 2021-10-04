@@ -1,12 +1,18 @@
+import { DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { Component, Inject, OnInit, ViewChild } from "@angular/core";
+import { Component, ElementRef, Inject, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
-import { InventaireService } from "../inventaire.service";
+ 
+import { StockageService } from "../stockage.service";
 
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { isNgTemplate } from "@angular/compiler";
 
 declare var require: any
 
@@ -31,7 +37,7 @@ export class BonSortieComponent implements OnInit {
   object: any = {};
   locals:any;
   @ViewChild('stepper') private myStepper: any = MatStepper;
-  constructor( private http: HttpClient,private _formBuilder: FormBuilder, public service: InventaireService, public dialog: MatDialog ,private router: Router) {
+  constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
     this.service.liste_articles().subscribe((data: any) => {
       this.liste_articles = data;
@@ -85,7 +91,7 @@ export class BonSortieComponent implements OnInit {
 
     this.cloture = this._formBuilder.group({
       local: ['', Validators.required],
-      reclamation: ['', Validators.required]
+      reclamation: ['.', Validators.required]
     });
   }
 
@@ -374,54 +380,56 @@ export class BonSortieComponent implements OnInit {
     return <File>theBlob;
   }
 
-
+  ch:any
   modeleSrc: any;
   //impression de la fiche recption
   generatePDF(id: any, date_Creation: any) {
 
     var body = [];
-    var title = new Array('Id Article', 'Article',  'Quantite');
-    body.push(title);
-    var tabArt: any = [];
+     
     for (let i = 0; i < this.table.length; i++) {
       var obj = new Array();
       obj.push(this.table[i].id);
       obj.push(this.table[i].nom);     
-      obj.push(this.table[i].qte);     
+      obj.push(this.table[i].qte); 
+      this.ch=""
+      if (this.table[i].type=='serie') 
+      {
+        
+        for(let j = 0 ; j<this.table[i].detail.length; j++)
+        {
+          this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n" 
+        
+        }
+       
+
+      }
+      else if (this.table[i].type=='4g') 
+      {
+       
+        for(let j = 0 ; j<this.table[i].detail.length; j++)
+        {
+           this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n"     
+           this.ch=this.ch+"E1 : "+this.table[i].detail[j].e1 +"\n"     
+           this.ch=this.ch+"E2 : "+this.table[i].detail[j].e2 +"\n"  
+            
+        }
+        
+      }   
+      obj.push(this.ch)
       body.push(obj);
     }
 
     
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
         title: 'Fiche Bon Sortie',
-
       },
       background: [
         {
@@ -431,68 +439,50 @@ export class BonSortieComponent implements OnInit {
 
       content: [
         {
-          text: 'Bon Sortie N° ' + id + '\n\n',
-          fontSize: 10,
-
-          alignment: 'left',
-
+          text: ''+this.cloture.local,
+          fontSize: 10, 
+          color: 'black',            
+          relativePosition: {x:35, y:-143}	       
+        },  
+      
+        {
+          text: 'rochdi ' ,
+          fontSize: 10, 
+          color: 'black',            
+          relativePosition: {x:50, y:-119}	       
+        }, 
+        {
+          text: ' ' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
+          fontSize: 10, 
+          color: 'black',            
+          relativePosition: {x:35, y:-95}	       
+        }, 
+        {
+          text: '' + id + '\n\n',
+          fontSize: 15, 
           color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'local :' + '\t' + this.cloture.local
-                + '\n\n' +
-                'Id Bon  :' + '\t' + id
-               
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                ' Utilisateur :' + '\t' + "rochdi"               
-                + '\n\n' + 'Date      :' + date_Creation + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-          text: '\n\n' + 'Liste des Articles ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
+          bold: true,
+          relativePosition: {x:400, y:-52}	       
         },
         {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
+          text: ''+this.cloture.reclamation,
+          fontSize: 10, 
+          color: 'black',            
+          relativePosition: {x:-10, y:430}	       
+        },  
+        {
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 20,180 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
         
-       
          
       ],
+      
     };
 
     pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
@@ -534,7 +524,8 @@ export class ligne {
 export class Detail4g {
   obj: any;
   inst: any = {}
-  constructor(public dialogRef: MatDialogRef<Detail4g>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
+  numero_Serie:any;
+  constructor(public dialogRef: MatDialogRef<Detail4g>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
@@ -543,16 +534,37 @@ export class Detail4g {
       this.inst.e2 = ""
       this.obj.detail.push(this.inst)
     }
+   
+  this.select_nserie();
   }
-  savens(ev: any, obj: any) {
-     obj.ns = ev.target.value
+
+select_nserie()
+{
+  this.service.Detail_Produit_4g(this.obj.id).subscribe((data2)=>
+  {
+     this.numero_Serie=data2;   
+     
+  })    
+}
+
+   d:any;
+  save(ns: any, obj: any ,id:any,i :any) {
+    obj.ns=ns    
+    this.service.Detail_Produit_N_serie(ns,id).subscribe((data3)=>
+    {
+      this.d=data3;
+      console.log(data3)
+      console.log(this.d)
+      console.log(this.d.e1+"  "+this.d.e2)
+      obj.e1=this.d.e1
+      obj.e2=this.d.e2
+    })
+    
+    
+    this.numero_Serie.splice(i,1);       
   }
-  savee1(ev: any, obj: any) {
-    obj.e1 = ev.target.value
-  }
-  savee2(ev: any, obj: any) {
-     obj.e2 = ev.target.value
-  }
+
+  
   //fermer dialogue
   close() {
     this.dialogRef.close();
@@ -568,17 +580,34 @@ export class Detail4g {
 export class detail_serie {
   obj: any;
   inst: any = {}
-  constructor(public dialogRef: MatDialogRef<detail_serie>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
+  
+  numero_Serie:any;
+  @ViewChild('input') input:any=ElementRef; 
+  constructor(public dialogRef: MatDialogRef<detail_serie>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
       this.inst.ns = ""
-
       this.obj.detail.push(this.inst)
     }
+    
+    this.select_nserie();
   }
-  save(ev: any, obj: any) {
-    obj.ns=ev.target.value     
+
+  select_nserie()
+  {
+    this.service.numero_Serie_Produit(this.obj.id).subscribe((data2)=>
+    {
+       this.numero_Serie=data2;   
+       
+    })    
+  }
+  
+  
+  
+  save(ns: any, obj: any ,i :any) {
+    obj.ns=ns    
+    this.numero_Serie.splice(i,1);       
   }
   //fermer dialogue
   close() {

@@ -8,12 +8,12 @@ import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.compo
 import { EditBonReceptionComponent } from './WMS/Bon-Reception/edit-bon-reception/edit-bon-reception.component';
 import { ListerBonReceptionComponent } from './WMS/Bon-Reception/lister-bon-reception/lister-bon-reception.component';
 import { ModifierBonReceptionComponent } from './WMS/Bon-Reception/modifier-bon-reception/modifier-bon-reception.component';
-import { BonSortieComponent } from './WMS/inventaire/bon-sortie/bon-sortie.component';
+import { BonSortieComponent } from './WMS/Stockage/bon-sortie/bon-sortie.component';
 import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
-import { ListerBonSortieComponent } from './WMS/inventaire/lister-bon-sortie/lister-bon-sortie.component';
+import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/lister-bon-sortie.component';
 import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
-import { EditStockageComponent } from './WMS/Stockage/entree/edit-stockage/edit-stockage.component';
-import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
+ import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
+import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
    
  
 const routes: Routes =
@@ -44,14 +44,15 @@ const routes: Routes =
            path: 'WMS-Stockage', component: EditStockageComponent, children: [
              { path: '', redirectTo: 'WMS-Stockage', pathMatch: 'full' },          
             { path: 'Entree', component: EntreeBonReceptionComponent},
+            { path: 'Bon_Sortie', component: BonSortieComponent},
+            { path: 'Lister_Bon_Sortie', component: ListerBonSortieComponent},
             
           ]
         } ,
         {
           path: 'WMS-Inventaire', component: EditInventaireComponent, children: [
             { path: '', redirectTo: 'WMS-Inventaire', pathMatch: 'full' },          
-           { path: 'Bon_Sortie', component: BonSortieComponent},
-           { path: 'Lister_Bon_Sortie', component: ListerBonSortieComponent},
+          
         
          ]
        } 

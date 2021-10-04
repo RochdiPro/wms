@@ -13,7 +13,7 @@
                 <tbody>
                     <tr *ngFor="let obj  of Supports; let i=index">
                         <th>{{obj.id}}</th>
-                        <th><input type="text" value="{{obj.qte}}" (keyup)="set_qte($event,obj.id,id_article_ajour)">
+                        <th><input type="number" value="{{obj.qte}}" (keyup)="set_qte($event,obj.id,id_article_ajour)">
                         </th>
                     </tr>
                 </tbody>

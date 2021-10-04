@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DatePipe } from '@angular/common';
 declare var require: any
 
 const pdfMake = require("pdfmake/build/pdfmake");
@@ -34,16 +35,22 @@ export class AjouterBonReceptionComponent implements OnInit {
   bonEntrees_impo: any = []
   bonretour: any = []
   bontransfert: any = []
-  type_bon: any;
+  public type_bon: any;
   id: any;
   nbSupport: any;
   listeArticleBon: any;
   Source: any;
   Destination: any;
   modele: any;
+  source_bon:any;
+  id_bon_source :any ;
+  nom_bon_Source:any;
+  tel_bon_source:any;
+  src:any;
+  tel_bon_Source:any;
 
 
-  constructor(public router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
+  constructor(private datePipe: DatePipe,public router: Router, public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
     this.service.Famille_Logistique().subscribe((data: any) => {
       this.Famille_Logistique = data;
     });
@@ -98,7 +105,7 @@ export class AjouterBonReceptionComponent implements OnInit {
     }
     if (this.selected == "Importation") {
       this.listeBonEntreeImporation();
-      this.type_bon = "Bon Entrée Importation"
+      this.type_bon = "Bon Importation"
       this.bonEntree_impo_selected = true;
 
     }
@@ -125,6 +132,15 @@ export class AjouterBonReceptionComponent implements OnInit {
       this.service.get_Information_Bon_entree_Local(id).subscribe((data: any) => {
         this.Source = data.id_Fr
         this.Destination = data.local
+        this.source_bon= "Fournisseur"
+        this.id_bon_source = data.local_Source
+        this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+        {
+          this.src=data2;
+          this.nom_bon_Source=this.src.nom_Fournisseur;
+          this.tel_bon_Source=this.src.tel1;
+        })
+
 
       });
     }
@@ -132,21 +148,47 @@ export class AjouterBonReceptionComponent implements OnInit {
       this.service.get_Information_Bon_entree_Importation(id).subscribe((data: any) => {
         this.Source = data.id_Fr
         this.Destination = data.local
+        this.source_bon= "Fournisseur"
+        this.id_bon_source = data.local_Source
+        this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+        {
+          this.src=data2;
+          this.nom_bon_Source=this.src.nom_Fournisseur;
+          this.tel_bon_Source=this.src.tel1;
+        })
 
       });
     }
     else if (this.bontransfert_selected) {
       this.service.get_Information_Bon_transfert(id).subscribe((data: any) => {
-        this.Source = data.local_Source
+        
         this.Destination = data.local_Destination
-
+        this.source_bon= "Entrepôt"
+        this.nom_bon_Source= data.local_Source
+        this.service.Filtre_Fiche_Local(data.local_Source).subscribe((data2) =>
+        {
+          this.src=data2;
+          
+          this.nom_bon_Source=this.src[0].nom_Local;
+          this.tel_bon_Source=this.src[0].tel;
+          this.id_bon_source=this.src[0].id_Local
+          this.Source = this.src[0].id_Local
+        })
       });
+      
     }
     else if (this.bonrtour_selected) {
       this.service.get_Information_Bon_retour(id).subscribe((data: any) => {
         this.Source = data.id_Clt
         this.Destination = data.local
-
+        this.source_bon= "Client"
+        this.id_bon_source = data.local_Source
+        this.service.Client(data.id_Clt).subscribe((data2) =>
+        {
+          this.src=data2;
+          this.nom_bon_Source=this.src.nom_Client;
+          this.tel_bon_Source=this.src.tel1;
+        })
       });
     }
   }
@@ -277,16 +319,15 @@ export class AjouterBonReceptionComponent implements OnInit {
     }
     else if (this.bonEntree_impo_selected) {
       this.service.Quantite_Fiche_Technique_Fiche_Bon_Entree_Importation(id).subscribe((data: any) => {
-        this.listeArticleBon = data;
-
-        for (let k = 0; k < this.arraySupport.length; k++) {
-          this.support = {}
-          this.support.id = k;
-          this.support.qte = 0;
-          this.supports.push(this.support);
-        }
-
+        this.listeArticleBon = data;    
         for (let i = 0; i < this.listeArticleBon.length; i++) {
+          this.supports=[]
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
           this.new_obj = {};
           this.new_obj.id = this.listeArticleBon[i].id;
           this.new_obj.nom = this.listeArticleBon[i].nom_Article;
@@ -301,21 +342,22 @@ export class AjouterBonReceptionComponent implements OnInit {
           this.new_obj.controle_tech = false;
           this.obj_articles.push(this.new_obj)
         }
-
+         
       });
+
+      
     }
     else if (this.bonrtour_selected) {
       this.service.Quantite_Fiche_Technique_Fiche_Bon_Retour(id).subscribe((data: any) => {
-        this.listeArticleBon = data;
-
-        for (let k = 0; k < this.arraySupport.length; k++) {
-          this.support = {}
-          this.support.id = k;
-          this.support.qte = 0;
-          this.supports.push(this.support);
-        }
-
+        this.listeArticleBon = data;    
         for (let i = 0; i < this.listeArticleBon.length; i++) {
+          this.supports=[]
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
           this.new_obj = {};
           this.new_obj.id = this.listeArticleBon[i].id;
           this.new_obj.nom = this.listeArticleBon[i].nom_Article;
@@ -330,21 +372,21 @@ export class AjouterBonReceptionComponent implements OnInit {
           this.new_obj.controle_tech = false;
           this.obj_articles.push(this.new_obj)
         }
-
+         
       });
+
     }
     else if (this.bontransfert_selected) {
       this.service.Quantite_Fiche_Technique_Fiche_Bon_Transfert(id).subscribe((data: any) => {
-        this.listeArticleBon = data;
-
-        for (let k = 0; k < this.arraySupport.length; k++) {
-          this.support = {}
-          this.support.id = k;
-          this.support.qte = 0;
-          this.supports.push(this.support);
-        }
-
+        this.listeArticleBon = data;    
         for (let i = 0; i < this.listeArticleBon.length; i++) {
+          this.supports=[]
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
           this.new_obj = {};
           this.new_obj.id = this.listeArticleBon[i].id;
           this.new_obj.nom = this.listeArticleBon[i].nom_Article;
@@ -359,8 +401,9 @@ export class AjouterBonReceptionComponent implements OnInit {
           this.new_obj.controle_tech = false;
           this.obj_articles.push(this.new_obj)
         }
-
+         
       });
+
     }
 
 
@@ -590,7 +633,7 @@ export class AjouterBonReceptionComponent implements OnInit {
                 if (result.isConfirmed) {
 
                   this.generatePDF(this.bon_reception.id, this.bon_reception.date_Creation);
-                  this.router.navigate(['Menu/WMS-Reception/Lister']);
+                 // this.router.navigate(['Menu/WMS-Reception/Lister']);
                 } else if (result.isDismissed) {
                   console.log('erreur  ');
                 }
@@ -739,320 +782,402 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
 
   modeleSrc: any;
-  //impression de la fiche recption
+  // impression de pdf  
   generatePDF(id: any, date_Creation: any) {
 
-    var body = [];
-    var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification');
-    body.push(title);
-    var tabArt: any = [];
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");
+    obj.push(" ");
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
-      obj.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { obj.push("oui"); } else { obj.push("non"); }
       obj.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { obj.push("oui"); } else { obj.push("non"); }
+      obj.push( "Quantité et qualité vérifiées ")      
       body.push(obj);
     }
 
-    var body2 = [];
-    var title = new Array('Id Support', 'Type', 'Poids', 'Hauteur', 'Largeur', 'Longeur');
-    body2.push(title);
-    var tabArt: any = [];
-    for (let i = 0; i < this.arraySupport.length; i++) {
-      var obj = new Array();
-      obj.push(i + 1);
-      obj.push(this.arraySupport[i].value.typeSupport);
-      obj.push(this.arraySupport[i].value.poids);
-      obj.push(this.arraySupport[i].value.hauteur);
-      obj.push(this.arraySupport[i].value.largeur);
-      obj.push(this.arraySupport[i].value.longeur);
+   
+ /*   var obj = new Array();
+    obj.push("6666");
+    obj.push("dssvfv sdvejgdzjed dcvfvf vfvfdvfd vfdvfvfdv fdvfdvf");
+    obj.push("10");
+    obj.push( "Quantité et qualité vérifiées ") 
+    body.push(obj);
+    var obj = new Array();
+    obj.push("142");
+    obj.push("dssvfv sdvejgdzjed dvfvfdv fdvfdvf");
+    obj.push("1");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vffff ffff fff ff  f f f f v vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+    var obj = new Array();
+    obj.push("1468");
+    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
+    obj.push("125");
+    obj.push( "Quantité et qualité vérifiées ")      
+    body.push(obj);
+ */
 
-      body2.push(obj);
-    }
-
-    var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
-      defaultStyle: {
-        // alignment: 'justify'
-      },
-      pageMargins: [40, 120, 40, 60],
-
-
+    let def = {
+      pageMargins: [40, 250, 40, 180],
       info: {
         title: 'Fiche Bon Réception',
-
       },
-      background: [
-        {
-          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
-        }
-      ],
-
-      content: [
-        {
-          text: 'Bon Reception N° ' + id + '\n\n',
-          fontSize: 10,
-
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Type Bon :' + '\t' + this.type_bon
-                + '\n\n' +
-                'Id Bon  :' + '\t' + this.id
-                + '\n\n' +
-                'Local  :' + '\t' + this.Destination
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                ' Utilisateur :' + '\t' + "rochdi"
-                + '\n\n' + 'Etat      :' + "Non Conforme " 
-                + '\n\n' + 'Date      :' + date_Creation + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-          text: '\n\n' + 'Liste des Articles ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-          text: '\n\n' + 'Liste des Supports ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*', '*'],
-            body: body2
-          }
-        },
-      ],
-    };
-
-    pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
-
-  }
-
-   //impression de la fiche recption non Conforme
-   generatePDFnonConforme(id: any, date_Creation: any) {
-
-    var body = [];
-    var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification','reclamation');
-    body.push(title);
-    var tabArt: any = [];
-    for (let i = 0; i < this.obj_articles.length; i++) {
-      var obj = new Array();
-      obj.push(this.obj_articles[i].id);
-      obj.push(this.obj_articles[i].nom);
-      obj.push(this.obj_articles[i].fiche_Technique);
-      let ch = "5555";
-      if (this.obj_articles[i].fiche_Technique = 'true') { obj.push("oui"); } else { obj.push("non");}
-      obj.push(this.obj_articles[i].qte);
-      console.log(this.obj_articles[i].controle_qt = 'true')
-      console.log(this.obj_articles[i].controle_qt == 'true')
-      if (this.obj_articles[i].controle_qt = 'true') { obj.push("oui"); } else { obj.push("non"); ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte ; }
-      obj.push(ch);
-      body.push(obj);
       
-    }
-    
-     
-
-    var body2 = [];
-    var title = new Array('Id Support', 'Type', 'Poids', 'Hauteur', 'Largeur', 'Longeur');
-    body2.push(title);
-    var tabArt: any = [];
-    for (let i = 0; i < this.arraySupport.length; i++) {
-      var obj = new Array();
-      obj.push(i + 1);
-      obj.push(this.arraySupport[i].value.typeSupport);
-      obj.push(this.arraySupport[i].value.poids);
-      obj.push(this.arraySupport[i].value.hauteur);
-      obj.push(this.arraySupport[i].value.largeur);
-      obj.push(this.arraySupport[i].value.longeur);
-
-      body2.push(obj);
-    }
-
-    var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
-      defaultStyle: {
-        // alignment: 'justify'
-      },
-      pageMargins: [40, 120, 40, 60],
-
-
-      info: {
-        title: 'Fiche Bon Réception',
-
-      },
-      background: [
-        {
-          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
-        }
-      ],
-
-      content: [
-        {
-          text: 'Bon Reception N° ' + id + '\n\n',
-          fontSize: 10,
-
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
           columns: [
-
             {
-              text:
-                'Type Bon :' + '\t' + this.type_bon
-                + '\n\n' +
-                'Id Bon  :' + '\t' + this.id
-                + '\n\n' +
-                'Local  :' + '\t' + this.Destination
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                ' Utilisateur :' + '\t' + "rochdi"
-                + '\n\n' + 'Etat      :' + "Non Conforme " 
-                + '\n\n' + 'Date      :' + date_Creation + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
           ]
-        },
-
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.id  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:440, y:197}	       
+      },
+     ] ,
+     
+     
+      background: [
+       
         {
-          text: '\n\n' + 'Liste des Articles ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-          text: '\n\n' + 'Liste des Supports ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*', '*', '*'],
-            body: body2
-          }
-        },
+          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600          
+        } 
       ],
+      
+   
+      content: [
+        
+        {
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 20, 180 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
+      ],
+      
     };
 
     pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
 
   }
+
+   
   
 
   // temps d'attente pour le traitement de fonction 
@@ -1097,10 +1222,12 @@ export class AjouterBonReceptionComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
 
-        const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {
-
+        const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {        
+           
           width: 'auto',
-          data: { objects: this.obj_articles, id_Bon: this.id, local: this.Destination, type: this.type_bon }
+          data: { objects: this.obj_articles,tel_bon_Source:this.tel_bon_Source,nom_bon_Source:this.nom_bon_Source,
+             id_bon_source:this.id_bon_source,source_bon: this.source_bon, id_Bon: this.id, Destination: this.Destination,
+              type: this.type_bon ,source :this.Source}
         });
         dialogRef.afterClosed().subscribe(result => {
         });
@@ -1137,10 +1264,21 @@ export class Ajouter_Bon_Rejet {
   local: any
   reclamation: any;
   type_bon: any;
-  constructor(public dialogRef: MatDialogRef<Ajouter_Bon_Rejet>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private router: Router, private http: HttpClient) {
+  tel_bon_Source:any;
+  nom_bon_Source:any;
+  id_bon_source:any;
+  source_bon:any
+  Destination:any
+  source:any
+  constructor(private datePipe: DatePipe,public dialogRef: MatDialogRef<Ajouter_Bon_Rejet>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private router: Router, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
-
+    this.tel_bon_Source= data.tel_bon_Source
+    this.nom_bon_Source= data.nom_bon_Source
+    this.id_bon_source= data.id_bon_source
+    this.source_bon= data.source_bon
+    this.Destination= data.Destination
+    this.source= data.source
     this.idBon = data.id_Bon
     this.local = data.local
     this.obj_articles = data.objects
@@ -1256,78 +1394,143 @@ export class Ajouter_Bon_Rejet {
   }
 
   imprimerFicheRejet(id: any, date: any) {
-    var body = [];
-    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
- 
-    body.push(titulos);
-    var tabArt: any = [];
-
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();
-
-      console.log(this.obj_articles[i].controle_qt + "   " + this.obj_articles[i].controle_tech);
-
-
-
-
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
       let ch = "";
-      if (this.obj_articles[i].controle_qt) {
-
-      }
-      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
+      
       if (this.obj_articles[i].controle_tech) {
 
       }
       else {
-        ch = ch + " Fiche Technique non Verifier "
+        ch = ch + " Caractéristique technique non conforme"
       }
+      if (this.obj_articles[i].controle_qt) {
 
-
-      fila.push(this.obj_articles[i].id);
-      fila.push(this.obj_articles[i].nom);
-      fila.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(this.obj_articles[i].qte);  
-      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(ch);
-
-      body.push(fila);
-
+      }
+      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
+      obj.push( ch)      
+      body.push(obj);
     }
-    console.log(body)
-
-
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Rejet Marchandise',
-
+        title: 'Fiche Bon Rejet',
       },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.idBon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:440, y:197}	       
+      },
+      {
+        text: ' ' +this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 60, y:665}	       
+      },  
+     ] ,
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -1335,75 +1538,22 @@ export class Ajouter_Bon_Rejet {
       ],
 
       content: [
+       
         {
-          text: 'Bon Rejet N°' + id + '\n\n',
-          fontSize: 10,
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Responsable :' + '\t' + 'User'
-                + '\n\n' +
-                'Id Bon  :' + '\t' + this.idBon
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY HH:mm:ss')
-                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-
-          text: '\n\n' + 'Liste des Article :' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-
-          text: '\n\n' + 'Reclamation :' + '\t\n\n\n' + this.reclamation,
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 200 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
       ],
+      
     };
-
+    
     pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
   }
 
@@ -1475,6 +1625,15 @@ export class Support {
   }
   set_qte(event:any ,s:any,id_article :any)
   {
+
+    if(Number (event.target.value)<0){
+      Swal.fire({
+        title: " Nombre des article Doit être supérieur au zéro  ",
+       
+       
+      });
+    }
+    else{
    
    for (let i = 0; i< this.obj_articles.length; i++) {
     
@@ -1487,6 +1646,7 @@ export class Support {
           }
       }
     }
+  }
    
   }
 

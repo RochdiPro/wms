@@ -53,7 +53,7 @@ export class EntreeBonReceptionComponent implements OnInit {
   filtre() {
      
      console.log( this.form.get('type_be')?.value)
-    this.service.filtre("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "etat", this.form.get('etat')?.value, "type_be", this.form.get('type_be')?.value).subscribe((data) => {
+    this.service.filtrereception("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "etat", this.form.get('etat')?.value, "type_be", this.form.get('type_be')?.value).subscribe((data) => {
       this.dataSource.data = data as table[];
     });
   }

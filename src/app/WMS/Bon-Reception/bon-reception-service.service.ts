@@ -205,6 +205,34 @@ export class BonReceptionServiceService {
   Bon_rejet():  Observable<any> {
       return this.httpClient.get(ERP + "Bon_Rejets");  
   }
+
+  // get information fournisseur 
+  fournisseur(id: any): Observable<Object> {
+      return this.httpClient.get(ERP + "Fournisseur", {
+        params: {
+          Id_Fr: id
+        }, observe: 'body'
+      }).pipe(catchError(this.handleError));
+  }
+
+  // get information client 
+  Client(id: any): Observable<Object> {
+    return this.httpClient.get(ERP + "Client", {
+      params: {
+        Id_Clt: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+
+   // get information Local 
+   Filtre_Fiche_Local (nom: any): Observable<Object> {
+    return this.httpClient.get(ERP + "Filtre_Fiche_Local", {
+      params: {
+        Champ: "nom_Local",
+        Valeur : nom,
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
      
   // Supprimer un bon Rejet
   Supprimer_Bon_rejet(id: any): Observable<Object> {

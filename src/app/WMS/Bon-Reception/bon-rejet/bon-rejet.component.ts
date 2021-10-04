@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -35,24 +36,94 @@ export class BonRejetComponent implements OnInit {
   dataSource = new MatTableDataSource<table>();
 
 
-  constructor(public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
+  constructor( private datePipe: DatePipe  ,public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
   }
 
 
-  telecharger(id: any) {
-    this.id = id
+  telecharger(id2: any) {
+    this.obj_articles=[]
+    this.id = id2
     this.getDetail()
-
-    this.service.get_Bon_Rejet_By_Id(id).subscribe(data => {
+  
+    this.service.get_Bon_Rejet_By_Id(id2).subscribe(data => {
       this.bonRejet = data;
       this.type_bon = this.bonRejet.type_Bon;
       this.Destination = this.bonRejet.local
       this.reclamation = this.bonRejet.reclamation
       this.date_Creation = this.bonRejet.date_Creation
+
+      if (this.type_bon == "Bon Entrée local") {
+        this.service.get_Information_Bon_entree_Local( this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local      
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+          }) 
+        });
+      }
+      else if (this.type_bon == "Bon Importation") {
+        this.service.get_Information_Bon_entree_Importation(this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+          })
+  
+        });
+      }
+      else if (this.type_bon == "Bon Transfert") {
+        this.service.get_Information_Bon_transfert(this.bonRejet.id_Bon).subscribe((data: any) => {
+          
+          this.Destination = data.local_Destination
+          this.source_bon= "Entrepôt"
+          this.nom_bon_Source= data.local_Source
+          this.service.Filtre_Fiche_Local(data.local_Source).subscribe((data2) =>
+          {
+            this.src=data2;
+            
+            this.nom_bon_Source=this.src[0].nom_Local;
+            this.tel_bon_Source=this.src[0].tel;
+            this.id_bon_source=this.src[0].id_Local
+            this.Source = this.src[0].id_Local
+          })
+        });
+        
+      }
+      else if (this.type_bon == "Bon Retour") {
+        this.service.get_Information_Bon_retour(this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Clt
+          this.Destination = data.local
+          this.source_bon= "Client"
+          this.id_bon_source = data.local_Source
+          this.service.Client(data.id_Clt).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Client;
+            this.tel_bon_Source=this.src.tel1;
+          })
+        });
+      }
+
     }, error => console.log(error));
-    this.telechargerPDF(this.id, this.date_Creation)
+   
+    setTimeout(() => {
+      console.log('sleep');
+      this.telechargerPDF(this.id, this.date_Creation)
+    
+      
+    }, 500);
   }
 
   modeleSrc2: any;
@@ -65,23 +136,98 @@ export class BonRejetComponent implements OnInit {
   date_Creation: any;
   reclamation: any
 
-
+  source_bon:any;
+  id_bon_source :any ;
+  nom_bon_Source:any;
+  tel_bon_source:any;
+  src:any;
+  id_Bon:any;
+  tel_bon_Source:any;
 
 
 
   pdf(id2: any) {
+    this.obj_articles=[]
     this.id = id2
     this.getDetail()
-    console.log(this.obj_articles)
+  
     this.service.get_Bon_Rejet_By_Id(id2).subscribe(data => {
       this.bonRejet = data;
       this.type_bon = this.bonRejet.type_Bon;
       this.Destination = this.bonRejet.local
       this.reclamation = this.bonRejet.reclamation
       this.date_Creation = this.bonRejet.date_Creation
-    }, error => console.log(error));
-    this.generatePDF(this.id, this.date_Creation)
 
+      if (this.type_bon == "Bon Entrée local") {
+        this.service.get_Information_Bon_entree_Local( this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local      
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+          }) 
+        });
+      }
+      else if (this.type_bon == "Bon Importation") {
+        this.service.get_Information_Bon_entree_Importation(this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+          })
+  
+        });
+      }
+      else if (this.type_bon == "Bon Transfert") {
+        this.service.get_Information_Bon_transfert(this.bonRejet.id_Bon).subscribe((data: any) => {
+          
+          this.Destination = data.local_Destination
+          this.source_bon= "Entrepôt"
+          this.nom_bon_Source= data.local_Source
+          this.service.Filtre_Fiche_Local(data.local_Source).subscribe((data2) =>
+          {
+            this.src=data2;
+            
+            this.nom_bon_Source=this.src[0].nom_Local;
+            this.tel_bon_Source=this.src[0].tel;
+            this.id_bon_source=this.src[0].id_Local
+            this.Source = this.src[0].id_Local
+          })
+        });
+        
+      }
+      else if (this.type_bon == "Bon Retour") {
+        this.service.get_Information_Bon_retour(this.bonRejet.id_Bon).subscribe((data: any) => {
+          this.Source = data.id_Clt
+          this.Destination = data.local
+          this.source_bon= "Client"
+          this.id_bon_source = data.local_Source
+          this.service.Client(data.id_Clt).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Client;
+            this.tel_bon_Source=this.src.tel1;
+          })
+        });
+      }
+
+    }, error => console.log(error));
+   
+    setTimeout(() => {
+      console.log('sleep');
+      this.generatePDF(this.id,this.date_Creation)
+    
+      
+    }, 500);
   }
 
   async modelePdfBase642() {
@@ -116,77 +262,141 @@ export class BonRejetComponent implements OnInit {
 
   //impression de la fiche recption
   generatePDF(id: any, date: any) {
-    var body = [];
-    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
-
-    body.push(titulos);
-    var tabArt: any = [];
-
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();
-
-
-
-
-
-      let ch = "";
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
+      let ch = "";      
+      if (this.obj_articles[i].controle_tech) {
+      }
+      else {
+        ch = ch + " Caractéristique technique non conforme"
+      }
       if (this.obj_articles[i].controle_qt) {
 
       }
       else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
-      if (this.obj_articles[i].controle_tech) {
-
-      }
-      else {
-        ch = ch + " Fiche Technique non Verifier "
-      }
-
-
-      fila.push(this.obj_articles[i].id);
-      fila.push(this.obj_articles[i].nom);
-      fila.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(ch);
-
-      body.push(fila);
-
+      obj.push( ch)      
+      body.push(obj);
     }
-    console.log(body)
-
-
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Rejet Marchandise',
-
+        title: 'Fiche Bon Rejet',
       },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.id_Bon ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:440, y:197}	       
+      },
+      {
+        text: ' ' +this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 60, y:665}	       
+      },  
+     ] ,
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -194,152 +404,163 @@ export class BonRejetComponent implements OnInit {
       ],
 
       content: [
+       
         {
-          text: 'Bon Rejet N°' + id + '\n\n',
-          fontSize: 10,
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Responsable :' + '\t' + 'User'
-                + '\n\n' +
-                'Id Bon  :' + '\t' + id
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY')
-                + '\n\n' + 'Local :' + this.Destination
-                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-
-          text: '\n\n' + 'Liste des Article :' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-
-          text: '\n\n' + 'Reclamation :' + '\t\n\n\n' + this.reclamation,
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 200 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
       ],
+      
     };
-
+    
     pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
   }
 
   //impression de la fiche recption
   telechargerPDF(id: any, date: any) {
-    var body = [];
-    var titulos = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification', 'Reclmation');
 
-    body.push(titulos);
-    var tabArt: any = [];
-
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();
-
-
-
-
-
-      let ch = "";
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
+      let ch = "";      
+      if (this.obj_articles[i].controle_tech) {
+      }
+      else {
+        ch = ch + " Caractéristique technique non conforme"
+      }
       if (this.obj_articles[i].controle_qt) {
 
       }
       else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
-      if (this.obj_articles[i].controle_tech) {
-
-      }
-      else {
-        ch = ch + " Fiche Technique non Verifier "
-      }
-
-
-      fila.push(this.obj_articles[i].id);
-      fila.push(this.obj_articles[i].nom);
-      fila.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { fila.push("oui"); } else { fila.push("non"); }
-      fila.push(ch);
-
-      body.push(fila);
-
+      obj.push( ch)      
+      body.push(obj);
     }
-    console.log(body)
-
-
     var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
+      
+      
       defaultStyle: {
         // alignment: 'justify'
       },
-      pageMargins: [40, 120, 40, 60],
-
-
+      pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Rejet Marchandise',
-
+        title: 'Fiche Bon Rejet',
       },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.id_Bon ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text: 'rochdi'  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:440, y:197}	       
+      },
+      {
+        text: ' ' +this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 60, y:665}	       
+      },  
+     ] ,
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -347,75 +568,22 @@ export class BonRejetComponent implements OnInit {
       ],
 
       content: [
+       
         {
-          text: 'Bon Rejet N°' + id + '\n\n',
-          fontSize: 10,
-          alignment: 'left',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
-          columns: [
-
-            {
-              text:
-                'Responsable :' + '\t' + 'User'
-                + '\n\n' +
-                'Id Bon  :' + '\t' + id
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                'Date :' + '\t' + (moment(date)).format('DD-MM-YYYY')
-                + '\n\n' + 'Local :' + this.Destination
-                + '\n\n' + 'Type Bon :' + this.type_bon + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
-          ]
-        },
-
-        {
-
-          text: '\n\n' + 'Liste des Article :' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-
-          text: '\n\n' + 'Reclamation :' + '\t\n\n\n' + this.reclamation,
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 40, 270, 200 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-30, 0 , 10,300]     
+        }
+        
+         
       ],
+      
     };
+    
     pdfMake.createPdf(def).download("BonRejet" + this.id);
 
   }
@@ -477,6 +645,7 @@ export class BonRejetComponent implements OnInit {
       reader.readAsDataURL(detail);
     })
 
+    
 
   }
 
