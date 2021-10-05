@@ -26,51 +26,52 @@
 
         <!--Colonne id -->
         <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
-            <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="ID" > {{element.id}} </mat-cell>
         </ng-container>
         <!--Colonne responsable -->
         <ng-container matColumnDef="responsable">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> responsable </th>
-            <td mat-cell *matCellDef="let element"> {{element.responsable}} </td>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> responsable </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="responsable"> {{element.responsable}}</mat-cell>
         </ng-container>
          
         
         <!--Colonne Ancien ID -->
         <ng-container matColumnDef="local">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Local </th>
-            <td mat-cell *matCellDef="let element"> {{element.local}} </td>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> Local </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="Local"> {{element.local}} </mat-cell>
         </ng-container>
          <!--Colonne Réclamation -->
          <ng-container matColumnDef="reclamation">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Réclamation </th>
-            <td mat-cell *matCellDef="let element"> {{element.reclamation}} </td>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header > Réclamation </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="Réclamation"> {{element.reclamation}} </mat-cell>
         </ng-container>
 
         <!--Colonne supprimer -->
         <ng-container matColumnDef="supprimer">
-            <th mat-header-cell *matHeaderCellDef> </th>
-            <td mat-cell *matCellDef="let element"> <i class="pe-7s-trash btn-r" title="Supprimer Le Bon"
-                    (click)="supprimer(element.id)"></i> </td>
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element" style="text-align: center;"> <i class="pe-7s-trash btn-r" title="Supprimer Le Bon"
+                    (click)="supprimer(element.id)"></i> </mat-cell>
         </ng-container>
+
         
         <!--Colonne Voir_pdf -->
         <ng-container matColumnDef="Voir_pdf">
-            <th mat-header-cell *matHeaderCellDef> </th>
-            <td mat-cell *matCellDef="let element;let i=index;"> <i class="pe-7s-look btn-b" title="Voir PDF"
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-look btn-b" title="Voir PDF"
                     (click)="pdf(element.id)"></i>
-            </td>
+                </mat-cell>
         </ng-container>
 
          <!--Colonne exporter_pdf -->
          <ng-container matColumnDef="exporter_pdf">
-            <th mat-header-cell *matHeaderCellDef> </th>
-            <td mat-cell *matCellDef="let element;let i=index;"> <i class="pe-7s-cloud-download btn-b"
-                    (click)="telecharger(element.id)" title="Télécharger PDF"></i> </td>
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-cloud-download btn-b"
+                    (click)="telecharger(element.id)" title="Télécharger PDF"></i> </mat-cell>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </table>
 
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>

@@ -60,6 +60,12 @@ Bon_Sortie( ) : Observable<any>{
   return this.http.get(ERP + 'Bon_Sorties', { observe: 'body' }).pipe(catchError(this.gererErreur)
   );
 }
+
+Bon_transfert( ) : Observable<any>{
+  return this.http.get(ERP + 'Bon_Transferts', { observe: 'body' }).pipe(catchError(this.gererErreur)
+  );
+}
+
   // creer bon de sortie
   creer_Bon_Sortie(form: any): Observable<Object> {
     return this.http.post(ERP + "/Creer_Bon_Sortie", form);
@@ -86,7 +92,7 @@ Bon_Sortie( ) : Observable<any>{
       }).pipe(catchError(this.handleError))
   }
 
-  // Supprimer un bon Rejet
+  // Supprimer un bon sortie
   Supprimer_BBon_Sortie(id: any): Observable<Object> {
     return this.http.delete(ERP + "Supprimer_Bon_Sortie", {
       params: {
@@ -94,6 +100,18 @@ Bon_Sortie( ) : Observable<any>{
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
   }
+
+
+   // Supprimer un bon transfert
+   Supprimer_Bon_transfert(id: any): Observable<Object> {
+    return this.http.delete(ERP + "Supprimer_Bon_Transfert", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+
+  
 
   // filtre bon reception
   filtre (champ1 : any, valeur1 : any, champ2 : any, valeur2 : any, champ3 : any, valeur3 : any )
@@ -111,7 +129,21 @@ Bon_Sortie( ) : Observable<any>{
     }).pipe(catchError(this.handleError));
   }
 
-  
+  // filtre bon transfert 
+  filtre_transfert(champ1 : any, valeur1 : any, champ2 : any, valeur2 : any, champ3 : any, valeur3 : any )
+  {
+    return this.http.get(ERP + 'Filtre_Bon_Transfert', {
+      params: {
+        Champ1: champ1,
+        Valeur1: valeur1,
+        Champ2: champ2,
+        Valeur2: valeur2,
+        Champ3: champ3,
+        Valeur3: valeur3,
+        
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
 
   // get all bon receptions 
   Bon_Receptions(): Observable<any> {
@@ -177,4 +209,11 @@ Bon_Sortie( ) : Observable<any>{
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
   }
+
+
+  // creer_Bon_Transfert
+  creer_Bon_Transfert(form: any): Observable<Object> {
+    return this.http.post(ERP + "/Creer_Bon_Transfert", form);
+  }
+  
 }

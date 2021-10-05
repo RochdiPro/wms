@@ -1,33 +1,36 @@
-<mat-horizontal-stepper [linear]="isLinear">
-    <mat-step [stepControl]="selectform">
+<mat-horizontal-stepper [linear]="isLinear"  #stepper>
+    <mat-step [stepControl]="localform">
         <form>
           <ng-template matStepLabel>Source / Destination  </ng-template>
           <div class="row">
             <br>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <mat-form-field>
                 <mat-label>Source</mat-label>
-                <mat-select [(ngModel)]="selectform.source" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="localform.source" [ngModelOptions]="{standalone: true}" (ngModelChange)="setsource()">
                     <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
                   </mat-select>
                
               </mat-form-field>
               <button mat-raised-button class="search" ><i class="fas fa-warehouse"></i> </button>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <mat-form-field>
                   <mat-label>Destination</mat-label>                 
-                    <mat-select [(ngModel)]="selectform.destination" [ngModelOptions]="{standalone: true}">
+                    <mat-select [(ngModel)]="localform.destination" [ngModelOptions]="{standalone: true}" (ngModelChange)="setdestination()">
                       <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
                     </mat-select>
+                  
                 </mat-form-field>
                 <button mat-raised-button class="search" ><i class="fas fa-warehouse"></i> </button>
               </div>
             </div>
-          
+            
+            <button class="mb-2 mr-2 btn btn-primary active"  (click)="suivant2()" mat-raised-button color="primary">
+              Suivant</button>
         </form>
       </mat-step>
 
@@ -80,7 +83,7 @@
             </thead>
             <tbody>
               <tr *ngFor="let article  of  table ;let i = index;">
-                <td>
+                <td style="text-align: center;">
                   <i class="pe-7s-pen pe-7s-trash" (click)="Modifier_ligne_table(article.id)"
                     title="Modifier article"></i>
                 </td>
@@ -94,9 +97,9 @@
                   <input type="text" value="{{article.qte}}" disabled />
                 </td>
   
-                <td>
+                <td style="text-align: center;">
   
-                  <i class="pe-7s-trash" (click)="Supprimer_ligne_table(i)" title="Supprimer article"></i>
+                  <i class="pe-7s-trash" (click)="Supprimer_ligne_table(i)" title="Supprimer article" ></i>
                 </td>
               </tr>
             </tbody>
@@ -118,6 +121,7 @@
         <table class="table table-striped">
           <thead>
             <tr>
+              <th> </th>
               <th>Id produit</th>
               <th>Nom produit</th>
               <th>Qte</th>
@@ -126,7 +130,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let article  of  table ;let i = index;">
-  
+              <td  style="text-align: center;">
+                <i class="pe-7s-pen pe-7s-trash" (click)="Modifier_ligne_table(article.id)"
+                  title="Modifier article"></i>
+              </td>
               <td>
                 <input type="text" value="{{article.id}}" disabled />
               </td>
@@ -136,7 +143,7 @@
               <td>
                 <input type="text" value="{{article.qte}}" disabled />
               </td>
-              <td> <i  class="pe-7s-look btn-b" title="plus" (click)="plus(article)"></i> </td>
+              <td style="text-align: center;" > <i  class="pe-7s-look btn-b" title="plus" (click)="plus(article)"></i> </td>
   
             </tr>
           </tbody>
@@ -158,6 +165,18 @@
     <mat-step>
       <ng-template matStepLabel icon>Cloture</ng-template>
       <div class="row">
+       
+        <div class="col-md-4 mb-4">  
+           <h3> {{source}}  </h3>   
+        </div>
+        <div class="col-md-4 mb-4">  
+            vers   
+       </div>
+       <div class="col-md-4 mb-4">  
+          <h3> {{destination}}  </h3> 
+     </div>
+      </div>
+      <div class="row">
         <div class="col-md-8 mb-8">
           <h6>
             <strong> Liste Des Articles</strong>
@@ -173,7 +192,8 @@
               </thead>
               <tbody>
                 <tr *ngFor="let article  of  table ;let i=index">
-                  <td scope="row"></td>
+                   
+                  <td></td>
                   <td>{{article.id}} </td>
                   <td>{{article.nom}} </td>
                   <td>{{article.qte}} </td>
@@ -184,16 +204,8 @@
             </table>
           </h6>
         </div>
-        <div class="col-md-4 mb-4">
-  
-          <div class="col-md-4">
-            <mat-form-field>
-              <mat-label>Local</mat-label>
-              <mat-select [(ngModel)]="cloture.local" [ngModelOptions]="{standalone: true}">
-                <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
-              </mat-select>
-            </mat-form-field>           
-          </div>
+        <div class="col-md-4 mb-4">  
+        
           <h4>Réclamation</h4>
           <textarea   [(ngModel)]="cloture.reclamation" [ngModelOptions]="{standalone: true}"
           matInput rows="5" cols="100" placeholder="Réclamation"></textarea>

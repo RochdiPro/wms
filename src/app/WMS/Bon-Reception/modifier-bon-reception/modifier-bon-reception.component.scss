@@ -1,0 +1,381 @@
+@media only screen and (max-width: 768px) {
+    //forcer le tableau pour ne pas s'afficher comme tableau
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+      display: block;
+    }
+    
+    //cacher les table headers (pas avec display: none;, pour raison d'accessibilité)
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+    
+    tr {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    
+    td {
+      // se comporter comme un "row"
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 25%;
+    }
+    
+  
+    
+    th {
+      border-radius: 5px;
+      border: none;
+      border-bottom: 1px solid #eee;
+      font-size: 20px;
+      font-weight: normal;
+      color: white;
+      background-color: #3f51b5;
+    }
+    
+    td:before {
+      //se comporter comme un table header
+      position: absolute;
+      //valeur du Top/left imittent le padding
+      top: 6px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    
+    
+    
+      // donner un label pour les données
+     
+    
+
+      .be {
+        td:nth-of-type(1):before {
+            content: "id_B";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Etat";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "Local";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(4):before {
+          content: "Date";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(5):before {
+            content: "id Fr";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+      }
+
+    .bi {
+        td:nth-of-type(1):before {
+            content: "id_B";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Etat";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "Local";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(4):before {
+          content: "Date";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(5):before {
+            content: "id Fr";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+      }
+
+      .br {
+        td:nth-of-type(1):before {
+            content: "id_B";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Clt";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "Etat";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(4):before {
+          content: "Date";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+        td:nth-of-type(5):before {
+            content: "Local";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+      }
+
+      .bt {
+        td:nth-of-type(1):before {
+            content: "id_B";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Etat";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "src";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+       
+        td:nth-of-type(4):before {
+            content: "Des";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+          td:nth-of-type(5):before {
+            content: "Date";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+      }
+
+      .support {
+        td:nth-of-type(1):before {
+            content: "Sup";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Type";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "Poi";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+       
+        td:nth-of-type(4):before {
+            content: "Hau";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+          td:nth-of-type(5):before {
+            content: "Lar";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(6):before {
+            content: "long";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+      }
+
+      .articlle {
+        td:nth-of-type(1):before {
+            content: "id";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Nom";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "Famaille";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+       
+        td:nth-of-type(4):before {
+            content: "S_Fam";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+          td:nth-of-type(5):before {
+            content: "Qte th";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(6):before {
+            content: "Qte";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(7):before {
+            content: "Total";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(8):before {
+            content: " ";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+      }
+
+      .articlle2 {
+        td:nth-of-type(1):before {
+            content: "id";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(2):before {
+            content: "Nom";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+        td:nth-of-type(3):before {
+          content: "tech";
+          font-weight: bold;
+          text-align: left;
+          margin-left: 10px;
+        
+        }
+       
+        td:nth-of-type(4):before {
+            content: "Qte";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+             
+          }
+          td:nth-of-type(5):before {
+            content: "Total";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(6):before {
+            content: "c tech";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+          td:nth-of-type(7):before {
+            content: "c Qte";
+            font-weight: bold;
+            text-align: left;
+            margin-left: 10px;
+          
+          }
+           
+      }
+    }
+
+
+
+
+     

@@ -30,6 +30,7 @@ import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/liste
 import { DatePipe } from '@angular/common';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
 import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_transfert} from './WMS/Stockage/bon-transfert/bon-transfert.component';
+import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert/lister-bon-transfert.component';
  
  
 @NgModule({ 
@@ -53,7 +54,7 @@ import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_
    BonSortieComponent,ligne,Detail4g,detail_serie,
    ListerBonSortieComponent,
    BonTransfertComponent,
-   ligne_transfert,Detail4g_transfert,detail_serie_transfert
+   ligne_transfert,Detail4g_transfert,detail_serie_transfert, ListerBonTransfertComponent
   ],
   exports: [
      

@@ -29,6 +29,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 })
 export class BonTransfertComponent implements OnInit {
   isLinear = false;
+  localform : any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
   cloture: any = FormGroup;
@@ -37,6 +38,9 @@ export class BonTransfertComponent implements OnInit {
   table: any = [];
   object: any = {};
   locals:any;
+  source :any
+  destination:any;
+  
   @ViewChild('stepper') private myStepper: any = MatStepper;
   constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
@@ -77,11 +81,16 @@ export class BonTransfertComponent implements OnInit {
     }, err => console.error(err))
   }
 
+
+   
   ngOnInit() {
 
-    this.selectform = this._formBuilder.group({
+    this.localform = this._formBuilder.group({
       source: ['', Validators.required],
       destination: ['', Validators.required],
+    });
+    this.selectform = this._formBuilder.group({
+   
       code: ['', Validators.required],
       id: ['', Validators.required],
       id2: ['', Validators.required]
@@ -98,7 +107,54 @@ export class BonTransfertComponent implements OnInit {
     });
   }
 
+  test:any;
+  // check local source et destination  
+  suivant2()
+  {
+    console.log(this.source  )
+    console.log(this.destination  )
+    
+    if ( this.source     )
+    {
+        this.test=1;
+    }
+    else
+    {
+      Swal.fire({
+        title: ' Local  source  ',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ok',
 
+      })
+    }
+
+    if ( this.destination     )
+    {
+         if(this.test==1){ this.myStepper.next();}
+    }
+    else
+    {
+      Swal.fire({
+        title: ' Local  destination  ',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ok',
+
+      })
+    }
+  }
+  // set slocal source
+  setsource()
+  {
+      this.source=this.localform.source
+    
+  }
+  // set local destination
+  setdestination()
+  {
+    this.destination=this.localform.destination
+  }
   // Ajouter article au liste a traver le choix
   Ajouter_Article_avec_choix() {
     this.service.Article_Id(this.selectform.id2).subscribe((data) => {
@@ -236,30 +292,17 @@ export class BonTransfertComponent implements OnInit {
 
   valide()
   {
-    if ( this.cloture.local    )
-    {
-   this.Creer_Bon_Sortie();
-    }
-    else
-    {
-      Swal.fire({
-        title: ' Local  ',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ok',
-
-      })
-    }
+     this.creer_Bon_transfert();
   }
 
   doc:any ;
   bonsortie:any;
   // creer bon sortie 
-  Creer_Bon_Sortie()
+  creer_Bon_transfert()
   {
-    this.doc = document.implementation.createDocument("Bon_Sortie", "", null);
+    this.doc = document.implementation.createDocument("Bon_Transfert", "", null);
 
-    var BR = this.doc.createElement("Bon_Sortie");
+    var BR = this.doc.createElement("Bon_Transfert");
  
     var Local = this.doc.createElement("Local"); Local.innerHTML = this.cloture.local
 
@@ -343,19 +386,18 @@ export class BonTransfertComponent implements OnInit {
 
         
     
-        formData.append('Responsable', "User2");
-     
-        formData.append('Local', this.cloture.local);
-         
-        formData.append('Reclamations', this.cloture.reclamation);
+        formData.append('Responsable', "User transfert ");
+        formData.append('Local_Destination', this.destination);
+        formData.append('Local_Source',this.source );   
+        formData.append('Description', this.cloture.reclamation);
 
         formData.append('Detail', myFile);
-        this.service.creer_Bon_Sortie(formData).subscribe(data => {
+        this.service.creer_Bon_Transfert(formData).subscribe(data => {
            
           this.bonsortie = data
           Swal.fire({
-            title: 'Bon Sortie!',
-            text: 'Bon Sortie est crée et envoyée.',
+            title: 'Bon Transfert!',
+            text: 'Bon Transfert est crée et envoyée.',
             icon: 'success',
             showCancelButton: true,
             confirmButtonColor: 'green',
@@ -366,7 +408,7 @@ export class BonTransfertComponent implements OnInit {
 
             if (result.isConfirmed) {
 
-               this.generatePDF(this.bonsortie.id, this.bonsortie.date_Creation)
+              // this.generatePDF(this.bonsortie.id, this.bonsortie.date_Creation)
 
             }
 

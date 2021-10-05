@@ -8,14 +8,14 @@
         </mat-form-field>
 
         <mat-form-field class="custom-width" [formGroup]="form" style="margin-left: 1%;">
-            <mat-label>Responsable</mat-label>
-            <input matInput placeholder="responsable" formControlName="responsable" (keyup)="filtre()" id="responsable">
+            <mat-label>Source</mat-label>
+            <input matInput placeholder="Source" formControlName="src" (keyup)="filtre()" id="responsable">
             <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
         </mat-form-field>
         
         <mat-form-field class="custom-width" [formGroup]="form" style="margin-left: 1%;">
-            <mat-label>Type</mat-label>
-            <input matInput placeholder="type" formControlName="type_Bon" (keyup)="filtre()" id="type">
+            <mat-label>Destination</mat-label>
+            <input matInput placeholder="Destination" formControlName="des" (keyup)="filtre()" id="local">
             <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
         </mat-form-field>
     </section>
@@ -26,51 +26,48 @@
 
         <!--Colonne id -->
         <ng-container matColumnDef="id">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="ID"> {{element.id}} </mat-cell>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="ID" > {{element.id_Bon_Transfert}} </mat-cell>
         </ng-container>
         <!--Colonne responsable -->
         <ng-container matColumnDef="responsable">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> responsable </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="responsable"> {{element.responsable}}</mat-cell>
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> responsable </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="user"> {{element.responsable}}</mat-cell>
         </ng-container>
          
-        <!--Colonne Ancien Type -->
-        <ng-container matColumnDef="type_Be">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Ancien Type </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="Ancien Type"> {{element.type_Bon}} </mat-cell>
-        </ng-container>
+        
         <!--Colonne Ancien ID -->
-        <ng-container matColumnDef="id_Be">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Ancien ID </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="Ancien ID"> {{element.id_Bon}} </mat-cell>
+        <ng-container matColumnDef="src">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> Local Source </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="src"> {{element.local_Source}} </mat-cell>
         </ng-container>
          <!--Colonne Réclamation -->
-         <ng-container matColumnDef="reclamation">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> Réclamation </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="Réclamation"> {{element.reclamation}} </mat-cell>
+         <ng-container matColumnDef="des">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header > Local Destination </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="des"> {{element.local_Destination}} </mat-cell>
         </ng-container>
 
         <!--Colonne supprimer -->
         <ng-container matColumnDef="supprimer">
-            <mat-header-cell *matHeaderCellDef > </mat-header-cell>
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
             <mat-cell *matCellDef="let element" style="text-align: center;"> <i class="pe-7s-trash btn-r" title="Supprimer Le Bon"
-                    (click)="supprimer(element.id)"></i> </mat-cell>
+                    (click)="supprimer(element.id_Bon_Transfert)"></i> </mat-cell>
         </ng-container>
+
         
         <!--Colonne Voir_pdf -->
         <ng-container matColumnDef="Voir_pdf">
-            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-look btn-b" title="Voir PDF"
-                    (click)="pdf(element.id)"></i>
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-look btn-b" title="Voir PDF"
+                    (click)="pdf(element.id_Bon_Transfert)"></i>
                 </mat-cell>
         </ng-container>
 
          <!--Colonne exporter_pdf -->
          <ng-container matColumnDef="exporter_pdf">
-            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
             <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-cloud-download btn-b"
-                    (click)="telecharger(element.id)" title="Télécharger PDF"></i> </mat-cell>
+                    (click)="telecharger(element.id_Bon_Transfert)" title="Télécharger PDF"></i> </mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

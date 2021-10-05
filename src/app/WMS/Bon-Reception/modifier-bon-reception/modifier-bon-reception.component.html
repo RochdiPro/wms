@@ -7,7 +7,7 @@
        <form [formGroup]="ArticleFormGroup">
           <ng-template matStepLabel>Identifier Article</ng-template>
           <div class="table-responsive">
-             <table class="mb-0 table">
+             <table class="mb-0 table articlle">
                 <thead>
                    <tr>
                       <th>ID Article</th>
@@ -24,7 +24,7 @@
                       <td>{{article.id}}</td>
                       <td>{{article.nom }}</td>
                       <td>
-                         <mat-form-field appearance="fill">
+                         <mat-form-field appearance="fill" style="width: 130px;">
                             <mat-label>Famille Logistique</mat-label>
                             <mat-select [disabled]="disableSelect.value" name="famille"
                                (selectionChange)="Famille($event,article.id)">
@@ -35,7 +35,7 @@
                          </mat-form-field>
                       </td>
                       <td>
-                         <mat-form-field appearance="fill">
+                         <mat-form-field appearance="fill" style="width: 130px;">
                             <mat-label>Sous Famille Logistique</mat-label>
                             <mat-select [disabled]="disableSelect.value" name="sousFamille"
                                (focus)="getSousFamille(article.id)" (selectionChange)="SousFamille($event,article.id)">
@@ -85,7 +85,7 @@
              <div class="card-body">
                 <h5 class="card-title">Liste Article Bon Entrée </h5>
                 <div class="table-responsive">
-                   <table class="table">
+                   <table class="table articlle2">
                       <thead>
                          <tr>
                             <th></th>
@@ -172,8 +172,8 @@
         
           <div class="col-md-8 mb-8">
              <h6>
-                <strong> Liste Des Articles</strong>
-                <table class="table">
+                <strong> Liste Des Articles </strong>
+                <table class="table articlle2">
                    <thead>
                       <tr>
                          <th></th>
@@ -214,7 +214,7 @@
           <div class="col-md-3 mb-3">
              <h6>
                 <strong> Liste Des Support</strong>
-                <table class="mb-0 table">
+                <table class="mb-0 table support">
                    <tr>
  
                       <th>Type</th>
