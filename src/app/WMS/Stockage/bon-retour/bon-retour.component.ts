@@ -23,13 +23,15 @@ const pdfFonts = require("pdfmake/build/vfs_fonts");
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
-  selector: 'app-bon-transfert',
-  templateUrl: './bon-transfert.component.html',
-  styleUrls: ['./bon-transfert.component.scss']
+  selector: 'app-bon-retour',
+  templateUrl: './bon-retour.component.html',
+  styleUrls: ['./bon-retour.component.scss']
 })
-export class BonTransfertComponent implements OnInit {
+export class BonRetourComponent implements OnInit {
+
   isLinear = false;
-  localform : any = FormGroup;
+  optionFormGroup: any = FormGroup;
+  info : any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
   cloture: any = FormGroup;
@@ -39,8 +41,9 @@ export class BonTransfertComponent implements OnInit {
   object: any = {};
   locals:any;
   source :any
-  destination:any;
-  
+  facture:any;
+  Clients:any;
+  Liste_Factures:any;
   @ViewChild('stepper') private myStepper: any = MatStepper;
   constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
@@ -50,7 +53,9 @@ export class BonTransfertComponent implements OnInit {
     this.service.locals().subscribe((data:any) => {
       this.locals=data
     })
-
+    this.service.Clients().subscribe((data:any) => {
+      this.Clients=data
+    })
     this.chargementModel();
     this.modelePdfBase64();
   }
@@ -75,7 +80,7 @@ export class BonTransfertComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel() {
-    this.http.get('./../../../assets/images/FicheTransfert.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/ficheSortie.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele = reponse;
       return this.modele;
     }, err => console.error(err))
@@ -85,12 +90,12 @@ export class BonTransfertComponent implements OnInit {
    
   ngOnInit() {
 
-    this.localform = this._formBuilder.group({
-      source: ['', Validators.required],
-      destination: ['', Validators.required],
+    this.info = this._formBuilder.group({
+      client: ['', Validators.required],
+      facture: ['', Validators.required],
+     
     });
-    this.selectform = this._formBuilder.group({
-   
+    this.selectform = this._formBuilder.group({   
       code: ['', Validators.required],
       id: ['', Validators.required],
       id2: ['', Validators.required]
@@ -100,61 +105,57 @@ export class BonTransfertComponent implements OnInit {
     this.secondFormGroup = this._formBuilder.group({
       
     });
-
+    this.optionFormGroup = this._formBuilder.group({
+      bl: ['', Validators.required],
+      facture: ['', Validators.required],
+    });
     this.cloture = this._formBuilder.group({
       local: ['', Validators.required],
       reclamation: ['.', Validators.required]
     });
   }
 
+  //  set type de bon facture ou bl 
+   choix:any
+  setchoix(choix:any){
+    if ( choix=="1"){ this.choix = "1"}
+    if ( choix=="2"){this.choix = "2"}
+     
+  }
+
+ // lister les facture pour un client 
+  lister_facture()
+  {
+   
+    if ( this.choix == "2" ){
+    this.service.get_facture_client(this.info.client).subscribe((data) =>{ 
+      this.Liste_Factures=data 
+    })
+    }else if ( this.choix == "1" ){
+      this.service.get_bl_client(this.info.client).subscribe((data) =>{ 
+        this.Liste_Factures=data 
+      })
+    }
+  }
+
   test:any;
   // check local source et destination  
-  suivant2()
-  {
-    console.log(this.source  )
-    console.log(this.destination  )
+  get_Factures()
+  {  
+    this.lister_facture()
     
-    if ( this.source     )
-    {
-        this.test=1;
-    }
-    else
-    {
-      Swal.fire({
-        title: ' Local  source  ',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ok',
-
-      })
-    }
-
-    if ( this.destination     )
-    {
-         if(this.test==1){ this.myStepper.next();}
-    }
-    else
-    {
-      Swal.fire({
-        title: ' Local  destination  ',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ok',
-
-      })
-    }
   }
   // set slocal source
-  setsource()
+  setfacture()
   {
-      this.source=this.localform.source
-    
+      this.facture=this.info.facture   
   }
-  // set local destination
-  setdestination()
+  // etape 2 
+  suivant2()
   {
-    this.destination=this.localform.destination
+    if(this.test==1){ this.myStepper.next();}
   }
+   
   // Ajouter article au liste a traver le choix
   Ajouter_Article_avec_choix() {
     this.service.Article_Id(this.selectform.id2).subscribe((data) => {
@@ -219,8 +220,7 @@ export class BonTransfertComponent implements OnInit {
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == id) {
 
-        const dialogRef = this.dialog.open(ligne_transfert, {
-
+        const dialogRef = this.dialog.open(ligne_retour, {
           width: 'auto',
           data: { object: this.table[i] }
         });
@@ -267,7 +267,7 @@ export class BonTransfertComponent implements OnInit {
 
       })
     } else if (produit.type == "4g") {
-      const dialogRef = this.dialog.open(Detail4g_transfert, {
+      const dialogRef = this.dialog.open(Detail4g_retour, {
 
         width: 'auto',
         data: { object: produit }
@@ -276,7 +276,7 @@ export class BonTransfertComponent implements OnInit {
       });
     } else if (produit.type == "serie") {
 
-      const dialogRef = this.dialog.open(detail_serie_transfert, {
+      const dialogRef = this.dialog.open(detail_serie_retour, {
 
         width: 'auto',
         data: { object: produit }
@@ -296,7 +296,7 @@ export class BonTransfertComponent implements OnInit {
   }
 
   doc:any ;
-  bontransfert:any;
+  bonsortie:any;
   // creer bon sortie 
   creer_Bon_transfert()
   {
@@ -387,14 +387,14 @@ export class BonTransfertComponent implements OnInit {
         
     
         formData.append('Responsable', "User transfert ");
-        formData.append('Local_Destination', this.destination);
+        //formData.append('Local_Destination', this.destination);
         formData.append('Local_Source',this.source );   
         formData.append('Description', this.cloture.reclamation);
 
         formData.append('Detail', myFile);
         this.service.creer_Bon_Transfert(formData).subscribe(data => {
            
-          this.bontransfert = data
+          this.bonsortie = data
           Swal.fire({
             title: 'Bon Transfert!',
             text: 'Bon Transfert est crée et envoyée.',
@@ -408,14 +408,14 @@ export class BonTransfertComponent implements OnInit {
 
             if (result.isConfirmed) {
 
-                this.generatePDF(this.bontransfert.id_Bon_Transfert, this.bontransfert.date_Creation)
+              // this.generatePDF(this.bonsortie.id, this.bonsortie.date_Creation)
 
             }
 
           })
         });
 
-      //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Transfert'])
+      //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Sortie'])
       })
   }
    //convertir blob à un fichier  
@@ -476,7 +476,7 @@ export class BonTransfertComponent implements OnInit {
       },
       pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Bon Transfert',
+        title: 'Fiche Bon Sortie',
        },
       footer: function (currentPage:any, pageCount:any) {
         return {
@@ -501,19 +501,19 @@ export class BonTransfertComponent implements OnInit {
           fontSize: 15, 
           color: 'black',
           bold: true,
-          relativePosition: {x:365, y:181}	       
+          relativePosition: {x:440, y:197}	       
         },
       {
-        text: ' ' + this.source ,
+        text: ' ' + this.cloture.local ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:110, y:107}	  , 
+        relativePosition: {x:80, y:107}	  , 
          
       },
       
       {
-        text: 'rochdi' ,
+        text: 'rochdi'  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -521,22 +521,13 @@ export class BonTransfertComponent implements OnInit {
          
       },
       {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:85}	 , 
-         
-      },
-      {
         text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:520, y:85}	  , 
+        relativePosition: {x:520, y:96}	  , 
          
       },
-      
       {
         text: ' ' +this.cloture.reclamation ,
         fontSize: 10, 
@@ -544,25 +535,18 @@ export class BonTransfertComponent implements OnInit {
         relativePosition: {x: 80, y:665}	       
       }, 
       {
-        text: ' ' + this.destination,
+        text: 'rochdi' ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:110, y:131}	       
+        relativePosition: {x:85, y:131}	       
       },
       {
         text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:110, y:154}	       
-      },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:179}	       
+        relativePosition: {x:65, y:154}	       
       },
      ] ,
       background: [
@@ -602,9 +586,9 @@ export class BonTransfertComponent implements OnInit {
   selector: 'ligne_table',
   templateUrl: 'ligne_table.html',
 })
-export class ligne_transfert {
+export class ligne_retour {
   obj: any;
-  constructor(public dialogRef: MatDialogRef<ligne_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
+  constructor(public dialogRef: MatDialogRef<ligne_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
     this.obj = data.object
   }
   modifier(ev: any) {
@@ -623,11 +607,11 @@ export class ligne_transfert {
   selector: 'detail4g',
   templateUrl: 'detail4g.html',
 })
-export class Detail4g_transfert {
+export class Detail4g_retour {
   obj: any;
   inst: any = {}
   numero_Serie:any;
-  constructor(public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
+  constructor(public dialogRef: MatDialogRef<Detail4g_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
@@ -679,13 +663,13 @@ select_nserie()
   selector: 'detail_serie',
   templateUrl: 'detail_serie.html',
 })
-export class detail_serie_transfert {
+export class detail_serie_retour {
   obj: any;
   inst: any = {}
   
   numero_Serie:any;
   @ViewChild('input') input:any=ElementRef; 
-  constructor(public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
+  constructor(public dialogRef: MatDialogRef<detail_serie_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}

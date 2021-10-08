@@ -215,5 +215,29 @@ Bon_transfert( ) : Observable<any>{
   creer_Bon_Transfert(form: any): Observable<Object> {
     return this.http.post(ERP + "/Creer_Bon_Transfert", form);
   }
+
+   //  get lise des Clients 
+   Clients( ) : Observable<any>{
+    return this.http.get(ERP + 'Clients', { observe: 'body' }).pipe(catchError(this.gererErreur)
+    );
+  }
+
   
+  get_facture_client( id : any):Observable<any>{
+    return this.http.get(ERP + 'Filtre_Facture', {
+      params: {
+        Champ: "id_Clt",
+        Valeur:id       
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+  
+  get_bl_client( id : any):Observable<any>{
+    return this.http.get(ERP + 'Filtre_Bon_Livraison', {
+      params: {
+        Champ: "id_Clt",
+        Valeur:id       
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
 }

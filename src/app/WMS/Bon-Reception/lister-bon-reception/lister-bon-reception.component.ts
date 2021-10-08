@@ -33,7 +33,7 @@ export class ListerBonReceptionComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  displayedColumns: string[] = ['modifier', 'id', "responsable", "etat", "type_Be", "id_Be", 'supprimer', 'Voir_pdf', 'exporter_pdf']; //les colonne du tableau 
+  displayedColumns: string[] = ['modifier', 'id', "responsable", "etat", "type_Be", "id_Be", 'supprimer' ]; //les colonne du tableau 
   dataSource = new MatTableDataSource<table>();
 
 
@@ -48,6 +48,7 @@ export class ListerBonReceptionComponent implements OnInit {
   Bon_Receptions() {
     this.service.Bon_Receptions().subscribe((data: any) => {
       this.bonReception = data;
+      this.bonReception= this.bonReception.sort((a:any, b:any) => a.id > b.id ? -1 : 1);
       this.dataSource.data = data as table[];
     })
   }
@@ -123,7 +124,7 @@ export class ListerBonReceptionComponent implements OnInit {
 
   filtre() {
      
-     console.log( this.form.get('type_be')?.value)
+      
     this.service.filtre("id", this.form.get('id')?.value, "responsable", this.form.get('responsable')?.value, "etat", this.form.get('etat')?.value, "type_be", this.form.get('type_be')?.value).subscribe((data) => {
       this.dataSource.data = data as table[];
     });
@@ -145,7 +146,7 @@ export class ListerBonReceptionComponent implements OnInit {
   src:any;
   tel_bon_Source:any;
 
-
+  // generate pdf function 
   async pdf(id2: any) {
     this.id=id2
     this.getDetail()
@@ -217,12 +218,7 @@ export class ListerBonReceptionComponent implements OnInit {
         });
       }
      
-    }, error => console.log(error));
-    
-   
- 
-    
-   
+    }, error => console.log(error));   
   }
 
 
@@ -322,13 +318,97 @@ export class ListerBonReceptionComponent implements OnInit {
      
     })
     setTimeout(() => {
-      console.log('sleep');
+       
       this.generatePDF(this.id,this.date_Creation)
     
       
     }, 1000);
    
   }
+
+  getDetail_telepcharger() {
+    this.obj_articles=[]
+    this.service.Detail_Bon_Reception(this.id).subscribe((detail: any) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        this.bonReception = reader.result;
+        var parseString = require('xml2js').parseString;
+        let data1;
+        parseString(atob(this.bonReception.substr(28)), function (err: any, result: any) {
+          data1 = result.Bon_Reception;
+
+        })
+
+           
+        this.xmldata = data1
+        for (let k = 0; k < this.xmldata.Liste_Supports[0].Support.length; k++) {
+          this.arraySupport.push(this.ajouterligneSupport());
+          this.arraySupport[k].Numero = this.xmldata.Liste_Supports[0].Support[k].Numero;
+          this.arraySupport[k].typeSupport = this.xmldata.Liste_Supports[0].Support[k].typeSupport;
+          this.arraySupport[k].poids = this.xmldata.Liste_Supports[0].Support[k].poids;
+          this.arraySupport[k].hauteur = this.xmldata.Liste_Supports[0].Support[k].hauteur;
+          this.arraySupport[k].largeur = this.xmldata.Liste_Supports[0].Support[k].largeur;
+          this.arraySupport[k].longeur = this.xmldata.Liste_Supports[0].Support[k].longeur;
+        }
+        
+        for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {
+
+          this.new_obj = {}
+          this.new_obj.id = this.xmldata.Produits[0].Produit[i].Id;
+          this.new_obj.nom = this.xmldata.Produits[0].Produit[i].Nom;
+          this.new_obj.fiche_Technique = this.xmldata.Produits[0].Produit[i].Fiche_Technique;
+          this.new_obj.qte = this.xmldata.Produits[0].Produit[i].Qte;
+          this.new_obj.famaille = this.xmldata.Produits[0].Produit[i].famaille;
+          this.new_obj.sous_famaille = this.xmldata.Produits[0].Produit[i].sous_famaille;
+          this.new_obj.total = this.xmldata.Produits[0].Produit[i].Total;
+
+          this.supports = []
+          for (let k = 0; k < this.arraySupport.length; k++) {
+            this.support = {}
+            this.support.id = k;
+            this.support.qte = 0;
+            this.supports.push(this.support);
+          }
+
+          if (this.xmldata.Produits[0].Produit[i].Supports[0].Support) {
+            for (let h = 0; h < this.xmldata.Produits[0].Produit[i].Supports[0].Support.length; h++) {
+              for (let z = 0; z < this.arraySupport.length; z++) {
+                if (this.supports[z].id == this.xmldata.Produits[0].Produit[i].Supports[0].Support[h].Numero_Support) {
+                  this.supports[z].qte = this.xmldata.Produits[0].Produit[i].Supports[0].Support[h].Qte
+                }
+              }
+
+            }
+          }
+          this.new_obj.supports = this.supports;         
+          this.new_obj.controle_qt = true;
+          this.new_obj.controle_tech =true ;
+        
+          if(this.xmldata.Produits[0].Produit[i].Qte_Verifier== 'false'){
+          this.new_obj.controle_qt = false;
+          }          
+          if(this.xmldata.Produits[0].Produit[i].Fiche_Technique_Verifier == 'false')
+          {
+            this.new_obj.controle_tech =false;
+          }
+          this.obj_articles.push(this.new_obj)
+          
+        }
+      }
+      
+      reader.readAsDataURL(detail);
+     
+    })
+    setTimeout(() => {
+       
+      this.telechargerpdf(this.id,this.date_Creation)
+    
+      
+    }, 1000);
+   
+  }
+
 
  modeleSrc: any;
   //impression de la fiche recption
@@ -344,7 +424,7 @@ export class ListerBonReceptionComponent implements OnInit {
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
-      obj.push( "Quantité et qualité vérifiées ")      
+       
       this.body.push(obj);
     }
     let def = {
@@ -446,7 +526,7 @@ export class ListerBonReceptionComponent implements OnInit {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:182}	 	       
       },
      ] ,
      
@@ -464,7 +544,7 @@ export class ListerBonReceptionComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 270, 20, 180 ],         
+            widths: [ 40, 455, 40 ],         
             body: this.body, 
           },      
           fontSize: 10, 
@@ -483,6 +563,8 @@ export class ListerBonReceptionComponent implements OnInit {
 
   }
 
+
+  // telecharger pdf  
   async telechargerpdf(id: any,date_Creation: any) {
     this.body=[];
     await delay(1000);
@@ -492,7 +574,7 @@ export class ListerBonReceptionComponent implements OnInit {
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
-      obj.push( "Quantité et qualité vérifiées ")      
+     
       this.body.push(obj);
     }
     let def = {
@@ -594,7 +676,7 @@ export class ListerBonReceptionComponent implements OnInit {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:182}	  
       },
      ] ,
      
@@ -612,7 +694,7 @@ export class ListerBonReceptionComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 270, 20, 180 ],         
+            widths: [ 40, 455, 40 ],              
             body: this.body, 
           },      
           fontSize: 10, 
@@ -642,7 +724,7 @@ export class ListerBonReceptionComponent implements OnInit {
       this.date_Creation =  this.bonReception.date_Creation
     }, error => console.log(error));
      
-    this.telechargerpdf(this.id,this.date_Creation) ;
+  //  this.telechargerpdf(this.id,this.date_Creation) ;
   }
 }
 

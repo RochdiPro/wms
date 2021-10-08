@@ -24,7 +24,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 })
 export class ListerBonTransfertComponent implements OnInit {
 
-  bonRejet: any;
+  transfert: any;
 
   @ViewChild(MatPaginator) paginator: any = MatPaginator;
   @ViewChild(MatSort) sort: any = MatSort;
@@ -35,7 +35,7 @@ export class ListerBonTransfertComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  displayedColumns: string[] = ['id', "responsable", "src", 'des', 'supprimer', 'Voir_pdf', 'exporter_pdf']; //les colonne du tableau 
+  displayedColumns: string[] = ['id', "responsable", "src", 'des', 'supprimer' ]; //les colonne du tableau 
   dataSource = new MatTableDataSource<table>();
 
 
@@ -50,11 +50,11 @@ export class ListerBonTransfertComponent implements OnInit {
     this.getDetail()
 
     this.service.get_Bon_Sortie_By_Id(id).subscribe(data => {
-      this.bonRejet = data;
-      this.type_bon = this.bonRejet.type_Bon;
-      this.Destination = this.bonRejet.local
-      this.reclamation = this.bonRejet.reclamation
-      this.date_Creation = this.bonRejet.date_Creation
+      this.transfert = data;
+      this.type_bon = this.transfert.type_Bon;
+      this.Destination = this.transfert.local
+      this.reclamation = this.transfert.reclamation
+      this.date_Creation = this.transfert.date_Creation
     }, error => console.log(error));
     setTimeout(() => {
       this.telechargerPDF(this.id, this.date_Creation)
@@ -80,11 +80,11 @@ export class ListerBonTransfertComponent implements OnInit {
     this.id = id2
     this.getDetail()     
     this.service.get_Bon_Sortie_By_Id(id2).subscribe(data => {
-      this.bonRejet = data;
-      this.type_bon = this.bonRejet.type_Bon;
-      this.Destination = this.bonRejet.local
-      this.reclamation = this.bonRejet.reclamation
-      this.date_Creation = this.bonRejet.date_Creation
+      this.transfert = data;
+      this.type_bon = this.transfert.type_Bon;
+      this.Destination = this.transfert.local
+      this.reclamation = this.transfert.reclamation
+      this.date_Creation = this.transfert.date_Creation
     }, error => console.log(error));
     setTimeout(() => {
       
@@ -532,7 +532,9 @@ export class ListerBonTransfertComponent implements OnInit {
 
   Bon_transfert() {
     this.service.Bon_transfert().subscribe((data: any) => {
-      this.bonRejet = data;
+      this.transfert = data;
+      this.transfert= this.transfert.sort((a:any, b:any) => a.id_Bon_Transfert > b.id_Bon_Transfert ? -1 : 1);
+
       this.dataSource.data = data as table[];
     })
   }

@@ -50,25 +50,15 @@
         <!--Colonne supprimer -->
         <ng-container matColumnDef="supprimer">
             <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let element" style="text-align: center;"> <i class="pe-7s-trash btn-r" title="Supprimer Le Bon"
-                    (click)="supprimer(element.id)"></i> </mat-cell>
-        </ng-container>
-
-        
-        <!--Colonne Voir_pdf -->
-        <ng-container matColumnDef="Voir_pdf">
-            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-look btn-b" title="Voir PDF"
-                    (click)="pdf(element.id)"></i>
+            <mat-cell *matCellDef="let element" style="text-align: center;"> 
+                <i class="pe-7s-trash btn-r" title="Supprimer Le Bon" (click)="supprimer(element.id)"></i>
+                    <i style="margin-left: 20px;" class="pe-7s-look btn-b" title="Voir PDF"   (click)="pdf(element.id)"></i>
+                    <i style="margin-left: 20px;" class="pe-7s-cloud-download btn-b" (click)="telecharger(element.id)" title="Télécharger PDF"></i> 
                 </mat-cell>
         </ng-container>
 
-         <!--Colonne exporter_pdf -->
-         <ng-container matColumnDef="exporter_pdf">
-            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;"> <i class="pe-7s-cloud-download btn-b"
-                    (click)="telecharger(element.id)" title="Télécharger PDF"></i> </mat-cell>
-        </ng-container>
+        
+        
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

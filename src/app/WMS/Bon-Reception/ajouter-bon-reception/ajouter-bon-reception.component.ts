@@ -427,7 +427,7 @@ export class AjouterBonReceptionComponent implements OnInit {
   // get liste des famailles 
   Famille(event: any, id: any) {
     let ch = event.value
-    console.log(ch, id)
+    
     for (let i = 0; i < this.obj_articles.length; i++) {
       if (this.obj_articles[i].id == id) {
         this.obj_articles[i].famaille = ch
@@ -470,7 +470,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         if (this.obj_articles[j].total == this.obj_articles[j].qte) { this.obj_articles[j].controle_qt = true } else { this.obj_articles[j].controle_qt = false }
       }
     }
-    console.log(this.obj_articles)
+   
 
   }
 
@@ -592,7 +592,7 @@ export class AjouterBonReceptionComponent implements OnInit {
     BR.appendChild(Produits_Listes);
     BR.appendChild(Supports_Listes);
     this.doc.appendChild(BR)
-    console.log(this.doc)
+     
 
     var formData: any = new FormData();
     let url = "assets/BonRecpetion.xml";
@@ -604,7 +604,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         let xml2string = new XMLSerializer().serializeToString(this.doc.documentElement);
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRecpetion.xml");
-        console.log("id bon :", this.id)
+        
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
         formData.append('Etat', "Validé");
@@ -633,7 +633,7 @@ export class AjouterBonReceptionComponent implements OnInit {
                 if (result.isConfirmed) {
 
                   this.generatePDF(this.bon_reception.id, this.bon_reception.date_Creation);
-                 // this.router.navigate(['Menu/WMS-Reception/Lister']);
+                  this.router.navigate(['Menu/WMS-Reception/Lister']);
                 } else if (result.isDismissed) {
                   console.log('erreur  ');
                 }
@@ -733,7 +733,7 @@ export class AjouterBonReceptionComponent implements OnInit {
     BR.appendChild(Produits_Listes);
     BR.appendChild(Supports_Listes);
     this.doc.appendChild(BR)
-    console.log(this.doc)
+  
 
     var formData: any = new FormData();
     let url = "assets/BonRecpetion.xml";
@@ -745,7 +745,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         let xml2string = new XMLSerializer().serializeToString(this.doc.documentElement);
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRecpetion.xml");
-        console.log("id bon :", this.id)
+       
         formData.append('Id', this.id);
         formData.append('Id_Be', this.id);
         formData.append('Etat', "En Attente");
@@ -756,8 +756,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);     
         this.service.createBonReception(formData).subscribe(data => {
-          console.log("data: ", data);
-          //this.bonReception = data
+         
 
           Swal.fire(
             'Conserver',
@@ -790,259 +789,17 @@ export class AjouterBonReceptionComponent implements OnInit {
     obj.push(" ");
     obj.push(" ");
     obj.push(" ");
-    obj.push(" ");
+     
     body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
-      obj.push( "Quantité et qualité vérifiées ")      
+     
       body.push(obj);
     }
-
-   
- /*   var obj = new Array();
-    obj.push("6666");
-    obj.push("dssvfv sdvejgdzjed dcvfvf vfvfdvfd vfdvfvfdv fdvfdvf");
-    obj.push("10");
-    obj.push( "Quantité et qualité vérifiées ") 
-    body.push(obj);
-    var obj = new Array();
-    obj.push("142");
-    obj.push("dssvfv sdvejgdzjed dvfvfdv fdvfdvf");
-    obj.push("1");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vffff ffff fff ff  f f f f v vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
-    var obj = new Array();
-    obj.push("1468");
-    obj.push("dssvfv sdvejgdzjed dcgvezyddcdscdsc fvfvfvfvf vfv vf");
-    obj.push("125");
-    obj.push( "Quantité et qualité vérifiées ")      
-    body.push(obj);
- */
+ 
 
     let def = {
       pageMargins: [40, 250, 40, 180],
@@ -1143,7 +900,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:182}	       
       },
      ] ,
      
@@ -1161,7 +918,7 @@ export class AjouterBonReceptionComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 270, 20, 180 ],         
+            widths: [ 40, 455, 40 ],         
             body: body, 
           },      
           fontSize: 10, 
@@ -1332,8 +1089,7 @@ export class Ajouter_Bon_Rejet {
     BR.appendChild(Produits_Listes);
 
     this.doc.appendChild(BR)
-    console.log(this.doc)
-
+   
 
     var formData: any = new FormData();
     let url = "assets/BonRejet.xml";
@@ -1344,7 +1100,7 @@ export class Ajouter_Bon_Rejet {
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
 
-        console.log(this.type_bon + "  " + this.idBon + "        hhhh")
+        
         formData.append('Id_Bon', this.idBon);
         formData.append('Etat', "Rejeter");
         formData.append('Responsable', "User1");
@@ -1355,7 +1111,7 @@ export class Ajouter_Bon_Rejet {
 
         formData.append('Detail', myFile);
         this.service.creer_BonR_ejet(formData).subscribe(data => {
-          console.log("Bon rejet", data);
+          
           this.bon_rejet = data
           Swal.fire({
             title: 'Bon Rejet!',
@@ -1369,9 +1125,12 @@ export class Ajouter_Bon_Rejet {
           }).then((result) => {
 
             if (result.isConfirmed) {
-
-              this.imprimerFicheRejet(this.bon_rejet.id, this.bon_rejet.date_Creation)
-
+              setTimeout(() => {
+         
+                this.imprimerFicheRejet(this.bon_rejet.id, this.bon_rejet.date_Creation)             
+                
+              }, 1000);
+             
             }
 
           })
@@ -1522,7 +1281,7 @@ export class Ajouter_Bon_Rejet {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:180}	       
       },
       {
         text: ' ' +this.reclamation ,
@@ -1638,7 +1397,7 @@ export class Support {
    for (let i = 0; i< this.obj_articles.length; i++) {
     
       if(this.obj_articles[i].id==this.id_article_ajour){
-        console.log(this.obj_articles[i].id)
+        
         for (let k = 0; k < this.obj_articles[i].supports.length; k++) {      
           if(this.obj_articles[i].supports[k].id==s){
             

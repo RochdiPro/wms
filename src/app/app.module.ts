@@ -31,9 +31,11 @@ import { DatePipe } from '@angular/common';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
 import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_transfert} from './WMS/Stockage/bon-transfert/bon-transfert.component';
 import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert/lister-bon-transfert.component';
+import { ListerBonRetourComponent } from './WMS/Stockage/lister-bon-retour/lister-bon-retour.component';
+import { BonRetourComponent ,ligne_retour,Detail4g_retour,detail_serie_retour, } from './WMS/Stockage/bon-retour/bon-retour.component';
  
- 
-@NgModule({ 
+import {MatRadioModule} from '@angular/material/radio';
+ @NgModule({ 
   declarations: [
     AppComponent,
     MenuComponent,
@@ -54,7 +56,10 @@ import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert
    BonSortieComponent,ligne,Detail4g,detail_serie,
    ListerBonSortieComponent,
    BonTransfertComponent,
-   ligne_transfert,Detail4g_transfert,detail_serie_transfert, ListerBonTransfertComponent
+   ligne_transfert,Detail4g_transfert,detail_serie_transfert,
+   ListerBonTransfertComponent, ListerBonRetourComponent, 
+   BonRetourComponent,
+   ligne_retour,Detail4g_retour,detail_serie_retour,
   ],
   exports: [
      
@@ -74,7 +79,8 @@ import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert
     MatPaginatorModule,
     MatTableModule,
     MatFormFieldModule,
-    MatInputModule 
+    MatInputModule ,
+    MatRadioModule
   ],
    
   providers: [

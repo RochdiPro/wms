@@ -1,33 +1,39 @@
 <mat-vertical-stepper [linear]="isLinear" #stepper>
-  <mat-step [stepControl]="localform">
+  <mat-step [stepControl]="info">
     <form>
-      <ng-template matStepLabel>Source / Destination </ng-template>
+      <ng-template matStepLabel>Client / Facture </ng-template>
       <div class="row">
         <br>
         <div class="col-md-3">
+
+          <mat-radio-group formControlName="options">
+            <mat-radio-button value="1" (click)="setchoix(1)">Bon Livraison</mat-radio-button>
+            <mat-radio-button value="2" (click)="setchoix(2)">Facture</mat-radio-button>
+          </mat-radio-group>
+
+
+        </div>
+
+        <div class="col-md-3"  *ngIf=" this.choix "> 
           <mat-form-field>
-            <mat-label>Source</mat-label>
-            <mat-select [(ngModel)]="localform.source" [ngModelOptions]="{standalone: true}"
-              (ngModelChange)="setsource()">
-              <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
+            <mat-label>Client</mat-label>
+            <mat-select [(ngModel)]="info.client" [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="get_Factures()">
+              <mat-option *ngFor="let l of Clients" value="{{l.id_Clt}}">{{l.id_Clt}} : {{l.nom_Client}}</mat-option>
             </mat-select>
 
           </mat-form-field>
-          <button mat-raised-button class="search"><i class="fas fa-warehouse"></i> </button>
-        </div>
-        <div class="col-md-3">
 
         </div>
-        <div class="col-md-3">
+      
+        <div style="margin-left: 40px;" class="col-md-3" *ngIf=" this.info.client ">
           <mat-form-field>
-            <mat-label>Destination</mat-label>
-            <mat-select [(ngModel)]="localform.destination" [ngModelOptions]="{standalone: true}"
-              (ngModelChange)="setdestination()">
-              <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
+            <mat-label>Facture</mat-label>
+            <mat-select [(ngModel)]="info.facture" [ngModelOptions]="{standalone: true}" (ngModelChange)="setfacture()">
+              <mat-option *ngFor="let f of Liste_Factures" value="{{f.id_Facture}}">{{f.id_Facture}}</mat-option>
             </mat-select>
 
           </mat-form-field>
-          <button mat-raised-button class="search"><i class="fas fa-warehouse"></i> </button>
         </div>
       </div>
 
@@ -40,37 +46,6 @@
     <form>
       <ng-template matStepLabel>Liste des articles </ng-template>
 
-      <div class="row">
-        <br>
-        <div class="col-md-4">
-          <mat-form-field>
-            <mat-label>Ajouter un code à bare</mat-label>
-            <input matInput placeholder="Saisir le code à bare de l'article" [(ngModel)]="selectform.code"
-              [ngModelOptions]="{standalone: true}" />
-          </mat-form-field>
-         
-            <i class="fas fa-barcode" (click)="Ajouter_Article_avec_code()"></i> 
-        </div>
-        <div class="col-md-4">
-          <mat-form-field>
-            <mat-label>Code Article</mat-label>
-            <input matInput placeholder="Saisir l' ID de l'article" [(ngModel)]="selectform.id"
-              [ngModelOptions]="{standalone: true}" />
-          </mat-form-field>
-          
-            <i class="fas fa-search" (click)="Ajouter_Article_avec_id()" ></i> 
-        </div>
-        <div class="col-md-4">
-          <mat-form-field>
-            <mat-label>Liste des Article</mat-label>
-            <mat-select [(ngModel)]="selectform.id2" [ngModelOptions]="{standalone: true}">
-              <mat-option *ngFor="let art of liste_articles" value="{{art.id_Produit}}">{{art.nom_Produit}}</mat-option>
-            </mat-select>
-          </mat-form-field>
- 
-            <i class="fas fa-plus-square" (click)="Ajouter_Article_avec_choix()"></i> 
-        </div>
-      </div>
       <div class="row mat-elevation-z8">
 
         <table class="table table-striped">
@@ -144,7 +119,7 @@
             <td>
               <input type="text" value="{{article.qte}}" disabled />
             </td>
-            <td style="text-align: center;"> <i class="pe-7s-edit" title="plus" (click)="plus(article)"></i> </td>
+            <td style="text-align: center;"> <i class="pe-7s-look btn-b" title="plus" (click)="plus(article)"></i> </td>
 
           </tr>
         </tbody>
@@ -174,7 +149,7 @@
         vers
       </div>
       <div class="col-md-4 mb-4">
-        <h3> {{destination}} </h3>
+        <h3> </h3>
       </div>
     </div>
     <div class="row">

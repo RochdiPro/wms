@@ -1,4 +1,4 @@
-<mat-horizontal-stepper [linear]="isLinear" #stepper>
+<mat-vertical-stepper [linear]="isLinear" #stepper>
 
    <!--  Select Bon   --->
    <mat-step [stepControl]="selectFormGroup">
@@ -6,7 +6,7 @@
          <ng-template matStepLabel>Selection Des Marchandise </ng-template>
         
          <div class="row">
-            <div class="col-md-8 mb-3"> </div>
+             
  
             <!--  select type des marchandise -->
             <div class="col-md-3 mb-3">
@@ -378,7 +378,7 @@
       <h5>Information Operation de récepetion</h5>
       <div class="row">
          <div class="col-md-3 mb-3">
-            <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy HH:MM:SS'}}
+            <h6> <strong> Date:</strong> </h6> {{sysDate | date:'dd/MM/yyyy '}}
          </div>
          <div class="col-md-2 mb-2">
             <h6> <strong>Type de Bon</strong> </h6> {{type_bon}}
@@ -490,4 +490,4 @@
    </mat-step>
 
 
-</mat-horizontal-stepper>
+</mat-vertical-stepper>

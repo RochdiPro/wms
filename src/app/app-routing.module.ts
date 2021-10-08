@@ -16,6 +16,8 @@ import { MenuWmsComponent } from './WMS/menu-wms/menu-wms.component';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
 import { BonTransfertComponent } from './WMS/Stockage/bon-transfert/bon-transfert.component';
 import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert/lister-bon-transfert.component';
+import { BonRetourComponent } from './WMS/Stockage/bon-retour/bon-retour.component';
+import { ListerBonRetourComponent } from './WMS/Stockage/lister-bon-retour/lister-bon-retour.component';
    
  
 const routes: Routes =
@@ -50,6 +52,8 @@ const routes: Routes =
             { path: 'Lister_Bon_Sortie', component: ListerBonSortieComponent},
             { path: 'Bon_Transfert', component: BonTransfertComponent},
             { path: 'Lister_Bon_Transfert', component: ListerBonTransfertComponent},
+            { path: 'Bon_Retour', component: BonRetourComponent},
+            { path: 'Lister_Bon_Retour', component: ListerBonRetourComponent},
             
           ]
         } ,

@@ -32,7 +32,7 @@ export class BonRejetComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  displayedColumns: string[] = ['id', "responsable", "type_Be", "id_Be", 'reclamation', 'supprimer', 'Voir_pdf', 'exporter_pdf']; //les colonne du tableau 
+  displayedColumns: string[] = ['id', "responsable", "type_Be", "id_Be", 'reclamation', 'supprimer'  ]; //les colonne du tableau 
   dataSource = new MatTableDataSource<table>();
 
 
@@ -119,7 +119,7 @@ export class BonRejetComponent implements OnInit {
     }, error => console.log(error));
    
     setTimeout(() => {
-      console.log('sleep');
+       
       this.telechargerPDF(this.id, this.date_Creation)
     
       
@@ -157,6 +157,7 @@ export class BonRejetComponent implements OnInit {
       this.Destination = this.bonRejet.local
       this.reclamation = this.bonRejet.reclamation
       this.date_Creation = this.bonRejet.date_Creation
+      this.id_Bon = this.bonRejet.id_Bon;
 
       if (this.type_bon == "Bon Entrée local") {
         this.service.get_Information_Bon_entree_Local( this.bonRejet.id_Bon).subscribe((data: any) => {
@@ -369,7 +370,7 @@ export class BonRejetComponent implements OnInit {
       }
       ,
       {
-        text: '' + this.source_bon + '\n\n',
+        text: '' + this.Source + '\n\n',
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -388,7 +389,7 @@ export class BonRejetComponent implements OnInit {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:180}	  	  
       },
       {
         text: ' ' +this.reclamation ,
@@ -533,7 +534,7 @@ export class BonRejetComponent implements OnInit {
       }
       ,
       {
-        text: '' + this.source_bon + '\n\n',
+        text: '' + this.Source + '\n\n',
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -552,7 +553,7 @@ export class BonRejetComponent implements OnInit {
         fontSize: 15, 
         color: 'black',
         bold: true,
-        relativePosition: {x:440, y:197}	       
+        relativePosition: {x:370, y:180}	  
       },
       {
         text: ' ' +this.reclamation ,
@@ -583,7 +584,6 @@ export class BonRejetComponent implements OnInit {
       ],
       
     };
-    
     pdfMake.createPdf(def).download("BonRejet" + this.id);
 
   }
@@ -622,15 +622,11 @@ export class BonRejetComponent implements OnInit {
         })
 
         this.xmldata = data1
-
-
         for (let i = 0; i < this.xmldata.Produits[0].Produit.length; i++) {
-
           this.new_obj = {}
           this.new_obj.id = this.xmldata.Produits[0].Produit[i].Id;
           this.new_obj.nom = this.xmldata.Produits[0].Produit[i].Nom;
           this.new_obj.fiche_Technique = this.xmldata.Produits[0].Produit[i].Fiche_Technique;
-
           this.new_obj.qte = this.xmldata.Produits[0].Produit[i].Qte;
           this.new_obj.famaille = this.xmldata.Produits[0].Produit[i].famaille;
           this.new_obj.sous_famaille = this.xmldata.Produits[0].Produit[i].sous_famaille;
@@ -645,7 +641,12 @@ export class BonRejetComponent implements OnInit {
       reader.readAsDataURL(detail);
     })
 
+    setTimeout(() => {
+       
+      this.generatePDF(this.id,this.date_Creation)
     
+      
+    }, 1000);
 
   }
 
@@ -660,6 +661,7 @@ export class BonRejetComponent implements OnInit {
   Bon_rejet() {
     this.service.Bon_rejet().subscribe((data: any) => {
       this.bonRejet = data;
+      this.bonRejet= this.bonRejet.sort((a:any, b:any) => a.id > b.id ? -1 : 1);
       this.dataSource.data = data as table[];
     })
   }

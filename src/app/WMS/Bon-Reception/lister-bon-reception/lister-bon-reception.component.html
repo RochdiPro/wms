@@ -1,4 +1,3 @@
- 
 <div class="position-relative custom-control">
     <section>
         <mat-form-field class="custom-width" [formGroup]="form">
@@ -29,58 +28,49 @@
     <mat-table [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="modifier">
             <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label=""> 
-                <a routerLink="/Menu/WMS-Reception/Modifier/{{element.id}}"> <i
-                        class="pe-7s-pen" title="Modifier BL"></i></a> </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="" style="text-align: center;">
+                <a routerLink="/Menu/WMS-Reception/Modifier/{{element.id}}"> <i class="pe-7s-pen"
+                        title="Modifier BL"></i></a>
+            </mat-cell>
         </ng-container>
 
         <!--Colonne id -->
         <ng-container matColumnDef="id">
             <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
-            <mat-cell   *matCellDef="let element" data-label="id"> {{element.id}} </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="id"> {{element.id}} </mat-cell>
         </ng-container>
         <!--Colonne responsable -->
         <ng-container matColumnDef="responsable">
             <mat-header-cell *matHeaderCellDef mat-sort-header> responsable </mat-header-cell>
-            <mat-cell   *matCellDef="let element" data-label="responsable"> {{element.responsable}} </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="responsable"> {{element.responsable}} </mat-cell>
         </ng-container>
         <!--Colonne etat -->
         <ng-container matColumnDef="etat">
             <mat-header-cell *matHeaderCellDef mat-sort-header> Etat </mat-header-cell>
-            <mat-cell   *matCellDef="let element" data-label="etat"> {{element.etat}} </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="etat"> {{element.etat}} </mat-cell>
         </ng-container>
         <!--Colonne Ancien Type -->
         <ng-container matColumnDef="type_Be">
             <mat-header-cell *matHeaderCellDef mat-sort-header> Ancien Type </mat-header-cell>
-            <mat-cell   *matCellDef="let element" data-label="type_Be"> {{element.type_Be}} </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="type_Be"> {{element.type_Be}} </mat-cell>
         </ng-container>
         <!--Colonne Ancien ID -->
         <ng-container matColumnDef="id_Be">
             <mat-header-cell mat-header-cell *matHeaderCellDef mat-sort-header> Ancien ID </mat-header-cell>
-            <mat-cell   *matCellDef="let element" data-label="id_Be"> {{element.id_Be}} </mat-cell>
+            <mat-cell *matCellDef="let element" data-label="id_Be"> {{element.id_Be}} </mat-cell>
         </ng-container>
 
         <!--Colonne supprimer -->
         <ng-container matColumnDef="supprimer">
             <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell *matCellDef="let element" data-label="" style="text-align: center;" > <i class="pe-7s-trash btn-r" title="Supprimer Le Bon"
-                    (click)="supprimer(element.id)"></i> </mat-cell>
-        </ng-container>
-        
-        <!--Colonne Voir_pdf -->
-        <ng-container matColumnDef="Voir_pdf"  >
-            <mat-header-cell  *matHeaderCellDef  > </mat-header-cell>
-            <mat-cell *matCellDef="let element;let i=index;" style="text-align: center;" > <i class="pe-7s-look btn-b" title="Voir PDF"
-                    (click)="pdf(element.id)"></i>
+            <mat-cell *matCellDef="let element" data-label="" style="text-align: center;">
+                <i class="pe-7s-look btn-b" title="Voir PDF" (click)="pdf(element.id)"></i>                
+                <i  style="margin-left: 20px;" class="pe-7s-trash btn-r" title="Supprimer Le Bon" (click)="supprimer(element.id)"></i>
+                <i  style="margin-left: 20px;"class="pe-7s-cloud-download btn-b" (click)="telecharger(element.id)" title="Télécharger PDF"></i>
             </mat-cell>
         </ng-container>
 
-        <!--Colonne exporter_pdf -->
-        <ng-container matColumnDef="exporter_pdf">
-            <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-            <mat-cell mat-cell *matCellDef="let element;let i=index;" style="text-align: center;" > <i class="pe-7s-cloud-download btn-b"
-                    (click)="telecharger(element.id)" title="Télécharger PDF"></i> </mat-cell>
-        </ng-container>
+        
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
