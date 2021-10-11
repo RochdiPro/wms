@@ -110,7 +110,14 @@ Bon_transfert( ) : Observable<any>{
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
   }
-
+  /// Supprimer_Bon_retour
+  Supprimer_Bon_retour(id: any): Observable<Object> {
+    return this.http.delete(ERP + "Supprimer_Bon_Retour", {
+      params: {
+        Id: id
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
   
 
   // filtre bon reception
@@ -124,6 +131,23 @@ Bon_transfert( ) : Observable<any>{
         Valeur2: valeur2,
         Champ3: champ3,
         Valeur3: valeur3,
+        
+      }, observe: 'body'
+    }).pipe(catchError(this.handleError));
+  }
+   // filtre bon retour 
+  filtre_retour(champ1 : any, valeur1 : any, champ2 : any, valeur2 : any, champ3 : any, valeur3 : any , champ4 : any, valeur4 : any )
+  {
+    return this.http.get(ERP + 'Filtre_Bon_Retour', {
+      params: {
+        Champ1: champ1,
+        Valeur1: valeur1,
+        Champ2: champ2,
+        Valeur2: valeur2,
+        Champ3: champ3,
+        Valeur3: valeur3,
+        Champ4: champ4,
+        Valeur4: valeur4,
         
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
@@ -215,14 +239,17 @@ Bon_transfert( ) : Observable<any>{
   creer_Bon_Transfert(form: any): Observable<Object> {
     return this.http.post(ERP + "/Creer_Bon_Transfert", form);
   }
-
+  creer_Bon_Retour
+  (form: any): Observable<Object> {
+    return this.http.post(ERP + "/Creer_Bon_Retour", form);
+  }
    //  get lise des Clients 
    Clients( ) : Observable<any>{
     return this.http.get(ERP + 'Clients', { observe: 'body' }).pipe(catchError(this.gererErreur)
     );
   }
 
-  
+  // get liste des facture par un client x
   get_facture_client( id : any):Observable<any>{
     return this.http.get(ERP + 'Filtre_Facture', {
       params: {
@@ -232,12 +259,32 @@ Bon_transfert( ) : Observable<any>{
     }).pipe(catchError(this.handleError));
   }
   
-  get_bl_client( id : any):Observable<any>{
-    return this.http.get(ERP + 'Filtre_Bon_Livraison', {
+  // get liste des bls pour un client  
+  get_bl_client( id : any , date1:any , date2 :any ):Observable<any>{
+    return this.http.get(ERP + 'Filtre_Bon_Livraison_Par_Client_Date1_Date2', {
       params: {
-        Champ: "id_Clt",
-        Valeur:id       
+        Client: id,
+        Date1:date1,
+        Date2:date2,       
       }, observe: 'body'
     }).pipe(catchError(this.handleError));
   }
+
+   
+  // get information from  bon livraison avec id 
+  Detail_detail_bl(Id: any): Observable<any> {
+    return this.http.get(ERP + "Detail_Bon_Livraison"
+      , {
+        params: {
+          Id_BL: Id
+        }, responseType: 'blob'
+      }).pipe(catchError(this.handleError))
+  }
+
+   // get all bon receptions 
+   Bon_retours(): Observable<any> {
+    return this.http.get(ERP + "Bon_Retours");
+
+  }
+
 }

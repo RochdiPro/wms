@@ -33,8 +33,10 @@ import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_
 import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert/lister-bon-transfert.component';
 import { ListerBonRetourComponent } from './WMS/Stockage/lister-bon-retour/lister-bon-retour.component';
 import { BonRetourComponent ,ligne_retour,Detail4g_retour,detail_serie_retour, } from './WMS/Stockage/bon-retour/bon-retour.component';
+import {MatDatepickerModule } from '@angular/material/datepicker';
  
 import {MatRadioModule} from '@angular/material/radio';
+import { MatNativeDateModule } from '@angular/material/core';
  @NgModule({ 
   declarations: [
     AppComponent,
@@ -80,7 +82,10 @@ import {MatRadioModule} from '@angular/material/radio';
     MatTableModule,
     MatFormFieldModule,
     MatInputModule ,
-    MatRadioModule
+    MatRadioModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+    
   ],
    
   providers: [

@@ -1,13 +1,13 @@
- 
+
 import { DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Component, ElementRef, Inject, OnInit, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { MatStepper } from "@angular/material/stepper";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
- 
+
 import { StockageService } from "../stockage.service";
 
 import { BrowserModule } from '@angular/platform-browser';
@@ -30,8 +30,10 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 export class BonRetourComponent implements OnInit {
 
   isLinear = false;
+  dateRangeForm: any = FormGroup;
+
   optionFormGroup: any = FormGroup;
-  info : any = FormGroup;
+  info: any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
   cloture: any = FormGroup;
@@ -39,31 +41,31 @@ export class BonRetourComponent implements OnInit {
   liste_articles: any;
   table: any = [];
   object: any = {};
-  locals:any;
-  source :any
-  facture:any;
-  Clients:any;
-  Liste_Factures:any;
+  locals: any;
+  source: any
+  facture: any;
+  Clients: any;
+  Liste_bls: any;
   @ViewChild('stepper') private myStepper: any = MatStepper;
-  constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
+  constructor(private datePipe: DatePipe, private http: HttpClient, private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog, private router: Router) {
 
     this.service.liste_articles().subscribe((data: any) => {
       this.liste_articles = data;
     });
-    this.service.locals().subscribe((data:any) => {
-      this.locals=data
+    this.service.locals().subscribe((data: any) => {
+      this.locals = data
     })
-    this.service.Clients().subscribe((data:any) => {
-      this.Clients=data
+    this.service.Clients().subscribe((data: any) => {
+      this.Clients = data
     })
     this.chargementModel();
     this.modelePdfBase64();
   }
 
 
-  modele:any;
-   // temps d'attente pour le traitement de fonction 
-   delai(ms: number) {
+  modele: any;
+  // temps d'attente pour le traitement de fonction 
+  delai(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
   // conversion de modele de pdf  en base 64 
@@ -80,22 +82,30 @@ export class BonRetourComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel() {
-    this.http.get('./../../../assets/images/ficheSortie.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/ficheRetour.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele = reponse;
       return this.modele;
     }, err => console.error(err))
   }
 
+  range = new FormGroup({
+    fromDate: new FormControl('', Validators.required),
+    toDate: new FormControl('', Validators.required)
+  });
 
-   
   ngOnInit() {
+    let myDate = new Date(); let myDate2 = new Date();
+    myDate2.setMonth(myDate2.getMonth() - 1);
+    this.dateRangeForm = this._formBuilder.group({
+      fromDate: new FormControl(myDate2, Validators.required),
+      toDate: new FormControl(myDate, Validators.required)
+    });
 
     this.info = this._formBuilder.group({
       client: ['', Validators.required],
-      facture: ['', Validators.required],
-     
+
     });
-    this.selectform = this._formBuilder.group({   
+    this.selectform = this._formBuilder.group({
       code: ['', Validators.required],
       id: ['', Validators.required],
       id2: ['', Validators.required]
@@ -103,7 +113,7 @@ export class BonRetourComponent implements OnInit {
 
 
     this.secondFormGroup = this._formBuilder.group({
-      
+
     });
     this.optionFormGroup = this._formBuilder.group({
       bl: ['', Validators.required],
@@ -115,157 +125,156 @@ export class BonRetourComponent implements OnInit {
     });
   }
 
-  //  set type de bon facture ou bl 
-   choix:any
-  setchoix(choix:any){
-    if ( choix=="1"){ this.choix = "1"}
-    if ( choix=="2"){this.choix = "2"}
-     
-  }
 
- // lister les facture pour un client 
-  lister_facture()
-  {
-   
-    if ( this.choix == "2" ){
-    this.service.get_facture_client(this.info.client).subscribe((data) =>{ 
-      this.Liste_Factures=data 
+  // lister les facture pour un client 
+  lister_facture() {
+    console.log(this.datePipe.transform(this.dateRangeForm.get('fromDate').value, 'dd/MM/yyyy'));
+    this.Liste_bls = [];
+    this.service.get_bl_client(this.info.client, this.datePipe.transform(this.dateRangeForm.get('fromDate').value, 'dd/MM/yyyy'), this.datePipe.transform(this.dateRangeForm.get('toDate').value, 'dd/MM/yyyy')).subscribe((data) => {
+      this.Liste_bls = data
     })
-    }else if ( this.choix == "1" ){
-      this.service.get_bl_client(this.info.client).subscribe((data) =>{ 
-        this.Liste_Factures=data 
-      })
-    }
+
   }
 
-  test:any;
+  test: any;
   // check local source et destination  
-  get_Factures()
-  {  
+  get_Factures() {
     this.lister_facture()
-    
+
   }
-  // set slocal source
-  setfacture()
-  {
-      this.facture=this.info.facture   
-  }
+
   // etape 2 
-  suivant2()
-  {
-    if(this.test==1){ this.myStepper.next();}
+  suivant2() {
+    this.table = [];
+    this.get_detail_bl(this.info.facture);
+    this.myStepper.next();
   }
-   
-  // Ajouter article au liste a traver le choix
-  Ajouter_Article_avec_choix() {
-    this.service.Article_Id(this.selectform.id2).subscribe((data) => {
-      this.ajouter_article_table(data)
+
+
+  //get detail bl 
+  detail: any;
+  bl: any
+  xmldata: any;
+  newAttribute: any = {}
+  inst: any = {}
+  get_detail_bl(id: any) {
+    this.service.Detail_detail_bl(id).subscribe((detail: any) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        this.bl = reader.result;
+        var parseString = require('xml2js').parseString;
+        let data1;
+        parseString(atob(this.bl.substr(28)), function (err: any, result: any) {
+          data1 = result.Bon_Livraison;
+
+        })
+        this.xmldata = data1
+
+
+        if (this.xmldata.Produits[0].Produits_Simples[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_Simples[0].Produit.length; i++) {
+
+
+            this.object = {}
+            this.object.id = (this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Id[0]);
+            this.object.nom = (this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Nom[0]);
+            this.object.qte = (this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Qte[0]);
+            this.object.type = "simple"
+            this.inst.qte2 = 0;
+            this.table.push(this.object)
+          }
+        }
+        if (this.xmldata.Produits[0].Produits_4Gs[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_4Gs[0].Produit.length; i++) {
+
+
+            this.object = {}
+            this.object.id = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Id[0]);
+            this.object.nom = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Nom[0]);
+            this.object.qte = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Qte[0]);
+            this.inst.qte2 = 0;
+            this.object.type = "4g"
+
+            this.object.detail = []
+
+            if (this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].n_Imei != undefined) {
+              for (let i = 0; i < this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G.length; i++) {
+
+                this.inst = {}
+                this.inst.ns = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].N_Serie;
+                this.inst.e1 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].E1
+                this.inst.e2 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].E2
+                this.inst.click = false;
+                this.object.detail.push(this.inst)
+              }
+            }
+            this.table.push(this.object)
+          }
+        }
+        if (this.xmldata.Produits[0].Produits_Series[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit.length; i++) {
+
+
+            this.object = {}
+            this.inst.qte2 = 0;
+            this.object.id = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Id[0]);
+            this.object.nom = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Nom);
+            this.object.qte = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Qte[0]);
+            this.inst.click = false;
+            this.object.type = "serie"
+            this.object.detail = []
+
+            for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit[0].N_Series[0].N_Serie.length; i++) {
+
+              this.inst = {}
+              this.inst.ns = this.xmldata.Produits[0].Produits_Series[0].Produit[0].N_Series[0].N_Serie[i]
+              this.object.detail.push(this.inst)
+            }
+            this.table.push(this.object)
+          }
+        }
+
+
+
+
+      }
+      reader.readAsDataURL(detail);
     })
-    this.selectform.id2 = ""
-  }
-  // Ajouter article au liste a traver le code a barre 
-  Ajouter_Article_avec_code() {
-    this.service.Arrticle_CodeBare(this.selectform.code).subscribe((data) => {
-
-      this.ajouter_article_table(data)
-    })
-    this.selectform.code = ""
-  }
-  // Ajouter article au liste a traver le id
-  Ajouter_Article_avec_id() {
-    this.service.Article_Id(this.selectform.id).subscribe((data) => {
-
-      this.ajouter_article_table(data)
-    })
-    this.selectform.id = ""
   }
 
 
 
-  // ajouter ligne au table
-  ajouter_article_table(art: any) {
-
-    console.log(art.id_Produit)
-    let test = 0;
-    for (let i = 0; i < this.table.length; i++) {
-      if (this.table[i].id == art.id_Produit) {
-        test = 1;
-        this.table[i].qte = this.table[i].qte + 1
-      }
-    }
-    if (test == 0) {
-      this.object = {}
-      this.object.id = art.id_Produit
-      this.object.nom = art.nom_Produit
-      this.object.qte = 1
-      this.object.type = "simple"
-      this.object.detail = []
-      if (art.n_Imei == 'true') {
-        this.object.type = "4g"
 
 
-      } else if (art.n_Serie == 'true') {
-        this.object.type = "serie"
 
-      }
 
-      console.log(this.object)
-      this.table.push(this.object)
-    }
-  }
-  //modifier ligne de table
-  Modifier_ligne_table(id: any) {
-    console.log(id)
-    this.object = {}
-    for (let i = 0; i < this.table.length; i++) {
-      if (this.table[i].id == id) {
 
-        const dialogRef = this.dialog.open(ligne_retour, {
-          width: 'auto',
-          data: { object: this.table[i] }
-        });
-        dialogRef.afterClosed().subscribe(result => {
-        });
-      }
-    }
 
-  }
-  //  supprimer ligne de table 
-  Supprimer_ligne_table(index: any) {
 
-    Swal.fire({
-      title: 'Êtes-vous sûr?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, supprimez le',
-      cancelButtonText: 'Non, garde le'
-    }).then((res) => {
-      if (res.value) {
-        this.table.splice(index, 1);
 
-      } else if (res.dismiss === Swal.DismissReason.cancel) {
-        Swal.fire(
-          'Annulé',
-          '',
-          'error'
-        )
-      }
-    }
-    );
 
-  }
+
+
+
+
+
+
+
+
+
 
   // detail article 
   plus(produit: any) {
-     
-    if (produit.type == "simple") {
-      Swal.fire({
-        title: ' Produit Simple ',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ok',
 
-      })
+    if (produit.type == "simple") {
+      const dialogRef = this.dialog.open(ligne_retour, {
+
+        width: 'auto',
+        data: { object: produit }
+      });
+      dialogRef.afterClosed().subscribe(result => {
+      });
     } else if (produit.type == "4g") {
       const dialogRef = this.dialog.open(Detail4g_retour, {
 
@@ -290,26 +299,24 @@ export class BonRetourComponent implements OnInit {
 
   }
 
-  valide()
-  {
-     this.creer_Bon_transfert();
+  valide() {
+    this.creer_Bon_retour();
   }
 
-  doc:any ;
-  bonsortie:any;
-  // creer bon sortie 
-  creer_Bon_transfert()
-  {
-    this.doc = document.implementation.createDocument("Bon_Transfert", "", null);
+  doc: any;
+  bonsortie: any;
+  // creer bon  retour
+  creer_Bon_retour() {
+    this.doc = document.implementation.createDocument("Bon_Retour", "", null);
 
-    var BR = this.doc.createElement("Bon_Transfert");
- 
+    var BR = this.doc.createElement("Bon_Retour");
+
     var Local = this.doc.createElement("Local"); Local.innerHTML = this.cloture.local
 
-    var InformationsGenerales = this.doc.createElement("Informations-Generales");   
-     
+    var InformationsGenerales = this.doc.createElement("Informations-Generales");
+
     var Responsable = this.doc.createElement("Responsable"); Responsable.innerHTML = "Responsable";
-    InformationsGenerales.appendChild(Local); 
+    InformationsGenerales.appendChild(Local);
     InformationsGenerales.appendChild(Responsable);
     var Produits_Listes = this.doc.createElement('Produits')
 
@@ -326,18 +333,15 @@ export class BonRetourComponent implements OnInit {
       Produit.appendChild(Nom);
       Produit.appendChild(Qte);
 
-   
-      if(this.table[i].type=='simple')
-      {
+
+      if (this.table[i].type == 'simple') {
         Produits_simple.appendChild(Produit);
       }
-      else if (this.table[i].type=='serie') 
-      {
+      else if (this.table[i].type == 'serie') {
         var n_series = this.doc.createElement('N_Series'); Qte.innerHTML = this.table[i].qte
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
+        for (let j = 0; j < this.table[i].detail.length; j++) {
           var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
-  
+
           n_series.appendChild(ns);
         }
         console.log(n_series)
@@ -345,11 +349,9 @@ export class BonRetourComponent implements OnInit {
         Produits_series.appendChild(Produit)
 
       }
-      else if (this.table[i].type=='4g') 
-      {
+      else if (this.table[i].type == '4g') {
         var p4gs = this.doc.createElement('Produit_4gs'); Qte.innerHTML = this.table[i].qte
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
+        for (let j = 0; j < this.table[i].detail.length; j++) {
           var p4g = this.doc.createElement('Produit_4g'); Qte.innerHTML = this.table[i].qte
           var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
           var e1 = this.doc.createElement('E1'); e1.innerHTML = this.table[i].detail[j].e1
@@ -358,16 +360,16 @@ export class BonRetourComponent implements OnInit {
           p4g.appendChild(e1);
           p4g.appendChild(e2);
           p4gs.appendChild(p4g);
-          
+
         }
         Produit.appendChild(p4gs)
         Produits_4g.appendChild(Produit)
-      } 
+      }
       Produits_Listes.appendChild(Produits_simple)
       Produits_Listes.appendChild(Produits_4g)
       Produits_Listes.appendChild(Produits_series)
     }
-    
+
     BR.appendChild(InformationsGenerales);
     BR.appendChild(Produits_Listes);
 
@@ -384,20 +386,22 @@ export class BonRetourComponent implements OnInit {
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
 
-        
-    
-        formData.append('Responsable', "User transfert ");
+
+
+        formData.append('Id_Responsable', "User retour ");
         //formData.append('Local_Destination', this.destination);
-        formData.append('Local_Source',this.source );   
+        formData.append('Local', this.cloture.local);
         formData.append('Description', this.cloture.reclamation);
+        formData.append('Id_Clt', this.info.client);
+        formData.append('N_Facture', this.info.facture);
 
         formData.append('Detail', myFile);
-        this.service.creer_Bon_Transfert(formData).subscribe(data => {
-           
+        this.service.creer_Bon_Retour(formData).subscribe(data => {
+
           this.bonsortie = data
           Swal.fire({
-            title: 'Bon Transfert!',
-            text: 'Bon Transfert est crée et envoyée.',
+            title: 'Bon Retour!',
+            text: 'Bon Retour est crée et envoyée.',
             icon: 'success',
             showCancelButton: true,
             confirmButtonColor: 'green',
@@ -408,147 +412,178 @@ export class BonRetourComponent implements OnInit {
 
             if (result.isConfirmed) {
 
-              // this.generatePDF(this.bonsortie.id, this.bonsortie.date_Creation)
+              this.generatePDF(this.bonsortie.id_Bon_Retour, this.bonsortie.date_Creation)
 
             }
 
           })
         });
 
-      //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Sortie'])
+        //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Sortie'])
       })
   }
-   //convertir blob à un fichier  
-   convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+  //convertir blob à un fichier  
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
     var b: any = theBlob;
     b.lastModifiedDate = new Date();
     b.name = fileName;
     return <File>theBlob;
   }
 
-  ch:any
+  ch: any
   modeleSrc: any;
   //impression de la fiche recption
   generatePDF(id: any, date_Creation: any) {
 
     var body = [];
-     
+
     for (let i = 0; i < this.table.length; i++) {
-      var obj = new Array();
-      obj.push(this.table[i].id);
-      obj.push(this.table[i].nom);     
-      obj.push(this.table[i].qte); 
-      this.ch=""
-      if (this.table[i].type=='serie') 
-      {
-        
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
-          this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n" 
-          this.ch=this.ch+" ----------------------  \n"  
+
+      if (this.table[i].type == 'simple') {
+
+        var obj = new Array();
+        obj.push(this.table[i].id);
+        obj.push(this.table[i].nom);
+        obj.push(this.table[i].qte2);
+
+
+        body.push(obj);
+      }
+      if (this.table[i].type == 'serie') {
+        var obj = new Array();
+        obj.push(this.table[i].id);
+        obj.push(this.table[i].nom);
+        obj.push(this.table[i].qte);
+        this.ch = ""
+        for (let j = 0; j < this.table[i].detail.length; j++) {
+          if (this.table[i].detail.click) {
+            this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
+            this.ch = this.ch + " ----------------------  \n"
+          }
         }
-       
+
+        obj.push(this.ch)
+        body.push(obj);
+      }
+      else if (this.table[i].type == '4g') {
+        var obj = new Array();
+        obj.push(this.table[i].id);
+        obj.push(this.table[i].nom);
+        obj.push(this.table[i].qte);
+        this.ch = ""
+        for (let j = 0; j < this.table[i].detail.length; j++) {
+          if (this.table[i].detail.click) {
+            this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
+            this.ch = this.ch + "E1 : " + this.table[i].detail[j].e1 + "\n"
+            this.ch = this.ch + "E2 : " + this.table[i].detail[j].e2 + "\n"
+            this.ch = this.ch + " ----------------------  \n"
+          }
+
+        }
+        obj.push(this.ch)
+        body.push(obj);
 
       }
-      else if (this.table[i].type=='4g') 
-      {
-       
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
-           this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n"     
-           this.ch=this.ch+"E1 : "+this.table[i].detail[j].e1 +"\n"     
-           this.ch=this.ch+"E2 : "+this.table[i].detail[j].e2 +"\n"  
-           this.ch=this.ch+" ----------------------  \n"  
-            
-        }
-        
-        
-      }   
-      obj.push(this.ch)
-      body.push(obj);
-    }    
-    
+
+    }
+
     var def = {
-      
-      
+
+
       defaultStyle: {
         // alignment: 'justify'
       },
       pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Bon Sortie',
-       },
-      footer: function (currentPage:any, pageCount:any) {
+        title: 'Fiche Bon retour',
+      },
+      footer: function (currentPage: any, pageCount: any) {
         return {
           margin: 35,
           columns: [
             {
               fontSize: 9,
               text: [
-  
+
                 {
                   text: currentPage.toString() + '/' + pageCount,
                 }
               ],
-              relativePosition: {x:250, y: 130}	
-            } 
+              relativePosition: { x: 250, y: 130 }
+            }
           ]
         };
       },
-      header:[ 
+      header: [
         {
           text: '' + id + '\n\n',
-          fontSize: 15, 
+          fontSize: 15,
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: { x: 370, y: 182 }
         },
-      {
-        text: ' ' + this.cloture.local ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:80, y:107}	  , 
-         
-      },
-      
-      {
-        text: 'rochdi'  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:390, y:96}	  , 
-         
-      },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:96}	  , 
-         
-      },
-      {
-        text: ' ' +this.cloture.reclamation ,
-        fontSize: 10, 
-        color: 'black',            
-        relativePosition: {x: 80, y:665}	       
-      }, 
-      {
-        text: 'rochdi' ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:85, y:131}	       
-      },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:154}	       
-      },
-     ] ,
+        {
+          text: ' ' + this.cloture.local,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 80, y: 107 },
+
+        },
+        {
+          text: ' ' + this.info.client,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 80, y: 179 },
+
+        },
+        {
+          text: ' ' + this.info.facture,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 210, y: 179 },
+
+        },
+
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 390, y: 96 },
+
+        },
+        {
+          text: '' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 520, y: 96 },
+
+        },
+        {
+          text: ' ' + this.cloture.reclamation,
+          fontSize: 10,
+          color: 'black',
+          relativePosition: { x: 80, y: 665 }
+        },
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 90, y: 131 }
+        },
+        {
+          text: '' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 65, y: 154 }
+        },
+      ],
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
@@ -556,23 +591,23 @@ export class BonRetourComponent implements OnInit {
       ],
 
       content: [
-       
+
         {
           layout: 'lightHorizontalLines',
-          table: {          
-            widths: [ 40, 270, 20,180 ],         
-            body: body, 
-          },      
-          fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          table: {
+            widths: [40, 270, 20, 180],
+            body: body,
+          },
+          fontSize: 10,
+          margin: [-30, 0, 10, 300]
         }
-        
-         
+
+
       ],
-      
+
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_sortie'+id+'.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_sortie' + id + '.pdf' });
 
   }
 
@@ -592,7 +627,20 @@ export class ligne_retour {
     this.obj = data.object
   }
   modifier(ev: any) {
-    this.obj.qte = ev.target.value
+    if (ev.target.value > this.obj.qte) {
+
+      Swal.fire({
+
+        icon: 'warning',
+        title: " Qte < = " + this.obj.qte
+
+      }).then((res) => {
+
+      }
+      );
+    } else {
+      this.obj.qte2 = ev.target.value
+    }
   }
   //fermer dialogue
   close() {
@@ -610,47 +658,24 @@ export class ligne_retour {
 export class Detail4g_retour {
   obj: any;
   inst: any = {}
-  numero_Serie:any;
-  constructor(public dialogRef: MatDialogRef<Detail4g_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
+  numero_Serie: any;
+  constructor(public dialogRef: MatDialogRef<Detail4g_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
-    while (this.obj.detail.length < this.obj.qte) {
-      this.inst = {}
-      this.inst.ns = ""
-      this.inst.e1 = ""
-      this.inst.e2 = ""
-      this.obj.detail.push(this.inst)
-    }
-   
-  this.select_nserie();
+
+
+
   }
 
-select_nserie()
-{
-  this.service.Detail_Produit_4g(this.obj.id).subscribe((data2)=>
-  {
-     this.numero_Serie=data2;   
-     
-  })    
-}
 
-   d:any;
-  save(ns: any, obj: any ,id:any,i :any) {
-    obj.ns=ns    
-    this.service.Detail_Produit_N_serie(ns,id).subscribe((data3)=>
-    {
-      this.d=data3;
-      console.log(data3)
-      console.log(this.d)
-      console.log(this.d.e1+"  "+this.d.e2)
-      obj.e1=this.d.e1
-      obj.e2=this.d.e2
-    })
-    
-    
-    this.numero_Serie.splice(i,1);       
+  update(obj: any) {
+    obj.click = !(obj.click)
+    if(obj.click==true){this.obj.qte2 = this.obj.qte2+1}else{this.obj.qte2 = this.obj.qte2-1}
   }
 
-  
+
+
+
+
   //fermer dialogue
   close() {
     this.dialogRef.close();
@@ -666,32 +691,21 @@ select_nserie()
 export class detail_serie_retour {
   obj: any;
   inst: any = {}
-  
-  numero_Serie:any;
-  @ViewChild('input') input:any=ElementRef; 
-  constructor(public dialogRef: MatDialogRef<detail_serie_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
+
+  numero_Serie: any;
+  @ViewChild('input') input: any = ElementRef;
+  constructor(public dialogRef: MatDialogRef<detail_serie_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
-    while (this.obj.detail.length < this.obj.qte) {
-      this.inst = {}
-      this.inst.ns = ""
-      this.obj.detail.push(this.inst)
-    }
-    
-    this.select_nserie();
+
+
+
   }
 
-  select_nserie()
-  {
-    this.service.numero_Serie_Produit(this.obj.id).subscribe((data2)=>
-    {
-       this.numero_Serie=data2;   
-       
-    })    
-  }
-  
-  save(ns: any, obj: any ,i :any) {
-    obj.ns=ns    
-     
+  update(obj: any) {
+
+    obj.click = !(obj.click);
+    if(obj.click==true){this.obj.qte2 = Number(this.obj.qte2)+1}else{this.obj.qte2 = Number(this.obj.qte2)-1}
+
   }
   //fermer dialogue
   close() {

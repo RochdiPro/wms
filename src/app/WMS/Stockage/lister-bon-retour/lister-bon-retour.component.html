@@ -1,1 +1,71 @@
-<p>lister-bon-retour works!</p>
+ 
+<div class="position-relative custom-control">
+    <section>
+        <mat-form-field class="custom-width" [formGroup]="form">
+            <mat-label>ID</mat-label>
+            <input matInput placeholder="ID" formControlName="id" (keyup)="filtre()" id="id">
+            <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+        </mat-form-field>
+     
+        <mat-form-field class="custom-width" [formGroup]="form" style="margin-left: 1%;">
+            <mat-label>Client</mat-label>
+            <input matInput placeholder="Client" formControlName="Client" (keyup)="filtre()" id="Client">
+            <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+        </mat-form-field>
+        
+        <mat-form-field class="custom-width" [formGroup]="form" style="margin-left: 1%;">
+            <mat-label>local</mat-label>
+            <input matInput placeholder="local" formControlName="local" (keyup)="filtre()" id="local">
+            <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+        </mat-form-field>
+        <mat-form-field class="custom-width" [formGroup]="form" style="margin-left: 1%;">
+            <mat-label>Bon Livraison</mat-label>
+            <input matInput placeholder="Bon_Livraison" formControlName="n_Facture" (keyup)="filtre()" id="n_Facture">
+            <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+        </mat-form-field>
+    </section>
+</div>
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+         
+
+        <!--Colonne id -->
+        <ng-container matColumnDef="id">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="ID" > {{element.id_Bon_Retour}} </mat-cell>
+        </ng-container>
+        <!--Colonne responsable -->
+        <ng-container matColumnDef="Client">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header>ID Client </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="Client"> {{element.id_Clt}}</mat-cell>
+        </ng-container>         
+       
+        <!--Colonne Ancien ID -->
+        <ng-container matColumnDef="local">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header> Local  </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="local"> {{element.local}} </mat-cell>
+        </ng-container>
+         <!--Colonne Réclamation -->
+         <ng-container matColumnDef="n_Facture">
+            <mat-header-cell  *matHeaderCellDef mat-sort-header > Bon Livraison </mat-header-cell>
+            <mat-cell *matCellDef="let element" data-label="Bon_Livraison"> {{element.n_Facture}} </mat-cell>
+        </ng-container>
+
+        <!--Colonne supprimer -->
+        <ng-container matColumnDef="supprimer">
+            <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
+            <mat-cell *matCellDef="let element" style="text-align: center;"> 
+                <i class="pe-7s-trash btn-r" title="Supprimer Le Bon" (click)="supprimer(element.id_Bon_Retour)"></i>
+                <i style="margin-left: 20px;" class="pe-7s-look btn-b" title="Voir PDF"  ></i>
+                <i style="margin-left: 20px;" class="pe-7s-cloud-download btn-b"  title="Télécharger PDF"></i>
+            </mat-cell>
+        </ng-container>
+
+        
+       
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+</div>

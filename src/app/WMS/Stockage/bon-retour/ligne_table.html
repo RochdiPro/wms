@@ -7,15 +7,17 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>NOm</th>
+                        <th>Nom</th>
                         <th>Qte</th>
+                        <th>nouveau Qte</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr >
                         <th>{{obj.id}}</th>
                         <th>{{obj.nom}}</th>
-                        <th><input type="number" value="{{obj.qte}}"  (change)="modifier($event )"  (keyup)="modifier($event )">  </th>
+                        <th>{{obj.qte}}</th>
+                        <th><input type="number" value="{{obj.qte2}}"  (change)="modifier($event )"  (keyup)="modifier($event )">  </th>
                                   
                     </tr>
                 </tbody>
