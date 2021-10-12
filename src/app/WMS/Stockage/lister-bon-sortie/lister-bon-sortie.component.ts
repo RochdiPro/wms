@@ -110,7 +110,7 @@ export class ListerBonSortieComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel2() {
-    this.http.get('./../../../assets/images/ficheRejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/ficheSortie.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele2 = reponse;
       return this.modele2;
     }, err => console.error(err),
@@ -127,11 +127,9 @@ export class ListerBonSortieComponent implements OnInit {
   //impression de la fiche recption
   generatePDF(id: any, date: any) {
      
- 
     var body = [];
-
+     
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();  
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);     
@@ -145,8 +143,6 @@ export class ListerBonSortieComponent implements OnInit {
           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
           this.ch=this.ch+" ----------------------  \n"  
         }
-       
-
       }
       else if (this.obj_articles[i].type=='4g') 
       {
@@ -164,9 +160,8 @@ export class ListerBonSortieComponent implements OnInit {
       }   
       obj.push(this.ch)
       body.push(obj);
-    }
-    console.log(body)
-
+    }    
+    
     var def = {
       
       
@@ -200,17 +195,16 @@ export class ListerBonSortieComponent implements OnInit {
           fontSize: 15, 
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: {x:370, y:182}	       
         },
       {
-        text: '  '  +this.Destination   ,
+        text: ' ' + this.Source ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:80, y:107}	  , 
+        relativePosition: {x:70, y:106}	  , 
          
       },
-     
       
       {
         text: 'rochdi'  ,
@@ -221,7 +215,7 @@ export class ListerBonSortieComponent implements OnInit {
          
       },
       {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        text: ''+this.datePipe.transform(date, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -229,7 +223,7 @@ export class ListerBonSortieComponent implements OnInit {
          
       },
       {
-        text: ' ' + this.reclamation ,
+        text: ' ' +this.reclamation ,
         fontSize: 10, 
         color: 'black',            
         relativePosition: {x: 80, y:665}	       
@@ -239,10 +233,10 @@ export class ListerBonSortieComponent implements OnInit {
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:85, y:131}	       
+        relativePosition: {x:90, y:131}	       
       },
       {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        text: ''+this.datePipe.transform(date, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -271,6 +265,7 @@ export class ListerBonSortieComponent implements OnInit {
       ],
       
     };
+
 
 
     pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
@@ -278,10 +273,10 @@ export class ListerBonSortieComponent implements OnInit {
 
   //impression de la fiche recption
   telechargerPDF(id: any, date: any) {
+     
     var body = [];
-
+     
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();  
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);     
@@ -295,8 +290,6 @@ export class ListerBonSortieComponent implements OnInit {
           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
           this.ch=this.ch+" ----------------------  \n"  
         }
-       
-
       }
       else if (this.obj_articles[i].type=='4g') 
       {
@@ -314,9 +307,8 @@ export class ListerBonSortieComponent implements OnInit {
       }   
       obj.push(this.ch)
       body.push(obj);
-    }
-    console.log(body)
-
+    }    
+    
     var def = {
       
       
@@ -350,17 +342,16 @@ export class ListerBonSortieComponent implements OnInit {
           fontSize: 15, 
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: {x:370, y:182}	       
         },
       {
-        text: '  '  +this.Destination   ,
+        text: ' ' + this.Source ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:80, y:107}	  , 
+        relativePosition: {x:70, y:106}	  , 
          
       },
-     
       
       {
         text: 'rochdi'  ,
@@ -371,7 +362,7 @@ export class ListerBonSortieComponent implements OnInit {
          
       },
       {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        text: ''+this.datePipe.transform(date, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -379,7 +370,7 @@ export class ListerBonSortieComponent implements OnInit {
          
       },
       {
-        text: ' ' + this.reclamation ,
+        text: ' ' +this.reclamation ,
         fontSize: 10, 
         color: 'black',            
         relativePosition: {x: 80, y:665}	       
@@ -389,10 +380,10 @@ export class ListerBonSortieComponent implements OnInit {
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:85, y:131}	       
+        relativePosition: {x:90, y:131}	       
       },
       {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
+        text: ''+this.datePipe.transform(date, 'dd/MM/yyyy')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -421,7 +412,8 @@ export class ListerBonSortieComponent implements OnInit {
       ],
       
     };
-    pdfMake.createPdf(def).download("BonRejet" + this.id);
+
+    pdfMake.createPdf(def).download("Bonsortie" + this.id);
 
   }
   // Ajouter une ligne dans le tableau du support  
@@ -563,7 +555,7 @@ export class ListerBonSortieComponent implements OnInit {
         })
         swalWithBootstrapButtons.fire(
           'Suppression',
-          'Bon Rejet N° ' + id + ' Supprimé Avec Sucées.',
+          'Bon Sortie N° ' + id + ' Supprimé Avec Sucées.',
           'success'
         )
       }

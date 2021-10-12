@@ -456,14 +456,14 @@ export class BonSortieComponent implements OnInit {
           fontSize: 15, 
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: {x:370, y:182}	       
         },
       {
         text: ' ' + this.cloture.local ,
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:80, y:107}	  , 
+        relativePosition: {x:70, y:106}	  , 
          
       },
       
@@ -494,7 +494,7 @@ export class BonSortieComponent implements OnInit {
         fontSize: 10, 
         color: 'black',
         bold: true,
-        relativePosition: {x:85, y:131}	       
+        relativePosition: {x:90, y:131}	       
       },
       {
         text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
