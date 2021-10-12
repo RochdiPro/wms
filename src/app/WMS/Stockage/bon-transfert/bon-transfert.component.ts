@@ -528,14 +528,7 @@ export class BonTransfertComponent implements OnInit {
         relativePosition: {x:520, y:85}	 , 
          
       },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:85}	  , 
-         
-      },
+     
       
       {
         text: ' ' +this.cloture.reclamation ,
@@ -551,7 +544,7 @@ export class BonTransfertComponent implements OnInit {
         relativePosition: {x:110, y:131}	       
       },
       {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
+        text: 'rochdi' ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -588,7 +581,7 @@ export class BonTransfertComponent implements OnInit {
       
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_sortie'+id+'.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_transfert'+id+'.pdf' });
 
   }
 

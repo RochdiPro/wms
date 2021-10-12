@@ -11,8 +11,7 @@
             <input matInput placeholder="Saisir le code à bare de l'article" [(ngModel)]="selectform.code"
               [ngModelOptions]="{standalone: true}" />
           </mat-form-field>
-          <button mat-raised-button class="search" (click)="Ajouter_Article_avec_code()"><i
-              class="fas fa-barcode"></i></button>
+          <i (click)="Ajouter_Article_avec_code()"class="fas fa-barcode"></i> 
         </div>
         <div class="col-md-4">
           <mat-form-field>
@@ -20,8 +19,7 @@
             <input matInput placeholder="Saisir l' ID de l'article" [(ngModel)]="selectform.id"
               [ngModelOptions]="{standalone: true}" />
           </mat-form-field>
-          <button mat-raised-button class="search" (click)="Ajouter_Article_avec_id()"><i
-              class="fas fa-search"></i></button>
+          <i (click)="Ajouter_Article_avec_id()" class="fas fa-search"></i> 
         </div>
         <div class="col-md-4">
           <mat-form-field>
@@ -30,8 +28,7 @@
               <mat-option *ngFor="let art of liste_articles" value="{{art.id_Produit}}">{{art.nom_Produit}}</mat-option>
             </mat-select>
           </mat-form-field>
-          <button mat-raised-button class="search" (click)="Ajouter_Article_avec_choix()"><i
-              class="fas fa-plus-square"></i></button>
+           <i  (click)="Ajouter_Article_avec_choix()" class="fas fa-plus-square"></i> 
         </div>
       </div>
       <div class="row mat-elevation-z8">

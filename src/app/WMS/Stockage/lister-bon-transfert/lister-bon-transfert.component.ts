@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 import Swal from 'sweetalert2';
- 
+
 import { StockageService } from '../stockage.service';
 
 declare var require: any
@@ -35,11 +35,11 @@ export class ListerBonTransfertComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  displayedColumns: string[] = ['id', "responsable", "src", 'des', 'supprimer' ]; //les colonne du tableau 
+  displayedColumns: string[] = ['id', "responsable", "src", 'des', 'supprimer']; //les colonne du tableau 
   dataSource = new MatTableDataSource<table>();
 
 
-  constructor(private datePipe: DatePipe,public router: Router, private _formBuilder: FormBuilder, private service: StockageService, private http: HttpClient) {
+  constructor(private datePipe: DatePipe, public router: Router, private _formBuilder: FormBuilder, private service: StockageService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
   }
@@ -49,22 +49,22 @@ export class ListerBonTransfertComponent implements OnInit {
     this.id = id
     this.getDetail()
 
-    this.service.get_Bon_Sortie_By_Id(id).subscribe(data => {
+    this.service.get_Bon_transfert_By_Id(id).subscribe(data => {
       this.transfert = data;
-      this.type_bon = this.transfert.type_Bon;
-      this.Destination = this.transfert.local
+      this.des = this.transfert.local_Destination;
+      this.src = this.transfert.local_Source
       this.reclamation = this.transfert.reclamation
       this.date_Creation = this.transfert.date_Creation
     }, error => console.log(error));
     setTimeout(() => {
       this.telechargerPDF(this.id, this.date_Creation)
     }, 500);
-   
-  } 
+
+  }
 
   modeleSrc2: any;
-  Source: any;
-  Destination: any;
+  des: any;
+  src: any;
   modele2: any;
   type_bon: any;
   nbSupport: any
@@ -78,19 +78,19 @@ export class ListerBonTransfertComponent implements OnInit {
 
   pdf(id2: any) {
     this.id = id2
-    this.getDetail()     
-    this.service.get_Bon_Sortie_By_Id(id2).subscribe(data => {
+    this.getDetail()
+    this.service.get_Bon_transfert_By_Id(id2).subscribe(data => {
       this.transfert = data;
-      this.type_bon = this.transfert.type_Bon;
-      this.Destination = this.transfert.local
+      this.des = this.transfert.local_Destination;
+      this.src = this.transfert.local_Source
       this.reclamation = this.transfert.reclamation
       this.date_Creation = this.transfert.date_Creation
     }, error => console.log(error));
     setTimeout(() => {
-      
-      this.generatePDF(this.id, this.date_Creation) 
+
+      this.generatePDF(this.id, this.date_Creation)
     }, 1000);
-    
+
   }
 
   async modelePdfBase642() {
@@ -110,7 +110,7 @@ export class ListerBonTransfertComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel2() {
-    this.http.get('./../../../assets/images/ficheRejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/FicheTransfert.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele2 = reponse;
       return this.modele2;
     }, err => console.error(err),
@@ -123,132 +123,134 @@ export class ListerBonTransfertComponent implements OnInit {
     return <File>theBlob;
   }
 
-  ch:any
+  ch: any
   //impression de la fiche transfert
   generatePDF(id: any, date: any) {
-     
- 
+
+
     var body = [];
 
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();  
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
-      obj.push(this.obj_articles[i].nom);     
-      obj.push(this.obj_articles[i].qte); 
-      this.ch=""
-      if (this.obj_articles[i].type=='serie') 
-      {
-        
-        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
-        {
-          this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
-          this.ch=this.ch+" ----------------------  \n"  
+      obj.push(this.obj_articles[i].nom);
+      obj.push(this.obj_articles[i].qte);
+      this.ch = ""
+      if (this.obj_articles[i].type == 'serie') {
+
+        for (let j = 0; j < this.obj_articles[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.obj_articles[i].detail[j].ns + "\n"
+          this.ch = this.ch + " ----------------------  \n"
         }
-       
+
 
       }
-      else if (this.obj_articles[i].type=='4g') 
-      {
-       
-        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
-        {
-           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n"     
-           this.ch=this.ch+"E1 : "+this.obj_articles[i].detail[j].e1 +"\n"     
-           this.ch=this.ch+"E2 : "+this.obj_articles[i].detail[j].e2 +"\n"  
-           this.ch=this.ch+" ----------------------  \n"  
-            
+      else if (this.obj_articles[i].type == '4g') {
+
+        for (let j = 0; j < this.obj_articles[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.obj_articles[i].detail[j].ns + "\n"
+          this.ch = this.ch + "E1 : " + this.obj_articles[i].detail[j].e1 + "\n"
+          this.ch = this.ch + "E2 : " + this.obj_articles[i].detail[j].e2 + "\n"
+          this.ch = this.ch + " ----------------------  \n"
+
         }
-        
-        
-      }   
+
+
+      }
       obj.push(this.ch)
       body.push(obj);
     }
-    console.log(body)
 
     var def = {
-      
-      
+
+
       defaultStyle: {
         // alignment: 'justify'
       },
       pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Bon Sortie',
-       },
-      footer: function (currentPage:any, pageCount:any) {
+        title: 'Fiche Bon Transfert',
+      },
+      footer: function (currentPage: any, pageCount: any) {
         return {
           margin: 35,
           columns: [
             {
               fontSize: 9,
               text: [
-  
+
                 {
                   text: currentPage.toString() + '/' + pageCount,
                 }
               ],
-              relativePosition: {x:250, y: 130}	
-            } 
+              relativePosition: { x: 250, y: 130 }
+            }
           ]
         };
       },
-      header:[ 
+      header: [
         {
           text: '' + id + '\n\n',
-          fontSize: 15, 
+          fontSize: 15,
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: { x: 365, y: 181 }
         },
-      {
-        text: '  '  +this.Destination   ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:80, y:107}	  , 
-         
-      },
-     
-      
-      {
-        text: 'rochdi'  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:390, y:96}	  , 
-         
-      },
-      {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:96}	  , 
-         
-      },
-      {
-        text: ' ' + this.reclamation ,
-        fontSize: 10, 
-        color: 'black',            
-        relativePosition: {x: 80, y:665}	       
-      }, 
-      {
-        text: 'rochdi' ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:85, y:131}	       
-      },
-      {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:154}	       
-      },
-     ] ,
+        {
+          text: ' ' + this.src,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 107 },
+
+        },
+
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 390, y: 96 },
+
+        },
+        {
+          text: '' + this.datePipe.transform(date, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 520, y: 96},
+
+        },
+       
+
+        {
+          text: ' ' + this.reclamation,
+          fontSize: 10,
+          color: 'black',
+          relativePosition: { x: 80, y: 665 }
+        },
+        {
+          text: ' ' + this.des,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 131 }
+        },
+        {
+          text: 'rochdi' ,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 154 }
+        },
+        {
+          text: '' + this.datePipe.transform(date, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 65, y: 179 }
+        },
+      ],
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -256,20 +258,20 @@ export class ListerBonTransfertComponent implements OnInit {
       ],
 
       content: [
-       
+
         {
           layout: 'lightHorizontalLines',
-          table: {          
-            widths: [ 40, 270, 20,180 ],         
-            body: body, 
-          },      
-          fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          table: {
+            widths: [40, 270, 20, 180],
+            body: body,
+          },
+          fontSize: 10,
+          margin: [-30, 0, 10, 300]
         }
-        
-         
+
+
       ],
-      
+
     };
 
 
@@ -281,124 +283,126 @@ export class ListerBonTransfertComponent implements OnInit {
     var body = [];
 
     for (let i = 0; i < this.obj_articles.length; i++) {
-      var fila = new Array();  
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
-      obj.push(this.obj_articles[i].nom);     
-      obj.push(this.obj_articles[i].qte); 
-      this.ch=""
-      if (this.obj_articles[i].type=='serie') 
-      {
-        
-        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
-        {
-          this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n" 
-          this.ch=this.ch+" ----------------------  \n"  
+      obj.push(this.obj_articles[i].nom);
+      obj.push(this.obj_articles[i].qte);
+      this.ch = ""
+      if (this.obj_articles[i].type == 'serie') {
+
+        for (let j = 0; j < this.obj_articles[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.obj_articles[i].detail[j].ns + "\n"
+          this.ch = this.ch + " ----------------------  \n"
         }
-       
+
 
       }
-      else if (this.obj_articles[i].type=='4g') 
-      {
-       
-        for(let j = 0 ; j<this.obj_articles[i].detail.length; j++)
-        {
-           this.ch=this.ch+"N_Série : "+this.obj_articles[i].detail[j].ns +"\n"     
-           this.ch=this.ch+"E1 : "+this.obj_articles[i].detail[j].e1 +"\n"     
-           this.ch=this.ch+"E2 : "+this.obj_articles[i].detail[j].e2 +"\n"  
-           this.ch=this.ch+" ----------------------  \n"  
-            
+      else if (this.obj_articles[i].type == '4g') {
+
+        for (let j = 0; j < this.obj_articles[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.obj_articles[i].detail[j].ns + "\n"
+          this.ch = this.ch + "E1 : " + this.obj_articles[i].detail[j].e1 + "\n"
+          this.ch = this.ch + "E2 : " + this.obj_articles[i].detail[j].e2 + "\n"
+          this.ch = this.ch + " ----------------------  \n"
+
         }
-        
-        
-      }   
+
+
+      }
       obj.push(this.ch)
       body.push(obj);
     }
-    console.log(body)
 
     var def = {
-      
-      
+
+
       defaultStyle: {
         // alignment: 'justify'
       },
       pageMargins: [40, 250, 40, 180],
       info: {
-        title: 'Fiche Bon Sortie',
-       },
-      footer: function (currentPage:any, pageCount:any) {
+        title: 'Fiche Bon Transfert',
+      },
+      footer: function (currentPage: any, pageCount: any) {
         return {
           margin: 35,
           columns: [
             {
               fontSize: 9,
               text: [
-  
+
                 {
                   text: currentPage.toString() + '/' + pageCount,
                 }
               ],
-              relativePosition: {x:250, y: 130}	
-            } 
+              relativePosition: { x: 250, y: 130 }
+            }
           ]
         };
       },
-      header:[ 
+      header: [
         {
           text: '' + id + '\n\n',
-          fontSize: 15, 
+          fontSize: 15,
           color: 'black',
           bold: true,
-          relativePosition: {x:440, y:197}	       
+          relativePosition: { x: 365, y: 181 }
         },
-      {
-        text: '  '  +this.Destination   ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:80, y:107}	  , 
-         
-      },
-     
-      
-      {
-        text: 'rochdi'  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:390, y:96}	  , 
-         
-      },
-      {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:96}	  , 
-         
-      },
-      {
-        text: ' ' + this.reclamation ,
-        fontSize: 10, 
-        color: 'black',            
-        relativePosition: {x: 80, y:665}	       
-      }, 
-      {
-        text: 'rochdi' ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:85, y:131}	       
-      },
-      {
-        text: ''+this.datePipe.transform(this.date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:154}	       
-      },
-     ] ,
+        {
+          text: ' ' + this.src,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 107 },
+
+        },
+
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 390, y: 96 },
+
+        },
+        {
+          text: '' + this.datePipe.transform(date, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 520, y: 96},
+
+        },
+       
+
+        {
+          text: ' ' + this.reclamation,
+          fontSize: 10,
+          color: 'black',
+          relativePosition: { x: 80, y: 665 }
+        },
+        {
+          text: ' ' + this.des,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 131 }
+        },
+        {
+          text: 'rochdi' ,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 154 }
+        },
+        {
+          text: '' + this.datePipe.transform(date, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 65, y: 179 }
+        },
+      ],
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
@@ -406,33 +410,23 @@ export class ListerBonTransfertComponent implements OnInit {
       ],
 
       content: [
-       
+
         {
           layout: 'lightHorizontalLines',
-          table: {          
-            widths: [ 40, 270, 20,180 ],         
-            body: body, 
-          },      
-          fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          table: {
+            widths: [40, 270, 20, 180],
+            body: body,
+          },
+          fontSize: 10,
+          margin: [-30, 0, 10, 300]
         }
-        
-         
-      ],
-      
-    };
-    pdfMake.createPdf(def).download("BonRejet" + this.id);
 
-  }
-  // Ajouter une ligne dans le tableau du support  
-  ajouterligneSupport(): FormGroup {
-    return this._formBuilder.group({
-      typeSupport: new FormControl({ value: 'Pallette', disabled: false }, Validators.required),
-      poids: new FormControl({ value: '1', disabled: false }, Validators.required),
-      hauteur: new FormControl({ value: '1', disabled: false }, Validators.required),
-      largeur: new FormControl({ value: '1', disabled: false }, Validators.required),
-      longeur: new FormControl({ value: '1', disabled: false }, Validators.required),
-    });
+
+      ],
+
+    };
+    pdfMake.createPdf(def).download("Bon_transfert" + this.id);
+
   }
 
 
@@ -445,72 +439,75 @@ export class ListerBonTransfertComponent implements OnInit {
   support: any = {}
   // Get Detail bon reception 
   xml: any;
-  detail:any=[];
-  ns:any={};
+  detail: any = [];
+  ns: any = {};
   getDetail() {
-    this.obj_articles=[]
-    this.service.Detail_Bon_Sortie(this.id).subscribe((detail: any) => {
+    this.obj_articles = []
+    this.service.Detail_Bon_Transfert(this.id).subscribe((detail: any) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         this.xml = reader.result;
         var parseString = require('xml2js').parseString;
         let data1;
         parseString(atob(this.xml.substr(28)), function (err: any, result: any) {
-          data1 = result.Bon_Sortie;
+          data1 = result.Bon_Transfert;
         })
         this.xmldata = data1
-         
-        for (let i = 0; i < this.xmldata.Produits[0].Produits_Simples[0].Produit.length; i++) {
 
-          this.new_obj = {}
-          this.new_obj.type="simple"
-          this.new_obj.id =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Id;
-          this.new_obj.nom =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Nom;  
-          this.new_obj.qte =  this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Qte;
-          this.obj_articles.push(this.new_obj)
-         
-        }
-        for (let i = 0; i < this.xmldata.Produits[0].Produits_4gs[0].Produit.length; i++) {
+        if (this.xmldata.Produits[0].Produits_Simples[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_Simples[0].Produit.length; i++) {
 
-          this.new_obj = {}
-          this.new_obj.type="4g"
-          this.new_obj.id =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Id;
-          this.new_obj.nom =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Nom;  
-          this.new_obj.qte =  this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Qte;
-          this.detail = []
-           for(let j = 0 ; j < this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g.length ; j++)
-          {
-            this.ns ={}
-            this.ns.ns=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].N_Serie
-            this.ns.e1=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E1
-            this.ns.e2=this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E2
-            this.detail.push(this.ns)
+            this.new_obj = {}
+            this.new_obj.type = "simple"
+            this.new_obj.id = this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Id;
+            this.new_obj.nom = this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Nom;
+            this.new_obj.qte = this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Qte;
+            this.obj_articles.push(this.new_obj)
+
           }
-          this.new_obj.detail =this.detail  
-          this.obj_articles.push(this.new_obj)
-         
         }
-        for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit.length; i++) {
+        if (this.xmldata.Produits[0].Produits_4gs[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_4gs[0].Produit.length; i++) {
 
-          this.new_obj = {}
-          this.new_obj.type="serie"
-          this.new_obj.id =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Id;
-          this.new_obj.nom =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Nom;  
-          this.new_obj.qte =  this.xmldata.Produits[0].Produits_Series[0].Produit[i].Qte;
-          this.detail = []
-          for(let j = 0 ; j < this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series.length ; j++)
-          {
-            this.ns ={}
-            this.ns.ns=this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series[j].N_Serie
- 
-            this.detail.push(this.ns)
+            this.new_obj = {}
+            this.new_obj.type = "4g"
+            this.new_obj.id = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Id;
+            this.new_obj.nom = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Nom;
+            this.new_obj.qte = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Qte;
+            this.detail = []
+            for (let j = 0; j < this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g.length; j++) {
+              this.ns = {}
+              this.ns.ns = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].N_Serie
+              this.ns.e1 = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E1
+              this.ns.e2 = this.xmldata.Produits[0].Produits_4gs[0].Produit[i].Produit_4gs[0].Produit_4g[j].E2
+              this.detail.push(this.ns)
+            }
+            this.new_obj.detail = this.detail
+            this.obj_articles.push(this.new_obj)
+
           }
-          this.new_obj.detail =this.detail  
-
-          this.obj_articles.push(this.new_obj)
-         
         }
-       
+        if (this.xmldata.Produits[0].Produits_Series[0].Produit != undefined) {
+          for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit.length; i++) {
+
+            this.new_obj = {}
+            this.new_obj.type = "serie"
+            this.new_obj.id = this.xmldata.Produits[0].Produits_Series[0].Produit[i].Id;
+            this.new_obj.nom = this.xmldata.Produits[0].Produits_Series[0].Produit[i].Nom;
+            this.new_obj.qte = this.xmldata.Produits[0].Produits_Series[0].Produit[i].Qte;
+            this.detail = []
+            for (let j = 0; j < this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series.length; j++) {
+              this.ns = {}
+              this.ns.ns = this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series[j].N_Serie
+
+              this.detail.push(this.ns)
+            }
+            this.new_obj.detail = this.detail
+
+            this.obj_articles.push(this.new_obj)
+
+          }
+        }
       }
       reader.readAsDataURL(detail);
     })
@@ -526,14 +523,14 @@ export class ListerBonTransfertComponent implements OnInit {
 
 
   ngOnInit(): void {
-   this.Bon_transfert();
+    this.Bon_transfert();
 
   }
 
   Bon_transfert() {
     this.service.Bon_transfert().subscribe((data: any) => {
       this.transfert = data;
-      this.transfert= this.transfert.sort((a:any, b:any) => a.id_Bon_Transfert > b.id_Bon_Transfert ? -1 : 1);
+      this.transfert = this.transfert.sort((a: any, b: any) => a.id_Bon_Transfert > b.id_Bon_Transfert ? -1 : 1);
 
       this.dataSource.data = data as table[];
     })
@@ -564,7 +561,7 @@ export class ListerBonTransfertComponent implements OnInit {
         })
         swalWithBootstrapButtons.fire(
           'Suppression',
-          'Bon Rejet N° ' + id + ' Supprimé Avec Sucées.',
+          'Bon Transfert N° ' + id + ' Supprimé Avec Sucées.',
           'success'
         )
       }
