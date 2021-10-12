@@ -81,6 +81,16 @@ Bon_transfert( ) : Observable<any>{
     }).pipe(catchError(this.handleError));
   }
 
+    // get bon   sortie  by id  
+    get_Bon_retour_By_Id(id: any): Observable<Object> {
+      return this.http.get(ERP + "Bon_Retour", {
+        params: {
+          Id: id
+        }, observe: 'body'
+      }).pipe(catchError(this.handleError));
+    }
+
+  
    // get bon   sortie  by id  
    get_Bon_transfert_By_Id(id: any): Observable<Object> {
     return this.http.get(ERP + "Bon_Transfert", {
@@ -97,6 +107,17 @@ Bon_transfert( ) : Observable<any>{
       , {
         params: {
           Id: Id
+        }, responseType: 'blob'
+      }).pipe(catchError(this.handleError))
+  }
+
+  // get information bon retour avec id 
+  Detail_Bon_Retour (Id: any): Observable<any> {
+
+    return this.http.get(ERP + "Detail_Bon_Retour"
+      , {
+        params: {
+          Id_Bon: Id
         }, responseType: 'blob'
       }).pipe(catchError(this.handleError))
   }

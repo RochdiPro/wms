@@ -56,8 +56,8 @@
             <mat-header-cell  *matHeaderCellDef> </mat-header-cell>
             <mat-cell *matCellDef="let element" style="text-align: center;"> 
                 <i class="pe-7s-trash btn-r" title="Supprimer Le Bon" (click)="supprimer(element.id_Bon_Retour)"></i>
-                <i style="margin-left: 20px;" class="pe-7s-look btn-b" title="Voir PDF"  ></i>
-                <i style="margin-left: 20px;" class="pe-7s-cloud-download btn-b"  title="Télécharger PDF"></i>
+                <i style="margin-left: 20px;" class="pe-7s-look btn-b" title="Voir PDF"   (click)="pdf(element.id_Bon_Retour)"></i>
+                <i style="margin-left: 20px;" class="pe-7s-cloud-download btn-b" (click)="telecharger(element.id_Bon_Retour)" title="Télécharger PDF"></i> 
             </mat-cell>
         </ng-container>
 

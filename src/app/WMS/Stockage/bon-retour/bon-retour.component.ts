@@ -181,7 +181,7 @@ export class BonRetourComponent implements OnInit {
             this.object.nom = (this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Nom[0]);
             this.object.qte = (this.xmldata.Produits[0].Produits_Simples[0].Produit[i].Qte[0]);
             this.object.type = "simple"
-            this.inst.qte2 = 0;
+            this.object.qte2 = 0;
             this.table.push(this.object)
           }
         }
@@ -193,7 +193,7 @@ export class BonRetourComponent implements OnInit {
             this.object.id = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Id[0]);
             this.object.nom = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Nom[0]);
             this.object.qte = (this.xmldata.Produits[0].Produits_4Gs[0].Produit[i].Qte[0]);
-            this.inst.qte2 = 0;
+            this.object.qte2 = 0;
             this.object.type = "4g"
 
             this.object.detail = []
@@ -217,7 +217,7 @@ export class BonRetourComponent implements OnInit {
 
 
             this.object = {}
-            this.inst.qte2 = 0;
+            this.object.qte2 = 0;
             this.object.id = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Id[0]);
             this.object.nom = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Nom);
             this.object.qte = (this.xmldata.Produits[0].Produits_Series[0].Produit[i].Qte[0]);
@@ -245,23 +245,20 @@ export class BonRetourComponent implements OnInit {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  table2: any = [];
+// etap 3 
+  suivante3()
+  {
+       this.table2  = [];
+      for( let i = 0 ; i<this.table.length;i++)
+      {
+        console.log(this.table[i].qte2)
+        if(this.table[i].qte2>0)
+        {
+             this.table2.push(this.table[i])
+        }
+      }
+  }
 
 
   // detail article 
@@ -323,24 +320,24 @@ export class BonRetourComponent implements OnInit {
     var Produits_series = this.doc.createElement('Produits_Series')
     var Produits_simple = this.doc.createElement('Produits_Simples')
     var Produits_4g = this.doc.createElement('Produits_4gs')
-    for (let i = 0; i < this.table.length; i++) {
+    for (let i = 0; i < this.table2.length; i++) {
 
       var Produit = this.doc.createElement('Produit')
-      var id = this.doc.createElement('Id'); id.innerHTML = this.table[i].id
-      var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.table[i].nom
-      var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.table[i].qte
+      var id = this.doc.createElement('Id'); id.innerHTML = this.table2[i].id
+      var Nom = this.doc.createElement('Nom'); Nom.innerHTML = this.table2[i].nom
+      var Qte = this.doc.createElement('Qte'); Qte.innerHTML = this.table2[i].qte2
       Produit.appendChild(id);
       Produit.appendChild(Nom);
       Produit.appendChild(Qte);
 
 
-      if (this.table[i].type == 'simple') {
+      if (this.table2[i].type == 'simple') {
         Produits_simple.appendChild(Produit);
       }
-      else if (this.table[i].type == 'serie') {
-        var n_series = this.doc.createElement('N_Series'); Qte.innerHTML = this.table[i].qte
+      else if (this.table2[i].type == 'serie') {
+        var n_series = this.doc.createElement('N_Series'); Qte.innerHTML = this.table2[i].qte
         for (let j = 0; j < this.table[i].detail.length; j++) {
-          var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
+          var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table2[i].detail[j].ns
 
           n_series.appendChild(ns);
         }
@@ -349,13 +346,13 @@ export class BonRetourComponent implements OnInit {
         Produits_series.appendChild(Produit)
 
       }
-      else if (this.table[i].type == '4g') {
-        var p4gs = this.doc.createElement('Produit_4gs'); Qte.innerHTML = this.table[i].qte
-        for (let j = 0; j < this.table[i].detail.length; j++) {
-          var p4g = this.doc.createElement('Produit_4g'); Qte.innerHTML = this.table[i].qte
-          var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
-          var e1 = this.doc.createElement('E1'); e1.innerHTML = this.table[i].detail[j].e1
-          var e2 = this.doc.createElement('E2'); e2.innerHTML = this.table[i].detail[j].e2
+      else if (this.table2[i].type == '4g') {
+        var p4gs = this.doc.createElement('Produit_4gs'); Qte.innerHTML = this.table[i].qte2
+        for (let j = 0; j < this.table2[i].detail.length; j++) {
+          var p4g = this.doc.createElement('Produit_4g'); Qte.innerHTML = this.table2[i].qte2
+          var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table2[i].detail[j].ns
+          var e1 = this.doc.createElement('E1'); e1.innerHTML = this.table2[i].detail[j].e1
+          var e2 = this.doc.createElement('E2'); e2.innerHTML = this.table2[i].detail[j].e2
           p4g.appendChild(ns);
           p4g.appendChild(e1);
           p4g.appendChild(e2);
@@ -437,27 +434,28 @@ export class BonRetourComponent implements OnInit {
 
     var body = [];
 
-    for (let i = 0; i < this.table.length; i++) {
+    for (let i = 0; i < this.table2.length; i++) {
 
-      if (this.table[i].type == 'simple') {
+      if (this.table2[i].type == 'simple') {
 
         var obj = new Array();
-        obj.push(this.table[i].id);
-        obj.push(this.table[i].nom);
-        obj.push(this.table[i].qte2);
-
+        obj.push(this.table2[i].id);
+        obj.push(this.table2[i].nom);
+        obj.push(this.table2[i].qte2);
+        this.ch = "";
+        obj.push(this.ch)
 
         body.push(obj);
       }
-      if (this.table[i].type == 'serie') {
+      if (this.table2[i].type == 'serie') {
         var obj = new Array();
-        obj.push(this.table[i].id);
-        obj.push(this.table[i].nom);
-        obj.push(this.table[i].qte);
+        obj.push(this.table2[i].id);
+        obj.push(this.table2[i].nom);
+        obj.push(this.table2[i].qte2);
         this.ch = ""
-        for (let j = 0; j < this.table[i].detail.length; j++) {
-          if (this.table[i].detail.click) {
-            this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
+        for (let j = 0; j < this.table2[i].detail.length; j++) {
+          if (this.table2[i].detail.click) {
+            this.ch = this.ch + "N_Série : " + this.table2[i].detail[j].ns + "\n"
             this.ch = this.ch + " ----------------------  \n"
           }
         }
@@ -465,17 +463,17 @@ export class BonRetourComponent implements OnInit {
         obj.push(this.ch)
         body.push(obj);
       }
-      else if (this.table[i].type == '4g') {
+      else if (this.table2[i].type == '4g') {
         var obj = new Array();
-        obj.push(this.table[i].id);
-        obj.push(this.table[i].nom);
-        obj.push(this.table[i].qte);
+        obj.push(this.table2[i].id);
+        obj.push(this.table2[i].nom);
+        obj.push(this.table2[i].qte);
         this.ch = ""
-        for (let j = 0; j < this.table[i].detail.length; j++) {
-          if (this.table[i].detail.click) {
-            this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
-            this.ch = this.ch + "E1 : " + this.table[i].detail[j].e1 + "\n"
-            this.ch = this.ch + "E2 : " + this.table[i].detail[j].e2 + "\n"
+        for (let j = 0; j < this.table2[i].detail.length; j++) {
+          if (this.table2[i].detail.click) {
+            this.ch = this.ch + "N_Série : " + this.table2[i].detail[j].ns + "\n"
+            this.ch = this.ch + "E1 : " + this.table2[i].detail[j].e1 + "\n"
+            this.ch = this.ch + "E2 : " + this.table2[i].detail[j].e2 + "\n"
             this.ch = this.ch + " ----------------------  \n"
           }
 
@@ -661,15 +659,14 @@ export class Detail4g_retour {
   numero_Serie: any;
   constructor(public dialogRef: MatDialogRef<Detail4g_retour>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
-
-
-
   }
 
 
   update(obj: any) {
     obj.click = !(obj.click)
-    if(obj.click==true){this.obj.qte2 = this.obj.qte2+1}else{this.obj.qte2 = this.obj.qte2-1}
+    if(obj.click==true){      
+      this.obj.qte2 =  Number(Number(this.obj.qte2)+1)      
+    }else{this.obj.qte2 = Number(this.obj.qte2)-1}
   }
 
 
@@ -704,7 +701,9 @@ export class detail_serie_retour {
   update(obj: any) {
 
     obj.click = !(obj.click);
-    if(obj.click==true){this.obj.qte2 = Number(this.obj.qte2)+1}else{this.obj.qte2 = Number(this.obj.qte2)-1}
+    if(obj.click==true){      
+      this.obj.qte2 =  Number(Number(this.obj.qte2)+1)      
+    }else{this.obj.qte2 = Number(this.obj.qte2)-1}
 
   }
   //fermer dialogue

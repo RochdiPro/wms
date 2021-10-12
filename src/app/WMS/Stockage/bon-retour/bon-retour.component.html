@@ -7,7 +7,7 @@
         <form [formGroup]="dateRangeForm"  >
           <mat-form-field>
       
-            <mat-label>Enter Session Period</mat-label>
+            <mat-label>période</mat-label>
       
             <mat-date-range-input [rangePicker]="picker">
               <input matStartDate placeholder="Date 1" required formControlName="fromDate">
@@ -103,7 +103,7 @@
           <i class="fas fa-chevron-left mr-2"></i>Précédent
         </button>
 
-        <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary">
+        <button class="mb-2 mr-2 btn btn-primary active" matStepperNext mat-raised-button color="primary" (click)="suivante3()">
           Suivant<i class="fas fa-chevron-right ml-2"></i></button>
 
 
@@ -128,7 +128,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let article  of  table ;let i=index">
+              <tr *ngFor="let article  of  table2 ;let i=index"  >
 
                 <td></td>
                 <td>{{article.id}} </td>
