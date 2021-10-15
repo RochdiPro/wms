@@ -12,6 +12,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Ajouter_Bon_Rejet } from '../ajouter-bon-reception/ajouter-bon-reception.component';
 import { Console } from 'console';
 import { BrowserModule } from '@angular/platform-browser'
+import { DatePipe } from '@angular/common';
 
 declare var require: any
 
@@ -46,7 +47,13 @@ export class ModifierBonReceptionComponent implements OnInit {
   Destination: any;
   modele: any;
   bonReception: any;
-  constructor(private router: Router, private route: ActivatedRoute, public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
+  source_bon:any;
+  id_bon_source :any ;
+  nom_bon_Source:any;
+  tel_bon_source:any;
+  src:any;
+  tel_bon_Source:any
+  constructor(private datePipe: DatePipe ,private router: Router, private route: ActivatedRoute, public dialog: MatDialog, private _formBuilder: FormBuilder, private http: HttpClient, public service: BonReceptionServiceService) {
     this.service.Famille_Logistique().subscribe((data: any) => {
       this.Famille_Logistique = data;
     });
@@ -58,7 +65,71 @@ export class ModifierBonReceptionComponent implements OnInit {
       this.type_bon = this.bonReception.type_Be;
       this.Destination = this.bonReception.local
       this.nbSupport = this.bonReception.nb_Support
-
+     
+      if (this.type_bon=="Bon Entrée local") {
+        this.service.get_Information_Bon_entree_Local( this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+             
+          })
+  
+  
+        });
+      }
+      else if (this.type_bon =="Importation") {
+        this.service.get_Information_Bon_entree_Importation( this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon= "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Fournisseur;
+            this.tel_bon_Source=this.src.tel1;
+          })
+  
+        });
+      }
+      else if (this.type_bon == "Bon Retour") {
+        this.service.get_Information_Bon_transfert( this.bonReception.id_Be).subscribe((data: any) => {
+          
+          this.Destination = data.local_Destination
+          this.source_bon= "Entrepôt"
+          this.nom_bon_Source= data.local_Source
+          this.service.Filtre_Fiche_Local(data.local_Source).subscribe((data2) =>
+          {
+            this.src=data2;
+            
+            this.nom_bon_Source=this.src[0].nom_Local;
+            this.tel_bon_Source=this.src[0].tel;
+            this.id_bon_source=this.src[0].id_Local
+            this.Source = this.src[0].id_Local
+          })
+        });
+        
+      }
+      else if (this.type_bon == "Bon Transfert") {
+        this.service.get_Information_Bon_retour( this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Clt
+          this.Destination = data.local
+          this.source_bon= "Client"
+          this.id_bon_source = data.local_Source
+          this.service.Client(data.id_Clt).subscribe((data2) =>
+          {
+            this.src=data2;
+            this.nom_bon_Source=this.src.nom_Client;
+            this.tel_bon_Source=this.src.tel1;
+          })
+        });
+      }
 
     }, error => console.log(error));
     this.getDetail();
@@ -593,153 +664,153 @@ export class ModifierBonReceptionComponent implements OnInit {
   //impression de la fiche recption
   generatePDF(id: any, date_Creation: any) {
 
-    var body = [];
-    var title = new Array('Id Article', 'Article', 'Fiche_Technique', 'Vérification', 'Quantite', 'vérification');
-    body.push(title);
-    var tabArt: any = [];
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");
+    obj.push(" ");
+    obj.push(" ");
+     
+    body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
-      obj.push(this.obj_articles[i].id);
+      obj.push(""+this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
-      obj.push(this.obj_articles[i].fiche_Technique);
-      if (this.obj_articles[i].fiche_Technique = 'true') { obj.push("oui"); } else { obj.push("non"); }
       obj.push(this.obj_articles[i].qte);
-      if (this.obj_articles[i].controle_qt = 'true') { obj.push("oui"); } else { obj.push("non"); }
+     
       body.push(obj);
     }
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
 
-    var body2 = [];
-    var title = new Array('Id Support', 'Type', 'Poids', 'Hauteur', 'Largeur', 'Longeur');
-    body2.push(title);
-    var tabArt: any = [];
-    for (let i = 0; i < this.arraySupport.length; i++) {
-      var obj = new Array();
-      obj.push(i + 1);
-      obj.push(this.arraySupport[i].value.typeSupport);
-      obj.push(this.arraySupport[i].value.poids);
-      obj.push(this.arraySupport[i].value.hauteur);
-      obj.push(this.arraySupport[i].value.largeur);
-      obj.push(this.arraySupport[i].value.longeur);
-
-      body2.push(obj);
-    }
-
-    var def = {
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          margin: [0, 0, 0, 10]
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          margin: [0, 10, 0, 5]
-        },
-        tableExample: {
-          margin: [0, 5, 0, 15]
-        },
-        tableHeader: {
-          bold: true,
-          fontSize: 13,
-          color: 'black'
-        }
-      },
-      defaultStyle: {
-        // alignment: 'justify'
-      },
-      pageMargins: [40, 120, 40, 60],
-
-
+    let def = {
+      pageMargins: [40, 250, 40, 180],
       info: {
         title: 'Fiche Bon Réception',
-
       },
-      background: [
-        {
-          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
-        }
-      ],
-
-      content: [
-        {
-          text: 'Bon Reception N° ' + id + '\n\n',
-          fontSize: 15,
-
-          alignment: 'center',
-
-          color: 'black',
-          bold: true
-        },
-
-        {
+      
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
           columns: [
-
             {
-              text:
-                'Type Bon :' + '\t' + this.type_bon
-                + '\n\n' +
-                'Id Bon  :' + '\t' + this.id
-                + '\n\n' +
-                'Local  :' + '\t' + this.Destination
-
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-            {
-              text:
-                ' Utilisateur :' + '\t' + "rochdi"
-                + '\n\n' + 'Date      :' + date_Creation + '\t'
-              ,
-
-              fontSize: 10,
-
-              alignment: 'left',
-
-              color: 'black'
-            },
-
-
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
           ]
-        },
-
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.id  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text:   sessionStorage.getItem('Utilisateur')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:370, y:182}	       
+      },
+     ] ,
+     
+     
+      background: [
+       
         {
-          text: '\n\n' + 'Liste des Articles ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-
-            alignment: 'right',
-            body: body
-          }
-        },
-        {
-          text: '\n\n' + 'Liste des Supports ' + '\t\n',
-          fontSize: 12,
-          alignment: 'Center',
-          color: 'black',
-          bold: true
-        },
-        {
-          table: {
-            headerRows: 1,
-            widths: ['*', '*', '*', '*', '*', '*', '*'],
-            body: body2
-          }
-        },
+          image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600          
+        } 
       ],
+      
+   
+      content: [
+        
+        {
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 80, 410, 38 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-16, -19 , 10,300]     
+        }
+        
+         
+      ],
+      
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Bon_Reception.pdf' });
 
   }
 
@@ -749,7 +820,7 @@ export class ModifierBonReceptionComponent implements OnInit {
   }
   // conversion de modele de pdf  en base 64 
   async modelePdfBase64() {
-    await this.delai(4000);
+    await this.delai(1000);
     const lecteur = new FileReader();
     lecteur.onloadend = () => {
       this.modeleSrc = lecteur.result;
@@ -761,7 +832,7 @@ export class ModifierBonReceptionComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel() {
-    this.http.get('./../../../assets/images/ficheRecpetion.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/Bon_Reception.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele = reponse;
       return this.modele;
     }, err => console.error(err))
@@ -771,7 +842,7 @@ export class ModifierBonReceptionComponent implements OnInit {
    *    etape genertation bon rejet
    * 
    */
-  Bon_rejet() {
+   async Bon_rejet() {
     Swal.fire({
       title: 'Bon Rejet',
       text: "Marchandise Non Verifé",
@@ -785,10 +856,12 @@ export class ModifierBonReceptionComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
 
-        const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {
-
+        const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {        
+           
           width: 'auto',
-          data: { objects: this.obj_articles, id_Bon: this.id, local: this.Destination, type: this.type_bon }
+          data: { objects: this.obj_articles,tel_bon_Source:this.tel_bon_Source,nom_bon_Source:this.nom_bon_Source,
+             id_bon_source:this.Source,source_bon: this.source_bon, id_Bon: this.id, Destination: this.Destination,
+              type: this.type_bon ,source :this.Source}
         });
         dialogRef.afterClosed().subscribe(result => {
         });
@@ -796,7 +869,7 @@ export class ModifierBonReceptionComponent implements OnInit {
       }
 
     })
-
+    
   }
 
 

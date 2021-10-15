@@ -44,6 +44,8 @@ export class ListerBonReceptionComponent implements OnInit {
   constructor(private datePipe: DatePipe, public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
     this.chargementModel();
     this.modelePdfBase64();
+    sessionStorage.setItem('Utilisateur', "rochdi");
+
   }
 
   // lister bon de receptions 
@@ -61,7 +63,7 @@ export class ListerBonReceptionComponent implements OnInit {
   }
   // conversion de modele de pdf  en base 64 
   async modelePdfBase64() {
-    await this.delai(4000);
+    await this.delai(1000);
     const lecteur = new FileReader();
     lecteur.onloadend = () => {
       this.modeleSrc = lecteur.result;
@@ -73,7 +75,7 @@ export class ListerBonReceptionComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel() {
-    this.http.get('./../../../assets/images/ficheRecpetion.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/Bon_Reception.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele = reponse;
       return this.modele;
     }, err => console.error(err))
@@ -235,7 +237,75 @@ export class ListerBonReceptionComponent implements OnInit {
     }, error => console.log(error));
   }
 
+  async telecharger(id2: any) {
+    this.id = id2
+    this.getDetail()
+    this.service.get_Bon_Reception_By_Id(id2).subscribe(data => {
+      this.bonReception = data;
+      this.type_bon = this.bonReception.type_Be;
+      this.Destination = this.bonReception.local
+      this.nbSupport = this.bonReception.nb_Support
+      this.date_Creation = this.bonReception.date_Creation
+      if (this.type_bon == "Bon Entrée local") {
+        this.service.get_Information_Bon_entree_Local(this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon = "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) => {
+            this.src = data2;
+            this.nom_bon_Source = this.src.nom_Fournisseur;
+            this.tel_bon_Source = this.src.tel1;
+          })
+        });
+      }
+      else if (this.type_bon == "Bon Importation") {
+        this.service.get_Information_Bon_entree_Importation(this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Fr
+          this.Destination = data.local
+          this.source_bon = "Fournisseur"
+          this.id_bon_source = data.local_Source
+          this.service.fournisseur(data.id_Fr).subscribe((data2) => {
+            this.src = data2;
+            this.nom_bon_Source = this.src.nom_Fournisseur;
+            this.tel_bon_Source = this.src.tel1;
+          })
 
+        });
+      }
+      else if (this.type_bon == "Bon Transfert") {
+        this.service.get_Information_Bon_transfert(this.bonReception.id_Be).subscribe((data: any) => {
+
+          this.Destination = data.local_Destination
+          this.source_bon = "Entrepôt"
+          this.nom_bon_Source = data.local_Source
+          this.service.Filtre_Fiche_Local(data.local_Source).subscribe((data2) => {
+            this.src = data2;
+
+            this.nom_bon_Source = this.src[0].nom_Local;
+            this.tel_bon_Source = this.src[0].tel;
+            this.id_bon_source = this.src[0].id_Local
+            this.Source = this.src[0].id_Local
+          })
+        });
+
+      }
+      else if (this.type_bon == "Bon Retour") {
+        this.service.get_Information_Bon_retour(this.bonReception.id_Be).subscribe((data: any) => {
+          this.Source = data.id_Clt
+          this.Destination = data.local
+          this.source_bon = "Client"
+          this.id_bon_source = data.local_Source
+          this.service.Client(data.id_Clt).subscribe((data2) => {
+            this.src = data2;
+            this.nom_bon_Source = this.src.nom_Client;
+            this.tel_bon_Source = this.src.tel1;
+          })
+        });
+      }
+
+    }, error => console.log(error));
+  }
 
   xmldata: any;
   obj_articles: any = [];
@@ -424,11 +494,16 @@ export class ListerBonReceptionComponent implements OnInit {
 
   modeleSrc: any;
   //impression de la fiche recption
-  body: any = [];
+
   async generatePDF(id: any, date_Creation: any) {
 
     await delay(1000);
-    this.body = [];
+    var body = [];
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
 
     for (let i = 0; i < this.obj_articles.length; i++) {
 
@@ -437,8 +512,10 @@ export class ListerBonReceptionComponent implements OnInit {
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
 
-      this.body.push(obj);
+       body.push(obj);
     }
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
+
     let def = {
       pageMargins: [40, 250, 40, 180],
       info: {
@@ -454,7 +531,7 @@ export class ListerBonReceptionComponent implements OnInit {
               text: [
 
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: { x: 250, y: 130 }
@@ -480,7 +557,7 @@ export class ListerBonReceptionComponent implements OnInit {
 
         },
         {
-          text: 'rochdi',
+          text:   sessionStorage.getItem('Utilisateur')  ,
           fontSize: 10,
           color: 'black',
           bold: true,
@@ -555,12 +632,12 @@ export class ListerBonReceptionComponent implements OnInit {
 
         {
           layout: 'lightHorizontalLines',
-          table: {
-            widths: [40, 455, 40],
-            body: this.body,
-          },
-          fontSize: 10,
-          margin: [-30, 0, 10, 300]
+          table: {          
+            widths: [ 50, 240, 236 ],             
+            body:  body, 
+          },      
+          fontSize: 10, 
+          margin: [-16, -19 , 10,300]     
         }
 
 
@@ -578,8 +655,16 @@ export class ListerBonReceptionComponent implements OnInit {
 
   // telecharger pdf  
   async telechargerpdf(id: any, date_Creation: any) {
-    this.body = [];
+    
+
     await delay(1000);
+    var body = [];
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
+
     for (let i = 0; i < this.obj_articles.length; i++) {
 
       var obj = new Array();
@@ -587,8 +672,10 @@ export class ListerBonReceptionComponent implements OnInit {
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
 
-      this.body.push(obj);
+       body.push(obj);
     }
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
+
     let def = {
       pageMargins: [40, 250, 40, 180],
       info: {
@@ -604,7 +691,7 @@ export class ListerBonReceptionComponent implements OnInit {
               text: [
 
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: { x: 250, y: 130 }
@@ -630,7 +717,7 @@ export class ListerBonReceptionComponent implements OnInit {
 
         },
         {
-          text: 'rochdi',
+          text:   sessionStorage.getItem('Utilisateur')  ,
           fontSize: 10,
           color: 'black',
           bold: true,
@@ -699,45 +786,28 @@ export class ListerBonReceptionComponent implements OnInit {
           image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
         }
       ],
-
-
       content: [
-
         {
           layout: 'lightHorizontalLines',
-          table: {
-            widths: [40, 455, 40],
-            body: this.body,
-          },
-          fontSize: 10,
-          margin: [-30, 0, 10, 300]
+          table: {          
+            widths: [ 50, 240, 236 ],             
+            body:  body, 
+          },      
+          fontSize: 10, 
+          margin: [-16, -19 , 10,300]     
         }
 
 
       ],
 
     };
-
-
     pdfMake.createPdf(def).download("Bon_Reception_" + this.id);
     this.obj_articles = []
 
   }
 
 
-  telecharger(id2: any) {
-    this.id = id2
-    this.getDetail()
-    this.service.get_Bon_Reception_By_Id(id2).subscribe(data => {
-      this.bonReception = data;
-      this.type_bon = this.bonReception.type_Be;
-      this.Destination = this.bonReception.local
-      this.nbSupport = this.bonReception.nb_Support
-      this.date_Creation = this.bonReception.date_Creation
-    }, error => console.log(error));
-
-    //  this.telechargerpdf(this.id,this.date_Creation) ;
-  }
+  
 }
 
 export interface table {

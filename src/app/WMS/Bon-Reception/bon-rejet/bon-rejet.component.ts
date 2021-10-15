@@ -39,6 +39,8 @@ export class BonRejetComponent implements OnInit {
   constructor( private datePipe: DatePipe  ,public router: Router, private _formBuilder: FormBuilder, private service: BonReceptionServiceService, private http: HttpClient) {
     this.chargementModel2();
     this.modelePdfBase642();
+    sessionStorage.setItem('Utilisateur', "rochdi");
+
   }
 
 
@@ -248,7 +250,7 @@ export class BonRejetComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel2() {
-    this.http.get('./../../../assets/images/ficheRejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/Bon_Rejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele2 = reponse;
       return this.modele2;
     }, err => console.error(err),
@@ -269,6 +271,8 @@ export class BonRejetComponent implements OnInit {
     obj.push(" ");
     obj.push(" ");
     body.push(obj);
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
+
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
       obj.push(this.obj_articles[i].id);
@@ -305,7 +309,7 @@ export class BonRejetComponent implements OnInit {
               text: [
   
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: {x:250, y: 130}	
@@ -331,171 +335,7 @@ export class BonRejetComponent implements OnInit {
          
       },
       {
-        text: 'rochdi'  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:390, y:96}	  , 
-         
-      },
-      {
-        text: ''+ this.datePipe.transform(date, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:96}	  , 
-         
-      },
-      
-      {
-        text: '' + this.Destination + '\n\n',
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:131}	       
-      },
-      {
-        text: '' + this.source_bon + '\n\n',
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:69, y:154	 }      
-      },
-      {
-        text: '' + this.nom_bon_Source + '\n\n',
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:180, y:154	 }      
-      }
-      ,
-      {
-        text: '' + this.Source + '\n\n',
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:200, y:179	 }      
-      },
-      
-      {
-        text: '' + this.tel_bon_Source + '\n\n',
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:64, y:179}	       
-      },
-      {
-        text: '' + id + '\n\n',
-        fontSize: 15, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:370, y:180}	  	  
-      },
-      {
-        text: ' ' +this.reclamation ,
-        fontSize: 10, 
-        color: 'black',            
-        relativePosition: {x: 60, y:665}	       
-      },  
-     ] ,
-      background: [
-        {
-          image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
-        }
-      ],
-
-      content: [
-       
-        {
-          layout: 'lightHorizontalLines',
-          table: {          
-            widths: [ 40, 270, 200 ],         
-            body: body, 
-          },      
-          fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
-        }
-        
-         
-      ],
-      
-    };
-    
-    pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
-  }
-
-  //impression de la fiche recption
-  telechargerPDF(id: any, date: any) {
-
-    var body = [];    
-    var obj = new Array();
-    obj.push(" ");     
-    obj.push(" ");
-    obj.push(" ");
-    body.push(obj);
-    for (let i = 0; i < this.obj_articles.length; i++) {
-      var obj = new Array();
-      obj.push(this.obj_articles[i].id);
-      obj.push(this.obj_articles[i].nom);     
-      let ch = "";      
-      if (this.obj_articles[i].controle_tech) {
-      }
-      else {
-        ch = ch + " Caractéristique technique non conforme"
-      }
-      if (this.obj_articles[i].controle_qt) {
-
-      }
-      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
-      obj.push( ch)      
-      body.push(obj);
-    }
-    var def = {
-      
-      
-      defaultStyle: {
-        // alignment: 'justify'
-      },
-      pageMargins: [40, 250, 40, 180],
-      info: {
-        title: 'Fiche Bon Rejet',
-      },
-      footer: function (currentPage:any, pageCount:any) {
-        return {
-          margin: 35,
-          columns: [
-            {
-              fontSize: 9,
-              text: [
-  
-                {
-                  text: currentPage.toString() + '/' + pageCount,
-                }
-              ],
-              relativePosition: {x:250, y: 130}	
-            } 
-          ]
-        };
-      },
-      header:[ 
-      {
-        text: ' ' + this.type_bon  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:80, y:107}	  , 
-         
-      },
-      {
-        text: ' ' + this.id_Bon ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:220, y:107}	  , 
-         
-      },
-      {
-        text: 'rochdi'  ,
+        text: sessionStorage.getItem('Utilisateur')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -573,11 +413,176 @@ export class BonRejetComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 270, 200 ],         
+            widths: [ 50, 240, 236 ],         
             body: body, 
           },      
           fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          margin: [-16, -19 , 10,300]        
+        }
+        
+         
+      ],
+      
+    };
+    pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
+  }
+
+  //impression de la fiche recption
+  telechargerPDF(id: any, date: any) {
+
+    var body = [];    
+    var obj = new Array();
+    obj.push(" ");     
+    obj.push(" ");
+    obj.push(" ");
+    body.push(obj);
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
+
+    for (let i = 0; i < this.obj_articles.length; i++) {
+      var obj = new Array();
+      obj.push(this.obj_articles[i].id);
+      obj.push(this.obj_articles[i].nom);     
+      let ch = "";      
+      if (this.obj_articles[i].controle_tech) {
+      }
+      else {
+        ch = ch + " Caractéristique technique non conforme"
+      }
+      if (this.obj_articles[i].controle_qt) {
+
+      }
+      else { ch = ch + " Quantite non Verifier :  " + this.obj_articles[i].total + " < " + this.obj_articles[i].qte }
+      obj.push( ch)      
+      body.push(obj);
+    }
+    var def = {
+      
+      
+      defaultStyle: {
+        // alignment: 'justify'
+      },
+      pageMargins: [40, 250, 40, 180],
+      info: {
+        title: 'Fiche Bon Rejet',
+      },
+      footer: function (currentPage:any, pageCount:any) {
+        return {
+          margin: 35,
+          columns: [
+            {
+              fontSize: 9,
+              text: [
+  
+                {
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
+                }
+              ],
+              relativePosition: {x:250, y: 130}	
+            } 
+          ]
+        };
+      },
+      header:[ 
+      {
+        text: ' ' + this.type_bon  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:80, y:107}	  , 
+         
+      },
+      {
+        text: ' ' + this.id_Bon ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:220, y:107}	  , 
+         
+      },
+      {
+        text: sessionStorage.getItem('Utilisateur')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:390, y:96}	  , 
+         
+      },
+      {
+        text: ''+ this.datePipe.transform(date, 'dd/MM/yyyy')  ,
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:520, y:96}	  , 
+         
+      },
+      
+      {
+        text: '' + this.Destination + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:65, y:131}	       
+      },
+      {
+        text: '' + this.source_bon + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:69, y:154	 }      
+      },
+      {
+        text: '' + this.nom_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:180, y:154	 }      
+      }
+      ,
+      {
+        text: '' + this.Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:200, y:179	 }      
+      },
+      
+      {
+        text: '' + this.tel_bon_Source + '\n\n',
+        fontSize: 10, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:64, y:179}	       
+      },
+      {
+        text: '' + id + '\n\n',
+        fontSize: 15, 
+        color: 'black',
+        bold: true,
+        relativePosition: {x:370, y:180}	  
+      },
+      {
+        text: ' ' +this.reclamation ,
+        fontSize: 10, 
+        color: 'black',            
+        relativePosition: {x: 60, y:665}	       
+      },  
+     ] ,
+      background: [
+        {
+          image: 'data:image/jpeg;base64,' + this.modeleSrc2, width: 600
+        }
+      ],
+
+      content: [
+       
+        {
+          layout: 'lightHorizontalLines',
+          table: {          
+            widths: [ 50, 240, 236 ],         
+            body: body, 
+          },      
+          fontSize: 10, 
+          margin: [-16, -19 , 10,300]        
         }
         
          
