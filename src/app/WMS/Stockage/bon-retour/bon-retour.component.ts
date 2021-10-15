@@ -199,12 +199,12 @@ export class BonRetourComponent implements OnInit {
             this.object.detail = []
 
             if (this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].n_Imei != undefined) {
-              for (let i = 0; i < this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G.length; i++) {
+              for (let j = 0; j < this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[i].Produit_4G.length; j++) {
 
                 this.inst = {}
-                this.inst.ns = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].N_Serie;
-                this.inst.e1 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].E1
-                this.inst.e2 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[i].E2
+                this.inst.ns = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[j].N_Serie;
+                this.inst.e1 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[j].E1
+                this.inst.e2 = this.xmldata.Produits[0].Produits_4Gs[0].Produit[0].Produit_4Gs[0].Produit_4G[j].E2
                 this.inst.click = false;
                 this.object.detail.push(this.inst)
               }
@@ -225,11 +225,11 @@ export class BonRetourComponent implements OnInit {
             this.object.type = "serie"
             this.object.detail = []
 
-            for (let i = 0; i < this.xmldata.Produits[0].Produits_Series[0].Produit[0].N_Series[0].N_Serie.length; i++) {
+            for (let j = 0; j < this.xmldata.Produits[0].Produits_Series[0].Produit[i].N_Series[0].N_Serie.length; j++) {
 
               this.inst = {}
-              this.inst.ns = this.xmldata.Produits[0].Produits_Series[0].Produit[0].N_Series[0].N_Serie[i]
-              this.object.detail.push(this.inst)
+              this.inst.ns = this.xmldata.Produits[0].Produits_Series[0].Produit[0].N_Series[0].N_Serie[j]
+               this.object.detail.push(this.inst)
             }
             this.table.push(this.object)
           }
@@ -252,7 +252,7 @@ export class BonRetourComponent implements OnInit {
        this.table2  = [];
       for( let i = 0 ; i<this.table.length;i++)
       {
-        console.log(this.table[i].qte2)
+       
         if(this.table[i].qte2>0)
         {
              this.table2.push(this.table[i])
@@ -264,6 +264,7 @@ export class BonRetourComponent implements OnInit {
   // detail article 
   plus(produit: any) {
 
+   
     if (produit.type == "simple") {
       const dialogRef = this.dialog.open(ligne_retour, {
 
@@ -341,7 +342,7 @@ export class BonRetourComponent implements OnInit {
 
           n_series.appendChild(ns);
         }
-        console.log(n_series)
+       
         Produit.appendChild(n_series);
         Produits_series.appendChild(Produit)
 
@@ -371,8 +372,7 @@ export class BonRetourComponent implements OnInit {
     BR.appendChild(Produits_Listes);
 
     this.doc.appendChild(BR)
-    console.log(this.doc)
-
+     
 
     var formData: any = new FormData();
     let url = "assets/BonRejet.xml";
@@ -433,6 +433,7 @@ export class BonRetourComponent implements OnInit {
   generatePDF(id: any, date_Creation: any) {
 
     var body = [];
+     
 
     for (let i = 0; i < this.table2.length; i++) {
 
@@ -453,11 +454,14 @@ export class BonRetourComponent implements OnInit {
         obj.push(this.table2[i].nom);
         obj.push(this.table2[i].qte2);
         this.ch = ""
+   
         for (let j = 0; j < this.table2[i].detail.length; j++) {
-          if (this.table2[i].detail.click) {
+         if (this.table2[i].detail[j].click != undefined) {
+          if ( this.table2[i].detail[j].click+"" == "true"  ) {
             this.ch = this.ch + "N_Série : " + this.table2[i].detail[j].ns + "\n"
             this.ch = this.ch + " ----------------------  \n"
           }
+        }
         }
 
         obj.push(this.ch)
@@ -470,12 +474,14 @@ export class BonRetourComponent implements OnInit {
         obj.push(this.table2[i].qte);
         this.ch = ""
         for (let j = 0; j < this.table2[i].detail.length; j++) {
-          if (this.table2[i].detail.click) {
+          if (this.table2[i].detail[j].click != undefined) {
+            if ( this.table2[i].detail[j].click+"" == "true"  ) {
+          
             this.ch = this.ch + "N_Série : " + this.table2[i].detail[j].ns + "\n"
             this.ch = this.ch + "E1 : " + this.table2[i].detail[j].e1 + "\n"
             this.ch = this.ch + "E2 : " + this.table2[i].detail[j].e2 + "\n"
             this.ch = this.ch + " ----------------------  \n"
-          }
+          }}
 
         }
         obj.push(this.ch)
@@ -593,7 +599,7 @@ export class BonRetourComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {
-            widths: [40, 270, 20, 180],
+            widths: [40, 270, 23, 180],
             body: body,
           },
           fontSize: 10,
@@ -605,7 +611,7 @@ export class BonRetourComponent implements OnInit {
 
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_sortie' + id + '.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_retour' + id + '.pdf' });
 
   }
 

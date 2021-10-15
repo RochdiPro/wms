@@ -244,9 +244,9 @@
                      <th>Nom Article</th>
                      <th>Famille</th>
                      <th>Sous Famille</th>
-                     <th>Quanitité théorique</th>
+                     <th>Quantité théorique</th>
                      <th>Support</th>
-                     <th>Totale</th>
+                     <th>Total</th>
                   </tr>
                </thead>
                <tbody>
@@ -258,7 +258,7 @@
                            <mat-label>Famille Logistique</mat-label>
                            <mat-select [disabled]="disableSelect.value" name="famille"
                               (selectionChange)="Famille($event,article.id)">
-                              <mat-option value="article.famaille" style="color: brown;" [disabled]>{{article.famaille}}
+                              <mat-option value="article.famaille"  [disabled]>{{article.famaille}}
                               </mat-option>
                               <mat-option *ngFor="let f of Famille_Logistique" [value]="f.nom">{{f.nom}}</mat-option>
                            </mat-select>
@@ -311,7 +311,7 @@
       <form [formGroup]="controleFormGroup">
          <div class="main-card mb-3 card">
             <div class="card-body">
-               <h5 class="card-title">Liste Article Bon Entrée </h5>
+               <h5 class="card-title">Liste des Articles </h5>
                <div class="table-responsive">
                   <table class="mb-0 table articlle2" >
                      <thead>
@@ -319,8 +319,8 @@
                            <th>ID Article</th>
                            <th>Nom Article</th>
                            <th>Fiche Technique</th>
-                           <th>Quanitité</th>
-                           <th>Totale </th>
+                           <th>Quantité</th>
+                           <th>Total </th>
                            <th>Controle Quantitatif</th>
                            <th>Controle Qualitatif</th>
                         </tr>
@@ -335,7 +335,7 @@
                            <td>{{article.total}} </td>
                            <td>
                               <label class="container">
-                                 <input type="checkbox" [checked]="article.controle_qt" data-toggle="toggle"
+                                 <input type="checkbox" [checked]="article.controle_qt" data-toggle="toggle" style="color: red; background-color: red;"
                                     data-onstyle="success" id="checkQuan" required disabled=true>
                                  <span class="checkmark"></span>
                               </label>

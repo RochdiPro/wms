@@ -16,17 +16,17 @@
           <div class="card-body">
              <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                 <li class="nav-item">
-                   <a role="tab" class="nav-link" href="/Menu/WMS-Reception/Lister">
+                   <a (click)="fnoption1()" [ngClass]="{'active': option1}" role="tab" class="nav-link" routerLink="/Menu/WMS-Reception/Lister">
                    <span>Liste Bon Reception</span>
                    </a>
                 </li>
                 <li class="nav-item">
-                   <a role="tab" class="nav-link" href="/Menu/WMS-Reception/Ajouter">
+                   <a (click)="fnoption2()" [ngClass]="{'active': option2}" role="tab" class="nav-link" routerLink="/Menu/WMS-Reception/Ajouter">
                    <span>Reception Marchandise</span>
                    </a>
                 </li>
                 <li class="nav-item">
-                   <a role="tab" class="nav-link" href="/Menu/WMS-Reception/Rejet">
+                   <a (click)="fnoption3()" [ngClass]="{'active': option3}" role="tab" class="nav-link" routerLink="/Menu/WMS-Reception/Rejet">
                    <span>Liste Bon Rejet</span>
                    </a>
                 </li> 

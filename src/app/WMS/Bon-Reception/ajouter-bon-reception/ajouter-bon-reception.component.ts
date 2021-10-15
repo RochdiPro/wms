@@ -28,7 +28,7 @@ export class AjouterBonReceptionComponent implements OnInit {
   @ViewChild("qte") qte: any;
 
 
-  isLinear = false;
+  isLinear = true;
   selected = 'id';
   disableSelect = new FormControl(false);
   bonEntrees_Local: any = []
@@ -57,6 +57,8 @@ export class AjouterBonReceptionComponent implements OnInit {
     this.chargementModel();
     this.modelePdfBase64();
 
+     sessionStorage.setItem('Utilisateur', "rochdi");
+     
   }
 
   ngOnInit() {
@@ -618,8 +620,8 @@ export class AjouterBonReceptionComponent implements OnInit {
         this.service.createBonReception(formData).subscribe((data) => {
           this.bon_reception = data
           Swal.fire(
-            'Ajout Effecté',
-            'Bon De Reception Ajouté Avec Sucées',
+            'success',
+            'Bon De Réception Ajouté Avec Sucées',
             'success'
           ).then((result) => {
             if (result.isConfirmed) {
@@ -793,13 +795,13 @@ export class AjouterBonReceptionComponent implements OnInit {
     body.push(obj);
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
-      obj.push(this.obj_articles[i].id);
+      obj.push(""+this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);
       obj.push(this.obj_articles[i].qte);
      
       body.push(obj);
     }
- 
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
 
     let def = {
       pageMargins: [40, 250, 40, 180],
@@ -816,7 +818,7 @@ export class AjouterBonReceptionComponent implements OnInit {
               text: [
   
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: {x:250, y: 130}	
@@ -842,7 +844,7 @@ export class AjouterBonReceptionComponent implements OnInit {
          
       },
       {
-        text: 'rochdi'  ,
+        text:   sessionStorage.getItem('Utilisateur')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -918,11 +920,11 @@ export class AjouterBonReceptionComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 455, 40 ],         
+            widths: [ 80, 410, 38 ],         
             body: body, 
           },      
           fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          margin: [-16, -19 , 10,300]     
         }
         
          
@@ -930,7 +932,7 @@ export class AjouterBonReceptionComponent implements OnInit {
       
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'FicheRecpetion.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Bon_Reception.pdf' });
 
   }
 
@@ -955,7 +957,7 @@ export class AjouterBonReceptionComponent implements OnInit {
   }
   // récupération de modele pour créer le pdf
   async chargementModel() {
-    this.http.get('./../../../assets/images/ficheRecpetion.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/Bon_Reception.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele = reponse;
       return this.modele;
     }, err => console.error(err))
@@ -983,7 +985,7 @@ export class AjouterBonReceptionComponent implements OnInit {
            
           width: 'auto',
           data: { objects: this.obj_articles,tel_bon_Source:this.tel_bon_Source,nom_bon_Source:this.nom_bon_Source,
-             id_bon_source:this.id_bon_source,source_bon: this.source_bon, id_Bon: this.id, Destination: this.Destination,
+             id_bon_source:this.Source,source_bon: this.source_bon, id_Bon: this.id, Destination: this.Destination,
               type: this.type_bon ,source :this.Source}
         });
         dialogRef.afterClosed().subscribe(result => {
@@ -1114,8 +1116,8 @@ export class Ajouter_Bon_Rejet {
           
           this.bon_rejet = data
           Swal.fire({
-            title: 'Bon Rejet!',
-            text: 'Bon Rejet est crée et envoyée.',
+            title: 'success',
+            text: 'Bon Rejet est crée ',
             icon: 'success',
             showCancelButton: true,
             confirmButtonColor: 'green',
@@ -1159,9 +1161,11 @@ export class Ajouter_Bon_Rejet {
     obj.push(" ");
     obj.push(" ");
     body.push(obj);
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
+
     for (let i = 0; i < this.obj_articles.length; i++) {
       var obj = new Array();
-      obj.push(this.obj_articles[i].id);
+      obj.push(""+this.obj_articles[i].id);
       obj.push(this.obj_articles[i].nom);     
       let ch = "";
       
@@ -1197,7 +1201,7 @@ export class Ajouter_Bon_Rejet {
               text: [
   
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: {x:250, y: 130}	
@@ -1223,7 +1227,7 @@ export class Ajouter_Bon_Rejet {
          
       },
       {
-        text: 'rochdi'  ,
+        text: sessionStorage.getItem('Utilisateur')  ,
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -1262,7 +1266,7 @@ export class Ajouter_Bon_Rejet {
       }
       ,
       {
-        text: '' + this.source_bon + '\n\n',
+        text: '' + this.id_bon_source + '\n\n',
         fontSize: 10, 
         color: 'black',
         bold: true,
@@ -1301,19 +1305,19 @@ export class Ajouter_Bon_Rejet {
         {
           layout: 'lightHorizontalLines',
           table: {          
-            widths: [ 40, 270, 200 ],         
+            widths: [ 50, 240, 236 ],         
             body: body, 
           },      
           fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          margin: [-16, -19 , 10,300]     
         }
-        
+         
          
       ],
       
     };
     
-    pdfMake.createPdf(def).open({ defaultFileName: 'BonRejet.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Bon_Rejet.pdf' });
   }
 
 
@@ -1334,7 +1338,7 @@ export class Ajouter_Bon_Rejet {
   }
   // récupération de modele pour créer le pdf
   async chargementModel2() {
-    this.http.get('./../../../assets/images/ficheRejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
+    this.http.get('./../../../assets/images/Bon_Rejet.jpg', { responseType: 'blob' }).subscribe((reponse: any) => {
       this.modele2 = reponse;
       return this.modele2;
     }, err => console.error(err),

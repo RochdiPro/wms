@@ -29,8 +29,7 @@
         <ng-container matColumnDef="modifier">
             <mat-header-cell *matHeaderCellDef> </mat-header-cell>
             <mat-cell *matCellDef="let element" data-label="" style="text-align: center;">
-                <a routerLink="/Menu/WMS-Reception/Modifier/{{element.id}}"> <i class="pe-7s-pen"
-                        title="Modifier BL"></i></a>
+                <a> <i class="pe-7s-pen"(click)="Modifier_Bon(element.id)"       title="Modifier "></i></a>
             </mat-cell>
         </ng-container>
 

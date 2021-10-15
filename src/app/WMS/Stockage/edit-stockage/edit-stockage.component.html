@@ -16,39 +16,39 @@
           <div class="card-body">
              <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                 <li class="nav-item">
-                   <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Entree">
+                   <a   (click)="fnoption1()" [ngClass]="{'active': option1}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Entree">
                    <span>Entrée Stock</span>
                    </a>
                 </li>               
-                <li class="nav-item">
-                   <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Transfert">
+                <li class="nav-item"  >
+                   <a  (click)="fnoption2()" [ngClass]="{'active': option2}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Transfert">
                    <span>Bon Transfert</span> 
                    </a>
                 </li>
                 <li class="nav-item">
-                  <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Transfert">
+                  <a (click)="fnoption3()" [ngClass]="{'active': option3}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Transfert">
                      <span>Liste Bon Transfert</span>
                    </a>
                 </li> 
 
                 <li class="nav-item">
-                  <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Retour">
+                  <a (click)="fnoption4()" [ngClass]="{'active': option4}"role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Retour">
                   <span>Bon Retour</span> 
                   </a>
                </li>
                <li class="nav-item">
-                 <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Retour">
+                 <a (click)="fnoption5()" [ngClass]="{'active': option5}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Retour">
                     <span>Liste Bon Retour</span>
                   </a>
                </li> 
                 
                 <li class="nav-item">
-                  <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Sortie">
+                  <a (click)="fnoption6()" [ngClass]="{'active': option6}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Bon_Sortie">
                   <span>Bon de Sortie Stock</span>
                   </a>
                </li> 
                <li class="nav-item">
-                 <a role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Sortie">
+                 <a (click)="fnoption7()" [ngClass]="{'active': option7}" role="tab" class="nav-link" routerLink="/Menu/WMS-Stockage/Lister_Bon_Sortie">
                  <span>Liste Bon Sortie</span>
                  </a>
               </li>   
