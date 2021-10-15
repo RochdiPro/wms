@@ -26,9 +26,9 @@ export class StockageService {
       'Veuillez réessayer plus tard.');
   }
 
-    // Obtenir la liste des Articles 
-    liste_articles(): Observable<any> {
-      return this.http.get(ERP + 'Fiche_Produits', { observe: 'body' }).pipe(catchError(this.gererErreur)
+    // Obtenir la liste des Articles du local source
+    liste_articles(src:any): Observable<any> {
+      return this.http.get(ERP + 'Liste_Produits_En_Local', { observe: 'body' }).pipe(catchError(this.gererErreur)
       );
     }
     // article avec id
@@ -326,6 +326,155 @@ Bon_transfert( ) : Observable<any>{
    Bon_retours(): Observable<any> {
     return this.http.get(ERP + "Bon_Retours");
 
+  }
+
+
+
+
+  ////////
+
+
+   //** Get All Articles EP */
+   getArticls() : Observable<any>{
+    return this.http.get(ERP+'Fiche_Produits');
+  }
+  //** Get Article by Id  */
+  getArticleById(id:string):Observable<any> {
+    return this.http.get(ERP+'Fiche_Produit/',{
+      params: {
+        Id_Produit: id,
+      },observe: 'response'
+    });
+  }
+  //** Get Article By Code à bare EP */
+  getArrByCodeBare(code : string) : Observable<any>{
+    return this.http.get(ERP + 'Filtre_Fiche_Produit_par_Code/', {
+      params: {
+        Code: code
+      }, observe: 'response'
+    });
+  }
+
+  //** Get Client By Code/id EP */
+  getClientById(id : string): Observable<any>{
+     return this.http.get(ERP +'Client/',{params :{
+      Id_Clt: id,
+    },observe: 'response'});
+  }
+  //** Get List All Client*/
+  getAllClient(): Observable<any>{
+    return this.http.get(ERP+'Clients')
+  }
+  //** List of Fourniseur */
+  getAllFourniseur(): Observable<any>{
+    return this.http.get(ERP+'Fournisseurs'); 
+  }
+
+  //** Get All Devis */
+  getAllDevis(): Observable<any>{
+    return this.http.get(ERP+'Deviss/'); 
+  }
+
+  //** Get Quate by ID */
+  getQuoteByID(id: string ): Observable<any>{
+    return this.http.get(ERP +'Devis/',{
+      params: { Id: id}, observe: 'response'
+    });
+  }
+  //** Get all Key word from the table "Devis" */
+  getListKeyWord(): Observable<any>{
+   return this.http.get(ERP+ 'Liste_Champs_Devis')
+  }
+  //** Get Info Product by Id */ 
+  getInfoProductByIdFromStock(id: string): Observable<any>{
+    return this.http.get(ERP+'Stock/',{
+      params:{Id : id },observe: 'response'
+    });
+  }
+  //** Create a Quote "Devis" */
+  createQuate(formData : any ): Observable<any>{
+    return this.http.post<any>(ERP+'Creer_Devis', formData); 
+  }
+  //** Filter By Champ */
+  filterByChampValeur(champ: string , value : string) : Observable<any>{
+    return this.http.get(ERP + 'Filtre_Devis/', {
+      params : {
+        Champ: champ, 
+        Valeur: value
+      }, observe: 'response'
+    });
+  }
+  //** Delete Devis by ID */
+  deleteDevis( id : string ): Observable<any>{
+    return this.http.delete(ERP + 'Supprimer_Devis/', {
+      params: {
+        Id: id
+      }, observe:'response'
+    })
+  }
+  //** Get detail devis */
+  detail(id: any):Observable<any>{
+    return this.http.get(ERP+'Detail_Devis/',{
+      params: {
+        Id_Devis : id
+      }, observe:'response', responseType : 'blob'
+    });
+  }
+  /** Update Quote (Modifier_Devis) */
+  updateQuote(formData : any): Observable<any>{
+    return this.http.post<any>(ERP+'Modifier_Devis', formData); 
+  }
+
+  //** Liste_Champs_Fiche_Produit */
+  getListChampsProduit(): Observable<any>{
+    return this.http.get(ERP+'Liste_Champs_Fiche_Produit');
+  }
+
+  //** Filtre_Fiche_Produit_par_Code2  */
+  getProduitByCodeBar(code: string){
+    return this.http.get(ERP+'Filtre_Fiche_Produit_par_Code2/',{
+      params: {
+        Code: code,
+      },observe:'response'
+    });
+  }
+
+  //** Filter By Champ for Produit */
+  filterByChampValeurForProd(champ: string , value : string) : Observable<any>{
+    return this.http.get(ERP + 'Filtre_Fiche_Produit/', {
+        params : {
+          Champ: champ, 
+          Valeur: value
+        }, observe: 'response'
+      });
+  }
+  //** Get Locals */
+  getLocals(): Observable<any>{
+    return this.http.get(ERP+'Locals/'); 
+  }
+  //** Quantite_Produit_Par_Stock_En_Local */
+  quentiteProdLocal( id : any,local : any ){
+    return this.http.get(ERP+'Quantite_Produit_Par_Stock_En_Local/',{params:{
+      Id: id,
+      Local: local
+    },observe: 'response'
+  });
+  }
+  //** Liste_Produits_En_Local */
+  listProdEnLocal (local : any ): Observable<any>{
+      return this.http.get(ERP+'Liste_Produits_En_Local/',{
+        params: {
+          Local: local,
+        },observe:'response'
+      });
+    }
+  //** Get Local by ID  */
+  getLocalById(id: any ): Observable<any>{
+    return this.http.get(ERP+"Local/",{
+      params:{
+        Id_Local: id,
+      }, observe: 'response'
+    });
   }
 
 }

@@ -39,9 +39,9 @@ export class BonSortieComponent implements OnInit {
   @ViewChild('stepper') private myStepper: any = MatStepper;
   constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
-    this.service.liste_articles().subscribe((data: any) => {
-      this.liste_articles = data;
-    });
+    // this.service.liste_articles().subscribe((data: any) => {
+    //   this.liste_articles = data;
+    // });
     this.service.locals().subscribe((data:any) => {
       this.locals=data
     })

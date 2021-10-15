@@ -37,6 +37,10 @@ import {MatDatepickerModule } from '@angular/material/datepicker';
  
 import {MatRadioModule} from '@angular/material/radio';
 import { MatNativeDateModule } from '@angular/material/core';
+ import { AjouterArticlesComponent } from './WMS/Stockage/dialog/ajouter-articles/ajouter-articles.component';
+ import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { SearchFilterPipe } from './WMS/Stockage/dialog/search-filter-pipe/search-filter.pipe';
+ 
  @NgModule({ 
   declarations: [
     AppComponent,
@@ -61,7 +65,8 @@ import { MatNativeDateModule } from '@angular/material/core';
    ligne_transfert,Detail4g_transfert,detail_serie_transfert,
    ListerBonTransfertComponent, ListerBonRetourComponent, 
    BonRetourComponent,
-   ligne_retour,Detail4g_retour,detail_serie_retour,
+   ligne_retour,Detail4g_retour,detail_serie_retour, AjouterArticlesComponent,
+   SearchFilterPipe
   ],
   exports: [
      
@@ -84,7 +89,10 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatInputModule ,
     MatRadioModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatProgressBarModule,
+    
+
     
   ],
    

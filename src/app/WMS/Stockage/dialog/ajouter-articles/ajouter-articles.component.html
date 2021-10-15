@@ -1,0 +1,119 @@
+<h2 mat-dialog-title>Liste des produits en stock - {{local | uppercase}}</h2>
+<br>
+<div class="container" mat-dialog-content>
+  <div class="container">
+    <div class="row title">Rechercher: </div>
+    <div class="row ">
+      <div class="input-group col-md-4">
+        <input class="form-control py-2" type="search" placeholder="Rechercher ..." id="example-search-input"
+          [(ngModel)]="query" />
+        <span class="input-group-append">
+          <button class="btn btn-outline-secondary" type="submit" disabled>
+            <i class="fa fa-search"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row title">Filtrer par</div>
+    <div class="row ">
+      <div class="col-md-4">
+        <select class="form-control" [ngModel]="champ" (change)="onChange($event)" required>
+          <option value="Sélectionnez votre option" disabled selected="selected">Sélectionnez votre option</option>
+          <option *ngFor="let type of keyWord" [value]="type">{{type | uppercase}}</option>
+        </select>
+      </div>
+      <div class="input-group col-md-4">
+        <input class="form-control py-2" type="search" placeholder="Code/ date/ noma produit..."
+          id="example-search-input" [ngModel]="value" (keyup)="$event.keyCode == 13 && filterByChamp($event)">
+        <span class="input-group-append">
+          <span class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit" disabled>
+              <i class="fa fa-search"></i>
+            </button>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <mat-progress-bar mode="indeterminate" *ngIf='loading'></mat-progress-bar>
+    <!-- Lignes d'article  -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th></th>
+          <th> Id produit </th>
+          <th>Nom produit</th>
+          <th>Prix U HT</th>
+          <th>TVA(%)</th>
+          <th>Fodec(%)</th>
+          <th>Qte. stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+          <td>
+            <mat-form-field class="custom-width">
+              <mat-label>Filtrer par ID</mat-label>
+              <input matInput [(ngModel)]="id" placeholder="Filtrer par ID" id="id">
+              <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="custom-width">
+              <mat-label>Filtrer par Nom</mat-label>
+              <input matInput [(ngModel)]="nom" placeholder="Filtrer par Nom" id="nom">
+              <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="custom-width">
+              <mat-label>Filtrer par Prix</mat-label>
+              <input matInput [(ngModel)]="prix" placeholder="Filtrer par Prix" id="prix">
+              <i matSuffix class="fa fa-filter" aria-hidden="true"></i>
+            </mat-form-field>
+          </td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr
+          *ngFor="let item of prouduits | searchFilter: query | searchFilter: id| searchFilter: nom| searchFilter: prix ; let i = index;">
+          <td><input type="checkbox" name="item" (change)="checkCheckBoxvalue($event,item)" /></td>
+          <td>
+            <input [ngModel]="item.id_Produit" class="form-control" type="text" name="{{item.id_Produit}}" disabled />
+          </td>
+          <td>
+            <input [ngModel]="item.nom_Produit" [ngModelOptions]="{standalone: true}" class="form-control" type="text"
+              name="{{item.nom_Produit}}" disabled />
+          </td>
+          <td>
+            <input [ngModel]="item.prixU" [ngModelOptions]="{standalone: true}" class="form-control" type="text"
+              name="{{item.prixU}}" disabled />
+          </td>
+          <td>
+            <input [ngModel]="item.tva" [ngModelOptions]="{standalone: true}" class="form-control" type="text"
+              name="{{item.tva}}" size="1" disabled />
+          </td>
+          <td>
+            <input [ngModel]="item.fodec" [ngModelOptions]="{standalone: true}" class="form-control" type="text"
+              name="{{item.fodec}}" disabled size="1" />
+          </td>
+          <td>
+            <input [ngModel]="item.qteStock" [ngModelOptions]="{standalone: true}" class="form-control" type="text"
+              name="{{item.qteStock}}" disabled size="1" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
+  <div class="row right">
+    <div><button mat-raised-button class="add-article" (click)="sendProd()" [disabled]="dsiable"><i
+          class="fas fa-plus"></i> Ajouter Article</button></div>
+  </div>
+</div>

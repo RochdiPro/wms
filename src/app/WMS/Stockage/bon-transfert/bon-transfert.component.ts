@@ -14,6 +14,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isNgTemplate } from "@angular/compiler";
+import { AjouterArticlesComponent } from "../dialog/ajouter-articles/ajouter-articles.component";
+ 
 
 declare var require: any
 
@@ -28,7 +30,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['./bon-transfert.component.scss']
 })
 export class BonTransfertComponent implements OnInit {
-  isLinear = false;
+  isLinear = true;
   localform : any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
@@ -44,9 +46,7 @@ export class BonTransfertComponent implements OnInit {
   @ViewChild('stepper') private myStepper: any = MatStepper;
   constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
-    this.service.liste_articles().subscribe((data: any) => {
-      this.liste_articles = data;
-    });
+   
     this.service.locals().subscribe((data:any) => {
       this.locals=data
     })
@@ -111,39 +111,53 @@ export class BonTransfertComponent implements OnInit {
   // check local source et destination  
   suivant2()
   {
-    console.log(this.source  )
-    console.log(this.destination  )
-    
-    if ( this.source     )
-    {
-        this.test=1;
-    }
-    else
-    {
+     console.log("jj"+this.source+"jj")
+
+    if ( this.destination+"" ==  this.source  +"" && !(this.source  +"" =="undefined")   )
+     {
       Swal.fire({
-        title: ' Local  source  ',
+        title: ' même local  ',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'ok',
 
       })
+    }else{
+      this.myStepper.next();
+      
     }
-
-    if ( this.destination     )
-    {
-         if(this.test==1){ this.myStepper.next();}
-    }
-    else
-    {
-      Swal.fire({
-        title: ' Local  destination  ',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ok',
-
-      })
-    }
+     
   }
+
+ //** open Dialog */
+ openDialog() {
+  const dialogRef = this.dialog.open(AjouterArticlesComponent, {
+    width: '100%',
+    height: '700px', data: {
+      fromPage: this.table,
+      local: this.source
+    }
+  });
+  dialogRef.afterClosed().subscribe(res => {   
+    console.log(res)
+    if (res != undefined) {
+      for (let i = 0; i < res.data.length; i++) {
+        let index = this.table.findIndex(((x: any) => parseInt(x.id_Produit) === parseInt(res.data[i].id_Produit)));
+
+        if (index != -1) {
+          this.table[index].qte = parseInt(this.table[index].qte);
+          this.table[index].qte += 1;    
+        }         
+      }
+    }
+  });
+}
+
+
+
+
+
+
   // set slocal source
   setsource()
   {
@@ -184,7 +198,7 @@ export class BonTransfertComponent implements OnInit {
   // ajouter ligne au table
   ajouter_article_table(art: any) {
 
-    console.log(art.id_Produit)
+     
     let test = 0;
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == art.id_Produit) {
