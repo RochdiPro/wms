@@ -51,7 +51,7 @@ export class ListerBonReceptionComponent implements OnInit {
   // lister bon de receptions 
   Bon_Receptions() {
     this.service.Bon_Receptions().subscribe((data: any) => {
-      this.bonReception = data;
+      this.bonReception = data;     
       this.bonReception = this.bonReception.sort((a: any, b: any) => a.id > b.id ? -1 : 1);
       this.dataSource.data = data as table[];
     })
@@ -130,7 +130,7 @@ export class ListerBonReceptionComponent implements OnInit {
       }
       else {
         Swal.fire({
-          title: " vous n'avez pas modifié ce bon de réception  ",
+          title: "Vous n'avez pas le droit de modifié ce bon de réception  ",
           icon: 'warning',
           showCancelButton: true,
           confirmButtonText: 'ok',

@@ -597,6 +597,7 @@ export class AjouterBonReceptionComponent implements OnInit {
      
 
     var formData: any = new FormData();
+   
     let url = "assets/BonRecpetion.xml";
 
 
@@ -616,7 +617,19 @@ export class AjouterBonReceptionComponent implements OnInit {
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);
-
+        if (this.bonEntree_selected) {
+          this.archiver_bel();
+        }
+        else if (this.bonEntree_impo_selected) {
+          this.archiver_bei();
+        }
+        else if (this.bontransfert_selected) {           
+          this.archiver_b_transfert();
+        }
+        else if (this.bonrtour_selected) {
+           this.archiver_b_retour();
+        }
+        
         this.service.createBonReception(formData).subscribe((data) => {
           this.bon_reception = data
           Swal.fire(
@@ -635,12 +648,13 @@ export class AjouterBonReceptionComponent implements OnInit {
                 if (result.isConfirmed) {
 
                   this.generatePDF(this.bon_reception.id, this.bon_reception.date_Creation);
-                  this.router.navigate(['Menu/WMS-Reception/Lister']);
+                  
                 } else if (result.isDismissed) {
                   console.log('erreur  ');
                 }
               });
             }
+            this.router.navigate(['Menu/WMS-Reception/Lister']);
           });
         }, (err) => {
 
@@ -649,11 +663,39 @@ export class AjouterBonReceptionComponent implements OnInit {
         });
       });
 
-
-
-
   }
 
+  
+
+
+  // archiver le bon de entree local 
+  archiver_bel()
+  {
+    var formData2: any = new FormData();
+    formData2.append('Id_Bon', this.id);
+    this.service.archiver_bel(formData2).subscribe((res)=>{console.log(res)});
+  }
+  // archiver le bon de entree importation
+  archiver_bei()
+  {
+    var formData2: any = new FormData();
+    formData2.append('Id_Bon', this.id);
+    this.service.archiver_bei(formData2).subscribe((res)=>{console.log(res)});
+  }
+    // archiver le bon de entree retour 
+  archiver_b_retour()
+  {
+    var formData2: any = new FormData();
+    formData2.append('Id_Bon', this.id);
+    this.service.archiver_b_retour(formData2).subscribe((res)=>{console.log(res)});
+  }  
+  // archiver le bon de entree transfert 
+  archiver_b_transfert()
+  {
+    var formData2: any = new FormData();
+    formData2.append('Id_Bon', this.id);
+    this.service.archiver_b_transfert(formData2).subscribe((res)=>{console.log(res)});
+  }
 
   // conserver le bon si le etat non verifier 
   Conserver() {
@@ -757,9 +799,20 @@ export class AjouterBonReceptionComponent implements OnInit {
         formData.append('Type_Be', this.type_bon);
         formData.append('Detail', myFile);
         formData.append('Nb_Support', this.nbSupport);     
-        this.service.createBonReception(formData).subscribe(data => {
-         
 
+        if (this.bonEntree_selected) {
+          this.archiver_bel();
+        }
+        else if (this.bonEntree_impo_selected) {
+          this.archiver_bei();
+        }
+        else if (this.bontransfert_selected) {           
+          this.archiver_b_transfert();
+        }
+        else if (this.bonrtour_selected) {
+           this.archiver_b_retour();
+        }
+        this.service.createBonReception(formData).subscribe(data => {    
           Swal.fire(
             'Conserver',
             'Bon De Reception Conserver avec  Sucées',
@@ -771,9 +824,8 @@ export class AjouterBonReceptionComponent implements OnInit {
       });
 
 
-  }
+  } 
 
-  
   //convertir blob à un fichier  
   convertBlobFichier = (theBlob: Blob, fileName: string): File => {
     var b: any = theBlob;
@@ -980,7 +1032,18 @@ export class AjouterBonReceptionComponent implements OnInit {
 
     }).then((result) => {
       if (result.isConfirmed) {
-
+        if (this.bonEntree_selected) {
+          this.archiver_bel();
+        }
+        else if (this.bonEntree_impo_selected) {
+          this.archiver_bei();
+        }
+        else if (this.bontransfert_selected) {           
+          this.archiver_b_transfert();
+        }
+        else if (this.bonrtour_selected) {
+           this.archiver_b_retour();
+        }
         const dialogRef = this.dialog.open(Ajouter_Bon_Rejet, {        
            
           width: 'auto',
@@ -1112,6 +1175,7 @@ export class Ajouter_Bon_Rejet {
         formData.append('Reclamations', this.reclamation);
 
         formData.append('Detail', myFile);
+        
         this.service.creer_BonR_ejet(formData).subscribe(data => {
           
           this.bon_rejet = data

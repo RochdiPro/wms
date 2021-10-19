@@ -22,7 +22,7 @@ export class BonReceptionServiceService {
 
   /// get liste of bon entree local
   Liste_Bon_Entree(): Observable<any> {
-    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Locals").pipe(
+    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Local_En_Cours").pipe(
       catchError(this.handleError)
 
     );
@@ -30,14 +30,14 @@ export class BonReceptionServiceService {
 
   /// get liste of bon entree inportation
   Liste_Bon_Entree_Importaion(): Observable<any> {
-    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Importations").pipe(
+    return this.httpClient.get(ERP + "Fiche_Bon_Entree_Importation_En_Cours").pipe(
       catchError(this.handleError)
 
     );
   }
   /// get liste of bon entree de retour
   liste_Bon_Retour(): Observable<any> {
-    return this.httpClient.get(ERP + "Bon_Retours").pipe(
+    return this.httpClient.get(ERP + "Bon_Retour_En_Cours").pipe(
       catchError(this.handleError)
 
     );
@@ -55,7 +55,7 @@ export class BonReceptionServiceService {
 
   // lister le bon des transfert 
   Liste_Bon_Transfert(): Observable<any> {
-    return this.httpClient.get(ERP + "Bon_Transferts").pipe(
+    return this.httpClient.get(ERP + "Bon_Transfert_En_Cours").pipe(
       catchError(this.handleError)
 
     );
@@ -290,6 +290,24 @@ export class BonReceptionServiceService {
           Id: Id
         }, responseType: 'blob'
       }).pipe(catchError(this.handleError))
+  }
+
+  archiver_bel(form:any)
+  {
+    return this.httpClient.post(ERP + "Archiver_Fiche_Bon_Entree_Local", form ).pipe(catchError(this.handleError));
+  }
+
+  archiver_bei(form:any)
+  {
+    return this.httpClient.post(ERP + "Archiver_Fiche_Bon_Entree_Importation", form ).pipe(catchError(this.handleError));
+  }
+  archiver_b_retour(form:any)
+  {
+    return this.httpClient.post(ERP + "Archiver_Bon_Retour", form ).pipe(catchError(this.handleError));
+  }
+  archiver_b_transfert(form:any)
+  {
+    return this.httpClient.post(ERP + "Archiver_Bon_Transfert", form ).pipe(catchError(this.handleError));
   }
 /*S
 
