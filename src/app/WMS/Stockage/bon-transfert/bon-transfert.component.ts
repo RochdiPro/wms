@@ -1,4 +1,4 @@
- 
+
 import { DatePipe } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Component, ElementRef, Inject, OnInit, ViewChild } from "@angular/core";
@@ -7,7 +7,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dial
 import { MatStepper } from "@angular/material/stepper";
 import { Router } from "@angular/router";
 import Swal from "sweetalert2";
- 
+
 import { StockageService } from "../stockage.service";
 
 import { BrowserModule } from '@angular/platform-browser';
@@ -15,7 +15,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isNgTemplate } from "@angular/compiler";
 import { AjouterArticlesComponent } from "../dialog/ajouter-articles/ajouter-articles.component";
- 
+
 
 declare var require: any
 
@@ -31,7 +31,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 })
 export class BonTransfertComponent implements OnInit {
   isLinear = true;
-  localform : any = FormGroup;
+  localform: any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
   cloture: any = FormGroup;
@@ -39,16 +39,16 @@ export class BonTransfertComponent implements OnInit {
   liste_articles: any;
   table: any = [];
   object: any = {};
-  locals:any;
-  source :any
-  destination:any;
-  
-  @ViewChild('stepper') private myStepper: any = MatStepper;
-  constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
+  locals: any;
+  source: any
+  destination: any;
 
-   
-    this.service.locals().subscribe((data:any) => {
-      this.locals=data
+  @ViewChild('stepper') private myStepper: any = MatStepper;
+  constructor(private datePipe: DatePipe, private http: HttpClient, private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog, private router: Router) {
+
+
+    this.service.locals().subscribe((data: any) => {
+      this.locals = data
     })
 
     this.chargementModel();
@@ -56,9 +56,9 @@ export class BonTransfertComponent implements OnInit {
   }
 
 
-  modele:any;
-   // temps d'attente pour le traitement de fonction 
-   delai(ms: number) {
+  modele: any;
+  // temps d'attente pour le traitement de fonction 
+  delai(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
   // conversion de modele de pdf  en base 64 
@@ -82,7 +82,7 @@ export class BonTransfertComponent implements OnInit {
   }
 
 
-   
+
   ngOnInit() {
 
     this.localform = this._formBuilder.group({
@@ -90,15 +90,15 @@ export class BonTransfertComponent implements OnInit {
       destination: ['', Validators.required],
     });
     this.selectform = this._formBuilder.group({
-   
-      code: ['', Validators.required],
-      id: ['', Validators.required],
-      id2: ['', Validators.required]
+
+      code: [''],
+      id: [''],
+      id2: ['']
     });
 
 
     this.secondFormGroup = this._formBuilder.group({
-      
+
     });
 
     this.cloture = this._formBuilder.group({
@@ -107,14 +107,10 @@ export class BonTransfertComponent implements OnInit {
     });
   }
 
-  test:any;
+  test: any;
   // check local source et destination  
-  suivant2()
-  {
-     console.log("jj"+this.source+"jj")
-
-    if ( this.destination+"" ==  this.source  +"" && !(this.source  +"" =="undefined")   )
-     {
+  suivant2() {
+    if (this.destination + "" == this.source + "" && !(this.source + "" == "undefined")) {
       Swal.fire({
         title: ' même local  ',
         icon: 'warning',
@@ -122,36 +118,33 @@ export class BonTransfertComponent implements OnInit {
         confirmButtonText: 'ok',
 
       })
-    }else{
+    } else {
       this.myStepper.next();
-      
+
     }
-     
+
   }
+  
 
- //** open Dialog */
- openDialog() {
-  const dialogRef = this.dialog.open(AjouterArticlesComponent, {
-    width: '100%',
-    height: '700px', data: {
-      fromPage: this.table,
-      local: this.source
-    }
-  });
-  dialogRef.afterClosed().subscribe(res => {   
-    console.log(res)
-    if (res != undefined) {
-      for (let i = 0; i < res.data.length; i++) {
-        let index = this.table.findIndex(((x: any) => parseInt(x.id_Produit) === parseInt(res.data[i].id_Produit)));
-
-        if (index != -1) {
-          this.table[index].qte = parseInt(this.table[index].qte);
-          this.table[index].qte += 1;    
-        }         
+  resultat_dialog: any;
+  //** open Dialog */
+  openDialog() {
+    const dialogRef = this.dialog.open(AjouterArticlesComponent, {
+      height: '600px', data: {
+        fromPage: this.table,
+        local: this.source
       }
-    }
-  });
-}
+    });
+    dialogRef.afterClosed().subscribe(res => {
+      console.log(res)
+      this.resultat_dialog = res.data
+      if (res != undefined) {
+        for (let i = 0; i < this.resultat_dialog.length; i++) {
+          this.ajouter_article_table(this.resultat_dialog[i])
+        }
+      }
+    });
+  }
 
 
 
@@ -159,15 +152,14 @@ export class BonTransfertComponent implements OnInit {
 
 
   // set slocal source
-  setsource()
-  {
-      this.source=this.localform.source
-    
+  setsource() {
+    this.source = this.localform.source
+    this.table=[]
+
   }
   // set local destination
-  setdestination()
-  {
-    this.destination=this.localform.destination
+  setdestination() {
+    this.destination = this.localform.destination
   }
   // Ajouter article au liste a traver le choix
   Ajouter_Article_avec_choix() {
@@ -176,29 +168,72 @@ export class BonTransfertComponent implements OnInit {
     })
     this.selectform.id2 = ""
   }
+  
+  obj:any={}
   // Ajouter article au liste a traver le code a barre 
   Ajouter_Article_avec_code() {
     this.service.Arrticle_CodeBare(this.selectform.code).subscribe((data) => {
-
-      this.ajouter_article_table(data)
+      this.obj=data;
+      this.service.quentiteProdLocal( data.id_Produit,this.source).subscribe((data2)=>
+      {
+      
+         if(Number(data2.body) >0)
+         {
+           this.obj.qteStock=data2.body
+           this.ajouter_article_table(this.obj)
+         }
+         else{
+          Swal.fire({
+            title: '  Quantité non disponible   ',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ok',
+    
+          })
+         }
+            
+      });
+   //   
     })
     this.selectform.code = ""
   }
   // Ajouter article au liste a traver le id
   Ajouter_Article_avec_id() {
     this.service.Article_Id(this.selectform.id).subscribe((data) => {
+      this.obj=data;
+      this.service.quentiteProdLocal( data.id_Produit,this.source).subscribe((data2)=>
+      {
+        
+         if(Number(data2.body) >0)
+         {
+           this.obj.qteStock=data2.body
+           this.ajouter_article_table(this.obj)
+         }
+         else{
+          Swal.fire({
+            title: '  Quantité non disponible   ',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ok',
+    
+          })
+         }
+            
+      });
 
-      this.ajouter_article_table(data)
+
+      
     })
     this.selectform.id = ""
   }
 
+ 
 
 
   // ajouter ligne au table
   ajouter_article_table(art: any) {
 
-     
+  
     let test = 0;
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == art.id_Produit) {
@@ -208,6 +243,7 @@ export class BonTransfertComponent implements OnInit {
     }
     if (test == 0) {
       this.object = {}
+      this.object.qteStock = art.qteStock
       this.object.id = art.id_Produit
       this.object.nom = art.nom_Produit
       this.object.qte = 1
@@ -221,8 +257,6 @@ export class BonTransfertComponent implements OnInit {
         this.object.type = "serie"
 
       }
-
-      console.log(this.object)
       this.table.push(this.object)
     }
   }
@@ -271,7 +305,7 @@ export class BonTransfertComponent implements OnInit {
 
   // detail article 
   plus(produit: any) {
-     
+
     if (produit.type == "simple") {
       Swal.fire({
         title: ' Produit Simple ',
@@ -304,26 +338,24 @@ export class BonTransfertComponent implements OnInit {
 
   }
 
-  valide()
-  {
-     this.creer_Bon_transfert();
+  valide() {
+    this.creer_Bon_transfert();
   }
 
-  doc:any ;
-  bontransfert:any;
+  doc: any;
+  bontransfert: any;
   // creer bon sortie 
-  creer_Bon_transfert()
-  {
+  creer_Bon_transfert() {
     this.doc = document.implementation.createDocument("Bon_Transfert", "", null);
 
     var BR = this.doc.createElement("Bon_Transfert");
- 
+
     var Local = this.doc.createElement("Local"); Local.innerHTML = this.cloture.local
 
-    var InformationsGenerales = this.doc.createElement("Informations-Generales");   
-     
+    var InformationsGenerales = this.doc.createElement("Informations-Generales");
+
     var Responsable = this.doc.createElement("Responsable"); Responsable.innerHTML = "Responsable";
-    InformationsGenerales.appendChild(Local); 
+    InformationsGenerales.appendChild(Local);
     InformationsGenerales.appendChild(Responsable);
     var Produits_Listes = this.doc.createElement('Produits')
 
@@ -340,18 +372,15 @@ export class BonTransfertComponent implements OnInit {
       Produit.appendChild(Nom);
       Produit.appendChild(Qte);
 
-   
-      if(this.table[i].type=='simple')
-      {
+
+      if (this.table[i].type == 'simple') {
         Produits_simple.appendChild(Produit);
       }
-      else if (this.table[i].type=='serie') 
-      {
+      else if (this.table[i].type == 'serie') {
         var n_series = this.doc.createElement('N_Series'); Qte.innerHTML = this.table[i].qte
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
+        for (let j = 0; j < this.table[i].detail.length; j++) {
           var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
-  
+
           n_series.appendChild(ns);
         }
         console.log(n_series)
@@ -359,11 +388,9 @@ export class BonTransfertComponent implements OnInit {
         Produits_series.appendChild(Produit)
 
       }
-      else if (this.table[i].type=='4g') 
-      {
+      else if (this.table[i].type == '4g') {
         var p4gs = this.doc.createElement('Produit_4gs'); Qte.innerHTML = this.table[i].qte
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
+        for (let j = 0; j < this.table[i].detail.length; j++) {
           var p4g = this.doc.createElement('Produit_4g'); Qte.innerHTML = this.table[i].qte
           var ns = this.doc.createElement('N_Serie'); ns.innerHTML = this.table[i].detail[j].ns
           var e1 = this.doc.createElement('E1'); e1.innerHTML = this.table[i].detail[j].e1
@@ -372,16 +399,16 @@ export class BonTransfertComponent implements OnInit {
           p4g.appendChild(e1);
           p4g.appendChild(e2);
           p4gs.appendChild(p4g);
-          
+
         }
         Produit.appendChild(p4gs)
         Produits_4g.appendChild(Produit)
-      } 
+      }
       Produits_Listes.appendChild(Produits_simple)
       Produits_Listes.appendChild(Produits_4g)
       Produits_Listes.appendChild(Produits_series)
     }
-    
+
     BR.appendChild(InformationsGenerales);
     BR.appendChild(Produits_Listes);
 
@@ -398,16 +425,16 @@ export class BonTransfertComponent implements OnInit {
         var myBlob = new Blob([xml2string], { type: 'application/xml' });
         var myFile = this.convertBlobFichier(myBlob, "assets/BonRejet.xml");
 
-        
-    
+
+
         formData.append('Responsable', "User transfert ");
         formData.append('Local_Destination', this.destination);
-        formData.append('Local_Source',this.source );   
+        formData.append('Local_Source', this.source);
         formData.append('Description', this.cloture.reclamation);
 
         formData.append('Detail', myFile);
         this.service.creer_Bon_Transfert(formData).subscribe(data => {
-           
+
           this.bontransfert = data
           Swal.fire({
             title: 'Bon Transfert!',
@@ -422,156 +449,152 @@ export class BonTransfertComponent implements OnInit {
 
             if (result.isConfirmed) {
 
-                this.generatePDF(this.bontransfert.id_Bon_Transfert, this.bontransfert.date_Creation)
+              this.generatePDF(this.bontransfert.id_Bon_Transfert, this.bontransfert.date_Creation)
 
             }
 
           })
         });
 
-      //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Transfert'])
+        //  this.router.navigate(['/Menu/WMS-Inventaire/Lister_Bon_Transfert'])
       })
   }
-   //convertir blob à un fichier  
-   convertBlobFichier = (theBlob: Blob, fileName: string): File => {
+  //convertir blob à un fichier  
+  convertBlobFichier = (theBlob: Blob, fileName: string): File => {
     var b: any = theBlob;
     b.lastModifiedDate = new Date();
     b.name = fileName;
     return <File>theBlob;
   }
 
-  ch:any
+  ch: any
   modeleSrc: any;
   //impression de la fiche recption
   generatePDF(id: any, date_Creation: any) {
 
     var body = [];
-     
+
     for (let i = 0; i < this.table.length; i++) {
       var obj = new Array();
       obj.push(this.table[i].id);
-      obj.push(this.table[i].nom);     
-      obj.push(this.table[i].qte); 
-      this.ch=""
-      if (this.table[i].type=='serie') 
-      {
-        
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
-          this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n" 
-          this.ch=this.ch+" ----------------------  \n"  
+      obj.push(this.table[i].nom);
+      obj.push(this.table[i].qte);
+      this.ch = ""
+      if (this.table[i].type == 'serie') {
+
+        for (let j = 0; j < this.table[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
+          this.ch = this.ch + " ----------------------  \n"
         }
-       
+
 
       }
-      else if (this.table[i].type=='4g') 
-      {
-       
-        for(let j = 0 ; j<this.table[i].detail.length; j++)
-        {
-           this.ch=this.ch+"N_Série : "+this.table[i].detail[j].ns +"\n"     
-           this.ch=this.ch+"E1 : "+this.table[i].detail[j].e1 +"\n"     
-           this.ch=this.ch+"E2 : "+this.table[i].detail[j].e2 +"\n"  
-           this.ch=this.ch+" ----------------------  \n"  
-            
+      else if (this.table[i].type == '4g') {
+
+        for (let j = 0; j < this.table[i].detail.length; j++) {
+          this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
+          this.ch = this.ch + "E1 : " + this.table[i].detail[j].e1 + "\n"
+          this.ch = this.ch + "E2 : " + this.table[i].detail[j].e2 + "\n"
+          this.ch = this.ch + " ----------------------  \n"
+
         }
-        
-        
-      }   
+
+
+      }
       obj.push(this.ch)
       body.push(obj);
-    }    
-    
+    }
+
     var def = {
-      
-      
+
+
       defaultStyle: {
         // alignment: 'justify'
       },
       pageMargins: [40, 250, 40, 180],
       info: {
         title: 'Fiche Bon Transfert',
-       },
-      footer: function (currentPage:any, pageCount:any) {
+      },
+      footer: function (currentPage: any, pageCount: any) {
         return {
           margin: 35,
           columns: [
             {
               fontSize: 9,
               text: [
-  
+
                 {
                   text: currentPage.toString() + '/' + pageCount,
                 }
               ],
-              relativePosition: {x:250, y: 130}	
-            } 
+              relativePosition: { x: 250, y: 130 }
+            }
           ]
         };
       },
-      header:[ 
+      header: [
         {
           text: '' + id + '\n\n',
-          fontSize: 15, 
+          fontSize: 15,
           color: 'black',
           bold: true,
-          relativePosition: {x:365, y:181}	       
+          relativePosition: { x: 365, y: 181 }
         },
-      {
-        text: ' ' + this.source ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:110, y:107}	  , 
-         
-      },
-      
-      {
-        text: 'rochdi' ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:390, y:96}	  , 
-         
-      },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:520, y:85}	 , 
-         
-      },
-     
-      
-      {
-        text: ' ' +this.cloture.reclamation ,
-        fontSize: 10, 
-        color: 'black',            
-        relativePosition: {x: 80, y:665}	       
-      }, 
-      {
-        text: ' ' + this.destination,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:110, y:131}	       
-      },
-      {
-        text: 'rochdi' ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:110, y:154}	       
-      },
-      {
-        text: ''+this.datePipe.transform(date_Creation, 'dd/MM/yyyy')  ,
-        fontSize: 10, 
-        color: 'black',
-        bold: true,
-        relativePosition: {x:65, y:179}	       
-      },
-     ] ,
+        {
+          text: ' ' + this.source,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 107 },
+
+        },
+
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 390, y: 96 },
+
+        },
+        {
+          text: '' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 520, y: 85 },
+
+        },
+
+
+        {
+          text: ' ' + this.cloture.reclamation,
+          fontSize: 10,
+          color: 'black',
+          relativePosition: { x: 80, y: 665 }
+        },
+        {
+          text: ' ' + this.destination,
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 131 }
+        },
+        {
+          text: 'rochdi',
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 110, y: 154 }
+        },
+        {
+          text: '' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
+          fontSize: 10,
+          color: 'black',
+          bold: true,
+          relativePosition: { x: 65, y: 179 }
+        },
+      ],
       background: [
         {
           image: 'data:image/jpeg;base64,' + this.modeleSrc, width: 600
@@ -579,23 +602,23 @@ export class BonTransfertComponent implements OnInit {
       ],
 
       content: [
-       
+
         {
           layout: 'lightHorizontalLines',
-          table: {          
-            widths: [ 40, 270, 20,180 ],         
-            body: body, 
-          },      
-          fontSize: 10, 
-          margin: [-30, 0 , 10,300]     
+          table: {
+            widths: [40, 270, 20, 180],
+            body: body,
+          },
+          fontSize: 10,
+          margin: [-30, 0, 10, 300]
         }
-        
-         
+
+
       ],
-      
+
     };
 
-    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_transfert'+id+'.pdf' });
+    pdfMake.createPdf(def).open({ defaultFileName: 'Fiche_transfert' + id + '.pdf' });
 
   }
 
@@ -615,7 +638,19 @@ export class ligne_transfert {
     this.obj = data.object
   }
   modifier(ev: any) {
-    this.obj.qte = ev.target.value
+ 
+    if (Number(this.obj.qteStock) < Number(ev.target.value)) {
+      Swal.fire({
+        title: '  Quantité non disponible   ',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ok',
+
+      })
+      this.obj.qte = 1
+    } else {
+      this.obj.qte = ev.target.value
+    }
   }
   //fermer dialogue
   close() {
@@ -633,9 +668,10 @@ export class ligne_transfert {
 export class Detail4g_transfert {
   obj: any;
   inst: any = {}
-  numero_Serie:any;
-  constructor(public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
+  numero_Serie: any;
+  constructor(private http: HttpClient,public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
+   
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
       this.inst.ns = ""
@@ -644,36 +680,89 @@ export class Detail4g_transfert {
       this.obj.detail.push(this.inst)
     }
    
-  this.select_nserie();
+    while (this.obj.detail.length>this.obj.qte)
+    {
+      this.obj.detail.splice(this.obj.detail.length-1, 1);
+    }
+    this.select_nserie();
   }
 
-select_nserie()
-{
-  this.service.Detail_Produit_4g(this.obj.id).subscribe((data2)=>
-  {
-     this.numero_Serie=data2;   
-     
-  })    
-}
+  select_nserie() {
+    this.service.Detail_Produit_4g(this.obj.id).subscribe((data2) => {
+      this.numero_Serie = data2;
 
-   d:any;
-  save(ns: any, obj: any ,id:any,i :any) {
-    obj.ns=ns    
-    this.service.Detail_Produit_N_serie(ns,id).subscribe((data3)=>
-    {
-      this.d=data3;
-      console.log(data3)
-      console.log(this.d)
-      console.log(this.d.e1+"  "+this.d.e2)
-      obj.e1=this.d.e1
-      obj.e2=this.d.e2
     })
-    
-    
-    this.numero_Serie.splice(i,1);       
+  }
+
+  d: any;
+  save(ns: any, obj: any, id: any, i: any) {
+    obj.ns = ns
+    this.service.Detail_Produit_N_serie(ns, id).subscribe((data3) => {
+      this.d = data3;     
+      obj.e1 = this.d.e1
+      obj.e2 = this.d.e2
+    })
+
+
+    this.numero_Serie.splice(i, 1);
   }
 
   
+  csvContent:any
+
+  onFileLoad(fileLoadedEvent:any) {
+    const textFromFileLoaded = fileLoadedEvent.target.result;              
+    this.csvContent = textFromFileLoaded;     
+    // alert(this.csvContent);
+}
+
+obj2:any={}
+public  Array: any = [];
+  onFileSelected(event:any) {
+    const file:File = event.target.files[0]; 
+    const fileReader = new FileReader();
+    fileReader.onloadend = () => {
+     
+      let csvToRowArray = (fileReader.result+"").split("\n");
+      for (let index = 0; index < csvToRowArray.length; index++) {
+        this.obj2={}
+        let row = csvToRowArray[index].split("\r") ;
+        this.obj2.ns=row[0]
+     
+        this.Array.push(this.obj2);
+       
+      }
+      console.log(this.Array);
+      for(let j = 0 ; j<this.obj.detail.length; j++)
+      {
+        this.obj.detail[j].ns = this.Array[j].ns
+        
+        this.service.Detail_Produit_N_serie( this.Array[j].ns,this.obj.id).subscribe((data3) => {
+         
+          this.d = data3;    
+          this.obj.detail[j].ns 
+          this.obj.detail[j].e1 = this.d.e1
+          this.obj.detail[j].e2 = this.d.e2
+        })
+         
+          
+      }
+      
+    }
+
+    fileReader.readAsText(file, "UTF-8");
+     
+  }
+
+    
+
+      
+    
+ 
+
+ 
+   
+
   //fermer dialogue
   close() {
     this.dialogRef.close();
@@ -689,33 +778,38 @@ select_nserie()
 export class detail_serie_transfert {
   obj: any;
   inst: any = {}
-  
-  numero_Serie:any;
-  @ViewChild('input') input:any=ElementRef; 
-  constructor(public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
+
+  numero_Serie: any;
+  @ViewChild('input') input: any = ElementRef;
+  constructor(private http: HttpClient ,public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
       this.inst.ns = ""
       this.obj.detail.push(this.inst)
     }
-    
+
     this.select_nserie();
   }
 
-  select_nserie()
-  {
-    this.service.numero_Serie_Produit(this.obj.id).subscribe((data2)=>
-    {
-       this.numero_Serie=data2;   
-       
-    })    
+  select_nserie() {
+    this.service.numero_Serie_Produit(this.obj.id).subscribe((data2) => {
+      this.numero_Serie = data2;
+
+    })
   }
+
+  save(ns: any, obj: any, i: any) {
+    obj.ns = ns
+
+  }
+
+  public userArray: any = [];
+    obj2 :any ={};
   
-  save(ns: any, obj: any ,i :any) {
-    obj.ns=ns    
-     
-  }
+ 
+
+
   //fermer dialogue
   close() {
     this.dialogRef.close();
