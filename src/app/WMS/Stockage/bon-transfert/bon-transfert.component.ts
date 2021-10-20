@@ -30,7 +30,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['./bon-transfert.component.scss']
 })
 export class BonTransfertComponent implements OnInit {
-  isLinear = false;
+  isLinear = true;
   localform: any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
@@ -340,11 +340,15 @@ export class BonTransfertComponent implements OnInit {
 
   valide() {
     if (this.cloture.reclamation != 'undefined') { this.cloture.reclamation = "-" }
-    let test = 1
+    let test = "1"
     for (let i = 0; i < this.table.length; i++) {
-      if (this.table.complet + "" == "Quantité non vérifiée") { test = 0 }
+       console.log(this.table[i].complet + "" == "Quantité non vérifiée")
+      if (this.table[i].complet + "" == "Quantité non vérifiée") { test = "0" }
     }
-    if (test = 1)
+   
+
+    if (test == "0")
+    {
       Swal.fire({
         title: 'Bon de Transfert ne pas être fini   ',
         icon: 'warning',
@@ -352,8 +356,9 @@ export class BonTransfertComponent implements OnInit {
         confirmButtonText: 'ok',
 
       })
+    }
     else {
-      this.creer_Bon_transfert();
+       this.creer_Bon_transfert();
     }
   }
 
@@ -486,9 +491,20 @@ export class BonTransfertComponent implements OnInit {
   modeleSrc: any;
   //impression de la fiche recption
   generatePDF(id: any, date_Creation: any) {
-
+    var body2 = [];
+    var obj2 = new Array();
+    obj2.push("ID");
+    obj2.push("N° Serie");
+    obj2.push("N° IMEI 1");
+    obj2.push("N° IMEI 2");
+   
+    body2.push(obj2);
     var body = [];
-
+    var obj = new Array();
+    obj.push("");
+    obj.push("");
+    obj.push("");
+    body.push(obj);
     for (let i = 0; i < this.table.length; i++) {
       var obj = new Array();
       obj.push(this.table[i].id);
@@ -500,6 +516,12 @@ export class BonTransfertComponent implements OnInit {
         for (let j = 0; j < this.table[i].detail.length; j++) {
           this.ch = this.ch + "N_Série : " + this.table[i].detail[j].ns + "\n"
           this.ch = this.ch + " ----------------------  \n"
+          var obj2 = new Array();
+          obj2.push(this.table[i].id);
+          obj2.push(this.table[i].detail[j].ns);
+          obj2.push("-");
+          obj2.push("-");
+          body2.push(obj2);
         }
 
 
@@ -511,14 +533,20 @@ export class BonTransfertComponent implements OnInit {
           this.ch = this.ch + "E1 : " + this.table[i].detail[j].e1 + "\n"
           this.ch = this.ch + "E2 : " + this.table[i].detail[j].e2 + "\n"
           this.ch = this.ch + " ----------------------  \n"
-
+          var obj2 = new Array();
+          obj2.push(this.table[i].id);
+          obj2.push(this.table[i].detail[j].ns);
+          obj2.push(this.table[i].detail[j].e1 );
+          obj2.push(this.table[i].detail[j].e2 );
+          body2.push(obj2);
         }
 
 
       }
-      obj.push(this.ch)
+    //  obj.push(this.ch)
       body.push(obj);
     }
+    let date_edit = this.datePipe.transform(new Date(), 'dd/MM/yyyy  | HH:MM');
 
     var def = {
 
@@ -539,7 +567,7 @@ export class BonTransfertComponent implements OnInit {
               text: [
 
                 {
-                  text: currentPage.toString() + '/' + pageCount,
+                  text: currentPage.toString() + '/' + pageCount+"                                           éditer le  "+date_edit,
                 }
               ],
               relativePosition: { x: 250, y: 130 }
@@ -577,7 +605,7 @@ export class BonTransfertComponent implements OnInit {
           fontSize: 10,
           color: 'black',
           bold: true,
-          relativePosition: { x: 520, y: 85 },
+          relativePosition: { x: 520, y: 96 },
 
         },
 
@@ -595,19 +623,13 @@ export class BonTransfertComponent implements OnInit {
           bold: true,
           relativePosition: { x: 110, y: 131 }
         },
-        {
-          text: 'rochdi',
-          fontSize: 10,
-          color: 'black',
-          bold: true,
-          relativePosition: { x: 110, y: 154 }
-        },
+         
         {
           text: '' + this.datePipe.transform(date_Creation, 'dd/MM/yyyy'),
           fontSize: 10,
           color: 'black',
           bold: true,
-          relativePosition: { x: 65, y: 179 }
+          relativePosition: { x: 70, y: 156 }
         },
       ],
       background: [
@@ -621,11 +643,22 @@ export class BonTransfertComponent implements OnInit {
         {
           layout: 'lightHorizontalLines',
           table: {
-            widths: [40, 270, 20, 180],
+            widths: [80, 415, 34 ],
             body: body,
           },
           fontSize: 10,
-          margin: [-30, 0, 10, 300]
+          margin: [-16, -8 , 20,20]
+        },
+       
+        
+        {
+           
+          table: { 
+            widths: [80, 130, 130,130 ],           
+            body: body2,
+          },
+          fontSize: 10,
+         
         }
 
 

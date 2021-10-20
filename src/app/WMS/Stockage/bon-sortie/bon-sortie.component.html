@@ -2,7 +2,7 @@
   <mat-step [stepControl]="selectform">
     <form>
       <ng-template matStepLabel>Liste des articles </ng-template>
-
+      
       <div class="row">
         <br>
         <div class="col-md-4">
@@ -28,7 +28,7 @@
               <mat-option *ngFor="let art of liste_articles" value="{{art.id_Produit}}">{{art.nom_Produit}}</mat-option>
             </mat-select>
           </mat-form-field>
-           <i  (click)="Ajouter_Article_avec_choix()" class="fas fa-plus-square"></i> 
+           <i  (click)="openDialog()" class="fas fa-plus-square"></i> 
         </div>
       </div>
       <div class="row mat-elevation-z8">
@@ -105,7 +105,7 @@
             <td>
               <input type="text" value="{{article.qte}}" disabled />
             </td>
-            <td style="text-align: center;"> <i  class="pe-7s-look btn-b" title="plus" (click)="plus(article)"></i> </td>
+            <td style="text-align: center;"> <i class="pe-7s-edit" title="spécifications Articles" (click)="plus(article)"></i> </td>
 
           </tr>
         </tbody>
@@ -137,6 +137,7 @@
                 <th>ID Article</th>
                 <th>Nom Article</th>
                 <th>Quanitité</th>
+                <th> </th>
 
               </tr>
             </thead>
@@ -146,7 +147,7 @@
                 <td>{{article.id}} </td>
                 <td>{{article.nom}} </td>
                 <td>{{article.qte}} </td>
-
+                <td>{{article.complet}} </td>
               </tr>
 
             </tbody>
@@ -155,14 +156,7 @@
       </div>
       <div class="col-md-4 mb-4">
 
-        <div class="col-md-4">
-          <mat-form-field>
-            <mat-label>Local</mat-label>
-            <mat-select [(ngModel)]="cloture.local" [ngModelOptions]="{standalone: true}">
-              <mat-option *ngFor="let l of locals" value="{{l.nom_Local}}">{{l.nom_Local}}</mat-option>
-            </mat-select>
-          </mat-form-field>           
-        </div>
+      
         <h4>Réclamation</h4>
         <textarea   [(ngModel)]="cloture.reclamation" [ngModelOptions]="{standalone: true}"
         matInput rows="5" cols="100" placeholder="Réclamation"></textarea>

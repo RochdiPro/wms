@@ -13,6 +13,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isNgTemplate } from "@angular/compiler";
+import { AjouterArticlesComponent } from "../dialog/ajouter-articles/ajouter-articles.component";
 
 declare var require: any
 
@@ -35,16 +36,16 @@ export class BonSortieComponent implements OnInit {
   liste_articles: any;
   table: any = [];
   object: any = {};
-  locals:any;
+   local:any
   @ViewChild('stepper') private myStepper: any = MatStepper;
   constructor( private datePipe: DatePipe,private http: HttpClient,private _formBuilder: FormBuilder, public service: StockageService, public dialog: MatDialog ,private router: Router) {
 
     // this.service.liste_articles().subscribe((data: any) => {
     //   this.liste_articles = data;
     // });
-    this.service.locals().subscribe((data:any) => {
-      this.locals=data
-    })
+    sessionStorage.setItem('local', "tunis");
+    this.local= sessionStorage.getItem('local'); 
+      
 
     this.chargementModel();
     this.modelePdfBase64();
@@ -79,9 +80,9 @@ export class BonSortieComponent implements OnInit {
   ngOnInit() {
 
     this.selectform = this._formBuilder.group({
-      code: ['', Validators.required],
-      id: ['', Validators.required],
-      id2: ['', Validators.required]
+      code: ['' ],
+      id: ['' ],
+      id2: ['' ]
     });
 
 
@@ -90,7 +91,7 @@ export class BonSortieComponent implements OnInit {
     });
 
     this.cloture = this._formBuilder.group({
-      local: ['', Validators.required],
+     
       reclamation: ['.', Validators.required]
     });
   }
@@ -103,21 +104,79 @@ export class BonSortieComponent implements OnInit {
     })
     this.selectform.id2 = ""
   }
+  obj: any = {}
   // Ajouter article au liste a traver le code a barre 
   Ajouter_Article_avec_code() {
     this.service.Arrticle_CodeBare(this.selectform.code).subscribe((data) => {
+      this.obj = data;
+      this.service.quentiteProdLocal(data.id_Produit, this.local).subscribe((data2) => {
 
-      this.ajouter_article_table(data)
+        if (Number(data2.body) > 0) {
+          this.obj.qteStock = data2.body
+          this.ajouter_article_table(this.obj)
+        }
+        else {
+          Swal.fire({
+            title: '  Quantité non disponible   ',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ok',
+
+          })
+        }
+
+      });
+      //   
     })
     this.selectform.code = ""
   }
   // Ajouter article au liste a traver le id
   Ajouter_Article_avec_id() {
     this.service.Article_Id(this.selectform.id).subscribe((data) => {
+      this.obj = data;
+      this.service.quentiteProdLocal(data.id_Produit, this.local).subscribe((data2) => {
 
-      this.ajouter_article_table(data)
+        if (Number(data2.body) > 0) {
+          this.obj.qteStock = data2.body
+          this.ajouter_article_table(this.obj)
+        }
+        else {
+          Swal.fire({
+            title: '  Quantité non disponible   ',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ok',
+
+          })
+        }
+
+      });
+
+
+
     })
     this.selectform.id = ""
+  }
+
+  resultat_dialog: any;
+  //** open Dialog */
+  openDialog() {
+  
+    const dialogRef = this.dialog.open(AjouterArticlesComponent, {
+      height: '600px', data: {
+        fromPage: this.table,
+        local: this.local
+      }
+    });
+    dialogRef.afterClosed().subscribe(res => {
+      console.log(res)
+      this.resultat_dialog = res.data
+      if (res != undefined) {
+        for (let i = 0; i < this.resultat_dialog.length; i++) {
+          this.ajouter_article_table(this.resultat_dialog[i])
+        }
+      }
+    });
   }
 
 
@@ -125,7 +184,7 @@ export class BonSortieComponent implements OnInit {
   // ajouter ligne au table
   ajouter_article_table(art: any) {
 
-    console.log(art.id_Produit)
+ 
     let test = 0;
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == art.id_Produit) {
@@ -138,18 +197,20 @@ export class BonSortieComponent implements OnInit {
       this.object.id = art.id_Produit
       this.object.nom = art.nom_Produit
       this.object.qte = 1
+      this.object.complet = "Quantité vérifiée"
+
       this.object.type = "simple"
       this.object.detail = []
       if (art.n_Imei == 'true') {
         this.object.type = "4g"
+        this.object.complet = "Quantité non vérifiée"
 
 
       } else if (art.n_Serie == 'true') {
         this.object.type = "serie"
+        this.object.complet = "Quantité non vérifiée"
 
       }
-
-      console.log(this.object)
       this.table.push(this.object)
     }
   }
@@ -233,20 +294,28 @@ export class BonSortieComponent implements OnInit {
 
   valide()
   {
-    if ( this.cloture.local    )
-    {
-   this.Creer_Bon_Sortie();
+    if (this.cloture.reclamation != 'undefined') { this.cloture.reclamation = "-" }
+    let test = "1"
+    for (let i = 0; i < this.table.length; i++) {
+       console.log(this.table[i].complet + "" == "Quantité non vérifiée")
+      if (this.table[i].complet + "" == "Quantité non vérifiée") { test = "0" }
     }
-    else
+   
+
+    if (test == "0")
     {
       Swal.fire({
-        title: ' Local  ',
+        title: 'Bon de Transfert ne pas être fini   ',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'ok',
 
       })
     }
+    else {
+   this.Creer_Bon_Sortie();
+    }
+    
   }
 
   doc:any ;
