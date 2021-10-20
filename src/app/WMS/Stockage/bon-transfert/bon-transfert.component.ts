@@ -30,7 +30,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
   styleUrls: ['./bon-transfert.component.scss']
 })
 export class BonTransfertComponent implements OnInit {
-  isLinear = true;
+  isLinear = false;
   localform: any = FormGroup;
   selectform: any = FormGroup;
   secondFormGroup: any = FormGroup;
@@ -124,7 +124,7 @@ export class BonTransfertComponent implements OnInit {
     }
 
   }
-  
+
 
   resultat_dialog: any;
   //** open Dialog */
@@ -154,7 +154,7 @@ export class BonTransfertComponent implements OnInit {
   // set slocal source
   setsource() {
     this.source = this.localform.source
-    this.table=[]
+    this.table = []
 
   }
   // set local destination
@@ -168,72 +168,68 @@ export class BonTransfertComponent implements OnInit {
     })
     this.selectform.id2 = ""
   }
-  
-  obj:any={}
+
+  obj: any = {}
   // Ajouter article au liste a traver le code a barre 
   Ajouter_Article_avec_code() {
     this.service.Arrticle_CodeBare(this.selectform.code).subscribe((data) => {
-      this.obj=data;
-      this.service.quentiteProdLocal( data.id_Produit,this.source).subscribe((data2)=>
-      {
-      
-         if(Number(data2.body) >0)
-         {
-           this.obj.qteStock=data2.body
-           this.ajouter_article_table(this.obj)
-         }
-         else{
+      this.obj = data;
+      this.service.quentiteProdLocal(data.id_Produit, this.source).subscribe((data2) => {
+
+        if (Number(data2.body) > 0) {
+          this.obj.qteStock = data2.body
+          this.ajouter_article_table(this.obj)
+        }
+        else {
           Swal.fire({
             title: '  Quantité non disponible   ',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'ok',
-    
+
           })
-         }
-            
+        }
+
       });
-   //   
+      //   
     })
     this.selectform.code = ""
   }
   // Ajouter article au liste a traver le id
   Ajouter_Article_avec_id() {
     this.service.Article_Id(this.selectform.id).subscribe((data) => {
-      this.obj=data;
-      this.service.quentiteProdLocal( data.id_Produit,this.source).subscribe((data2)=>
-      {
-        
-         if(Number(data2.body) >0)
-         {
-           this.obj.qteStock=data2.body
-           this.ajouter_article_table(this.obj)
-         }
-         else{
+      this.obj = data;
+      this.service.quentiteProdLocal(data.id_Produit, this.source).subscribe((data2) => {
+
+        if (Number(data2.body) > 0) {
+          this.obj.qteStock = data2.body
+          this.ajouter_article_table(this.obj)
+        }
+        else {
           Swal.fire({
             title: '  Quantité non disponible   ',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'ok',
-    
+
           })
-         }
-            
+        }
+
       });
 
 
-      
+
     })
     this.selectform.id = ""
   }
 
- 
+
 
 
   // ajouter ligne au table
   ajouter_article_table(art: any) {
 
-  
+
     let test = 0;
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == art.id_Produit) {
@@ -247,14 +243,18 @@ export class BonTransfertComponent implements OnInit {
       this.object.id = art.id_Produit
       this.object.nom = art.nom_Produit
       this.object.qte = 1
+      this.object.complet = "Quantité vérifiée"
+
       this.object.type = "simple"
       this.object.detail = []
       if (art.n_Imei == 'true') {
         this.object.type = "4g"
+        this.object.complet = "Quantité non vérifiée"
 
 
       } else if (art.n_Serie == 'true') {
         this.object.type = "serie"
+        this.object.complet = "Quantité non vérifiée"
 
       }
       this.table.push(this.object)
@@ -262,11 +262,11 @@ export class BonTransfertComponent implements OnInit {
   }
   //modifier ligne de table
   Modifier_ligne_table(id: any) {
-    console.log(id)
+
     this.object = {}
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == id) {
-
+        this.table[i].complet = "Quantité non vérifiée"
         const dialogRef = this.dialog.open(ligne_transfert, {
 
           width: 'auto',
@@ -339,7 +339,22 @@ export class BonTransfertComponent implements OnInit {
   }
 
   valide() {
-    this.creer_Bon_transfert();
+    if (this.cloture.reclamation != 'undefined') { this.cloture.reclamation = "-" }
+    let test = 1
+    for (let i = 0; i < this.table.length; i++) {
+      if (this.table.complet + "" == "Quantité non vérifiée") { test = 0 }
+    }
+    if (test = 1)
+      Swal.fire({
+        title: 'Bon de Transfert ne pas être fini   ',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ok',
+
+      })
+    else {
+      this.creer_Bon_transfert();
+    }
   }
 
   doc: any;
@@ -638,7 +653,7 @@ export class ligne_transfert {
     this.obj = data.object
   }
   modifier(ev: any) {
- 
+
     if (Number(this.obj.qteStock) < Number(ev.target.value)) {
       Swal.fire({
         title: '  Quantité non disponible   ',
@@ -660,7 +675,7 @@ export class ligne_transfert {
 
 
 
-//Detail serie 
+//Detail 4g 
 @Component({
   selector: 'detail4g',
   templateUrl: 'detail4g.html',
@@ -669,9 +684,9 @@ export class Detail4g_transfert {
   obj: any;
   inst: any = {}
   numero_Serie: any;
-  constructor(private http: HttpClient,public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
+  constructor(private http: HttpClient, public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
-   
+
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
       this.inst.ns = ""
@@ -679,12 +694,19 @@ export class Detail4g_transfert {
       this.inst.e2 = ""
       this.obj.detail.push(this.inst)
     }
-   
-    while (this.obj.detail.length>this.obj.qte)
-    {
-      this.obj.detail.splice(this.obj.detail.length-1, 1);
+
+    while (this.obj.detail.length > this.obj.qte) {
+      this.obj.detail.splice(this.obj.detail.length - 1, 1);
     }
     this.select_nserie();
+  }
+
+  check_qte() {
+    this.obj.complet = "Quantité  vérifiée"
+    for (let j = 0; j < this.obj.detail.length; j++) {
+      if ((this.obj.detail[j].ns + "" == "") == true) { this.obj.complet = "Quantité non vérifiée" }
+
+    }
   }
 
   select_nserie() {
@@ -698,70 +720,60 @@ export class Detail4g_transfert {
   save(ns: any, obj: any, id: any, i: any) {
     obj.ns = ns
     this.service.Detail_Produit_N_serie(ns, id).subscribe((data3) => {
-      this.d = data3;     
+      this.d = data3;
       obj.e1 = this.d.e1
       obj.e2 = this.d.e2
     })
 
-
+    this.check_qte()
     this.numero_Serie.splice(i, 1);
   }
 
-  
-  csvContent:any
 
-  onFileLoad(fileLoadedEvent:any) {
-    const textFromFileLoaded = fileLoadedEvent.target.result;              
-    this.csvContent = textFromFileLoaded;     
+  csvContent: any
+
+  onFileLoad(fileLoadedEvent: any) {
+    const textFromFileLoaded = fileLoadedEvent.target.result;
+    this.csvContent = textFromFileLoaded;
     // alert(this.csvContent);
-}
+  }
 
-obj2:any={}
-public  Array: any = [];
-  onFileSelected(event:any) {
-    const file:File = event.target.files[0]; 
+  obj2: any = {}
+  public Array: any = [];
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
     const fileReader = new FileReader();
     fileReader.onloadend = () => {
-     
-      let csvToRowArray = (fileReader.result+"").split("\n");
+
+      let csvToRowArray = (fileReader.result + "").split("\n");
       for (let index = 0; index < csvToRowArray.length; index++) {
-        this.obj2={}
-        let row = csvToRowArray[index].split("\r") ;
-        this.obj2.ns=row[0]
-     
+        this.obj2 = {}
+        let row = csvToRowArray[index].split("\r");
+        this.obj2.ns = row[0]
+
         this.Array.push(this.obj2);
-       
+
       }
       console.log(this.Array);
-      for(let j = 0 ; j<this.obj.detail.length; j++)
-      {
+      for (let j = 0; j < this.obj.detail.length; j++) {
         this.obj.detail[j].ns = this.Array[j].ns
-        
-        this.service.Detail_Produit_N_serie( this.Array[j].ns,this.obj.id).subscribe((data3) => {
-         
-          this.d = data3;    
-          this.obj.detail[j].ns 
+        this.obj.detail[j].ns = ""
+        this.obj.detail[j].e1 = ""
+        this.obj.detail[j].e2 = "" 
+        this.service.Detail_Produit_N_serie(this.Array[j].ns, this.obj.id).subscribe((data3) => { 
+          this.d = data3;
+          this.obj.detail[j].ns
           this.obj.detail[j].e1 = this.d.e1
           this.obj.detail[j].e2 = this.d.e2
         })
-         
-          
       }
-      
+
     }
 
     fileReader.readAsText(file, "UTF-8");
-     
+    this.check_qte()
   }
 
-    
-
-      
-    
- 
-
- 
-   
 
   //fermer dialogue
   close() {
@@ -781,7 +793,7 @@ export class detail_serie_transfert {
 
   numero_Serie: any;
   @ViewChild('input') input: any = ElementRef;
-  constructor(private http: HttpClient ,public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
+  constructor(private http: HttpClient, public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}
@@ -790,6 +802,14 @@ export class detail_serie_transfert {
     }
 
     this.select_nserie();
+  }
+
+  check_qte() {
+    this.obj.complet = "Quantité  vérifiée"
+    for (let j = 0; j < this.obj.detail.length; j++) {
+      if ((this.obj.detail[j].ns + "" == "") == true) { this.obj.complet = "Quantité non vérifiée" }
+
+    }
   }
 
   select_nserie() {
@@ -801,13 +821,46 @@ export class detail_serie_transfert {
 
   save(ns: any, obj: any, i: any) {
     obj.ns = ns
+    this.check_qte()
 
   }
+  csvContent: any
 
-  public userArray: any = [];
-    obj2 :any ={};
-  
- 
+  onFileLoad(fileLoadedEvent: any) {
+    const textFromFileLoaded = fileLoadedEvent.target.result;
+    this.csvContent = textFromFileLoaded;
+    // alert(this.csvContent);
+  }
+
+  obj2: any = {}
+  public Array: any = [];
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    const fileReader = new FileReader();
+    fileReader.onloadend = () => {
+
+      let csvToRowArray = (fileReader.result + "").split("\n");
+      for (let index = 0; index < csvToRowArray.length; index++) {
+        this.obj2 = {}
+        let row = csvToRowArray[index].split("\r");
+        this.obj2.ns = row[0]
+
+        this.Array.push(this.obj2);
+
+      }
+     
+      for (let j = 0; j < this.obj.detail.length; j++) {
+        this.obj.detail[j].ns = this.Array[j].ns
+        
+      }
+
+    }
+
+    fileReader.readAsText(file, "UTF-8");
+    this.check_qte()
+  }
+
+
 
 
   //fermer dialogue

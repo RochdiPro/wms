@@ -27,5 +27,8 @@
 </div>
 
 <div mat-dialog-actions class="float-right">
+       
+    <input type="file" class="file-input"
+    (change)="onFileSelected($event)" #fileUpload>
     <button class="mb-2 mr-2 btn btn-primary" (click)="close()">Fermer</button>
 </div>
