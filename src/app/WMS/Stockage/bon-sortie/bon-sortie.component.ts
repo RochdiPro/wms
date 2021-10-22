@@ -14,7 +14,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isNgTemplate } from "@angular/compiler";
 import { AjouterArticlesComponent } from "../dialog/ajouter-articles/ajouter-articles.component";
-
+import { Detail4g, detail_serie, ligne } from "../bon-transfert/bon-transfert.component";
+ 
 declare var require: any
 
 const pdfMake = require("pdfmake/build/pdfmake");
@@ -269,7 +270,7 @@ export class BonSortieComponent implements OnInit {
 
       })
     } else if (produit.type == "4g") {
-      const dialogRef = this.dialog.open(Detail4g, {
+      const dialogRef = this.dialog.open(Detail4g , {
 
         width: 'auto',
         data: { object: produit }
@@ -278,7 +279,7 @@ export class BonSortieComponent implements OnInit {
       });
     } else if (produit.type == "serie") {
 
-      const dialogRef = this.dialog.open(detail_serie, {
+      const dialogRef = this.dialog.open(detail_serie , {
 
         width: 'auto',
         data: { object: produit }
@@ -605,121 +606,4 @@ export class BonSortieComponent implements OnInit {
 
 
 
-
-//modifier table dialogue
-@Component({
-  selector: 'ligne_table',
-  templateUrl: 'ligne_table.html',
-})
-export class ligne {
-  obj: any;
-  constructor(public dialogRef: MatDialogRef<ligne>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
-    this.obj = data.object
-  }
-  modifier(ev: any) {
-    this.obj.qte = ev.target.value
-  }
-  //fermer dialogue
-  close() {
-    this.dialogRef.close();
-  }
-}
-
-
-
-//Detail serie 
-@Component({
-  selector: 'detail4g',
-  templateUrl: 'detail4g.html',
-})
-export class Detail4g {
-  obj: any;
-  inst: any = {}
-  numero_Serie:any;
-  constructor(public dialogRef: MatDialogRef<Detail4g>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder ,private service:StockageService) {
-    this.obj = data.object
-    while (this.obj.detail.length < this.obj.qte) {
-      this.inst = {}
-      this.inst.ns = ""
-      this.inst.e1 = ""
-      this.inst.e2 = ""
-      this.obj.detail.push(this.inst)
-    }
-   
-  this.select_nserie();
-  }
-
-select_nserie()
-{
-  this.service.Detail_Produit_4g(this.obj.id).subscribe((data2)=>
-  {
-     this.numero_Serie=data2;   
-     
-  })    
-}
-
-   d:any;
-  save(ns: any, obj: any ,id:any,i :any) {
-    obj.ns=ns    
-    this.service.Detail_Produit_N_serie(ns,id).subscribe((data3)=>
-    {
-      this.d=data3;
-      console.log(data3)
-      console.log(this.d)
-      console.log(this.d.e1+"  "+this.d.e2)
-      obj.e1=this.d.e1
-      obj.e2=this.d.e2
-    })
-    
-    
-    this.numero_Serie.splice(i,1);       
-  }
-
-  
-  //fermer dialogue
-  close() {
-    this.dialogRef.close();
-  }
-}
-
-
-//Detail 4g 
-@Component({
-  selector: 'detail_serie',
-  templateUrl: 'detail_serie.html',
-})
-export class detail_serie {
-  obj: any;
-  inst: any = {}
-  
-  numero_Serie:any;
-  @ViewChild('input') input:any=ElementRef; 
-  constructor(public dialogRef: MatDialogRef<detail_serie>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder , private service:StockageService) {
-    this.obj = data.object
-    while (this.obj.detail.length < this.obj.qte) {
-      this.inst = {}
-      this.inst.ns = ""
-      this.obj.detail.push(this.inst)
-    }
-    
-    this.select_nserie();
-  }
-
-  select_nserie()
-  {
-    this.service.numero_Serie_Produit(this.obj.id).subscribe((data2)=>
-    {
-       this.numero_Serie=data2;   
-       
-    })    
-  }
-  
-  save(ns: any, obj: any ,i :any) {
-    obj.ns=ns    
-     
-  }
-  //fermer dialogue
-  close() {
-    this.dialogRef.close();
-  }
-}
+ 

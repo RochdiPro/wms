@@ -267,7 +267,7 @@ export class BonTransfertComponent implements OnInit {
     for (let i = 0; i < this.table.length; i++) {
       if (this.table[i].id == id) {
         this.table[i].complet = "Quantité non vérifiée"
-        const dialogRef = this.dialog.open(ligne_transfert, {
+        const dialogRef = this.dialog.open(ligne , {
 
           width: 'auto',
           data: { object: this.table[i] }
@@ -315,7 +315,7 @@ export class BonTransfertComponent implements OnInit {
 
       })
     } else if (produit.type == "4g") {
-      const dialogRef = this.dialog.open(Detail4g_transfert, {
+      const dialogRef = this.dialog.open(Detail4g , {
 
         width: 'auto',
         data: { object: produit }
@@ -324,7 +324,7 @@ export class BonTransfertComponent implements OnInit {
       });
     } else if (produit.type == "serie") {
 
-      const dialogRef = this.dialog.open(detail_serie_transfert, {
+      const dialogRef = this.dialog.open(detail_serie , {
 
         width: 'auto',
         data: { object: produit }
@@ -677,12 +677,12 @@ export class BonTransfertComponent implements OnInit {
 
 //modifier table dialogue
 @Component({
-  selector: 'ligne_table',
-  templateUrl: 'ligne_table.html',
+  selector: 'ligne',
+  templateUrl: './../../dialogue/ligne_table.html',
 })
-export class ligne_transfert {
+export class ligne {
   obj: any;
-  constructor(public dialogRef: MatDialogRef<ligne_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
+  constructor(public dialogRef: MatDialogRef<ligne>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder) {
     this.obj = data.object
   }
   modifier(ev: any) {
@@ -711,13 +711,13 @@ export class ligne_transfert {
 //Detail 4g 
 @Component({
   selector: 'detail4g',
-  templateUrl: 'detail4g.html',
+  templateUrl: './../../dialogue/detail4g.html',
 })
-export class Detail4g_transfert {
+export class Detail4g {
   obj: any;
   inst: any = {}
   numero_Serie: any;
-  constructor(private http: HttpClient, public dialogRef: MatDialogRef<Detail4g_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
+  constructor(private http: HttpClient, public dialogRef: MatDialogRef<Detail4g>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
 
     while (this.obj.detail.length < this.obj.qte) {
@@ -815,18 +815,18 @@ export class Detail4g_transfert {
 }
 
 
-//Detail 4g 
+//Detail  _serie
 @Component({
   selector: 'detail_serie',
-  templateUrl: 'detail_serie.html',
+  templateUrl: './../../dialogue/detail_serie.html',
 })
-export class detail_serie_transfert {
+export class detail_serie  {
   obj: any;
   inst: any = {}
 
   numero_Serie: any;
   @ViewChild('input') input: any = ElementRef;
-  constructor(private http: HttpClient, public dialogRef: MatDialogRef<detail_serie_transfert>, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
+  constructor(private http: HttpClient, public dialogRef: MatDialogRef<detail_serie >, @Inject(MAT_DIALOG_DATA) public data: any, private _formBuilder: FormBuilder, private service: StockageService) {
     this.obj = data.object
     while (this.obj.detail.length < this.obj.qte) {
       this.inst = {}

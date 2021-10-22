@@ -1,11 +1,11 @@
 <div mat-dialog-content>
 
-    <table class="mb-0 table">
+    <table>
         <tbody>
             <tr *ngFor="let object  of obj.detail ">
                 <th>
                     <mat-form-field appearance="fill">
-                        <mat-label>N_Série</mat-label>
+                         
                         <mat-select>
                             <!-- "  -->
                             <mat-option value="item.n_Serie" *ngFor="let item of numero_Serie ; let i=index"
@@ -23,5 +23,11 @@
 </div>
 
 <div mat-dialog-actions class="float-right">
+   
+     <input type="file" class="file-input"
+       (change)="onFileSelected($event)" #fileUpload>
+
+ 
+
     <button class="mb-2 mr-2 btn btn-primary" (click)="close()">Fermer</button>
 </div>

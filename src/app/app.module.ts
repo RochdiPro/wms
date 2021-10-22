@@ -21,7 +21,7 @@ import {ModifierBonReceptionComponent,Modifier_Support } from './WMS/Bon-Recepti
 import { BonRejetComponent } from './WMS/Bon-Reception/bon-rejet/bon-rejet.component';
 import { EntreeBonReceptionComponent } from './WMS/Stockage/entree/entree-bon-reception/entree-bon-reception.component';
 import { EditInventaireComponent } from './WMS/inventaire/edit-inventaire/edit-inventaire.component';
-import { BonSortieComponent ,ligne ,Detail4g,detail_serie} from './WMS/Stockage/bon-sortie/bon-sortie.component';
+import { BonSortieComponent} from './WMS/Stockage/bon-sortie/bon-sortie.component';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table'  
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -29,10 +29,10 @@ import {MatInputModule} from '@angular/material/input';
 import { ListerBonSortieComponent } from './WMS/Stockage/lister-bon-sortie/lister-bon-sortie.component';
 import { DatePipe } from '@angular/common';
 import { EditStockageComponent } from './WMS/Stockage/edit-stockage/edit-stockage.component';
-import { BonTransfertComponent ,ligne_transfert,Detail4g_transfert,detail_serie_transfert} from './WMS/Stockage/bon-transfert/bon-transfert.component';
+import { BonTransfertComponent ,ligne ,Detail4g ,detail_serie } from './WMS/Stockage/bon-transfert/bon-transfert.component';
 import { ListerBonTransfertComponent } from './WMS/Stockage/lister-bon-transfert/lister-bon-transfert.component';
 import { ListerBonRetourComponent } from './WMS/Stockage/lister-bon-retour/lister-bon-retour.component';
-import { BonRetourComponent ,ligne_retour,Detail4g_retour,detail_serie_retour, } from './WMS/Stockage/bon-retour/bon-retour.component';
+import { BonRetourComponent, Detail4g_retour, detail_serie_retour, ligne_retour   } from './WMS/Stockage/bon-retour/bon-retour.component';
 import {MatDatepickerModule } from '@angular/material/datepicker';
  
 import {MatRadioModule} from '@angular/material/radio';
@@ -62,7 +62,7 @@ import { SearchFilterPipe } from './WMS/Stockage/dialog/search-filter-pipe/searc
    BonSortieComponent,ligne,Detail4g,detail_serie,
    ListerBonSortieComponent,
    BonTransfertComponent,
-   ligne_transfert,Detail4g_transfert,detail_serie_transfert,
+   ligne ,Detail4g ,detail_serie ,
    ListerBonTransfertComponent, ListerBonRetourComponent, 
    BonRetourComponent,
    ligne_retour,Detail4g_retour,detail_serie_retour, AjouterArticlesComponent,
